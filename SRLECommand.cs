@@ -12,10 +12,10 @@ namespace SRLE
     {
         public override bool Execute(string[] args)
         {
-            List<string> sectorList = new List<string>();
             List<string> sectors =
                 "Main Nav|Crystals|Cliffs|Mountains|Solid Filler|Rocks|Ranch Features|Doors|Trees|Ceiling|Flora|Grass|Deco|Constructs|Resources|Slimes|FX|Lights|Water|Colliders|Loot|Audio|Build Sites|Interactives|Upgrades|Cave Roof|Race Waypoints|ValleyAmmoSwapTrigger|Giant Trees|Main Nav Internal|Solid FIller|Constructions|".Split('|').ToList();
             List<int> hashcodes = new List<int>();
+            List<GameObject> listOfCategory = new List<GameObject>();
 
                 foreach (var cellDirector in Resources.FindObjectsOfTypeAll<CellDirector>())
                 {
@@ -23,8 +23,7 @@ namespace SRLE
                     if (sector is null) continue;
                     foreach (Transform elements in sector)
                     {
-                        if (!sectorList.Contains(elements.gameObject.name))
-                            sectorList.Add(elements.gameObject.name);
+
 
                         if (sectors.Exists(s => s == elements.gameObject.name))
                         {
@@ -76,7 +75,7 @@ namespace SRLE
                                         
                                         if (num2 != -1)
                                         {
-                                            list.Add(miniElement.gameObject);   
+                                            listOfCategory.Add(miniElement.gameObject);   
                                         }
                                         
                                         
@@ -136,7 +135,7 @@ namespace SRLE
                                 }
                                 if (num2 != -1 && ignore)
                                 {
-                                    list.Add(element.gameObject);   
+                                    listOfCategory.Add(element.gameObject);   
                                 }
                     
 
@@ -150,11 +149,7 @@ namespace SRLE
                     
                     
                 }
-                string sectorString = "";
-                foreach (var VARIABLE in sectorList)
-                {
-                    sectorString += "|" + VARIABLE;
-                }
+
                 uint aa = 1;
 
                 bool InBounds (int index, string[] array) 
@@ -190,7 +185,7 @@ namespace SRLE
 
                 }
 
-                foreach (var element in list)
+                foreach (var element in listOfCategory)
                 {
                     var path = element.GetFullName();
                     var strings = path.Split('/', '/');

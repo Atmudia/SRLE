@@ -2,4 +2,5 @@
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSlimeRancherModding_005CAssembliesSRML_005CSRML_002DPublicized_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSlimeRancherModding_005CAssembliesSRML_005CDebuggingMod_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSlimeRancherModding_005CAssembliesSRML_005C0Harmony_002Edll/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSlimeRancherModding_005CAssembliesSRML_005CAssembly_002DCSharp_005Fold_002DPublicized_002Edll/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSlimeRancherModding_005CAssembliesSRML_005CAssembly_002DCSharp_005Fold_002DPublicized_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_005CSRML_005CLibs_005CNewtonsoft_002EJson_002Edll/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

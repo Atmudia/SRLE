@@ -78,6 +78,9 @@
           <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\mscorlib.dll</HintPath>
           <Private>True</Private>
         </Reference>
+        <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+          <HintPath>..\..\..\SteamLibrary\steamapps\common\Slime Rancher\SRML\Libs\Newtonsoft.Json.dll</HintPath>
+        </Reference>
         <Reference Include="SRML, Version=0.1.8.2, Culture=neutral, PublicKeyToken=null">
           <HintPath>..\..\AssembliesSRML\SRML-Publicized.dll</HintPath>
         </Reference>
@@ -416,9 +419,15 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="EntryPoint.cs" />
+        <Compile Include="IdClass.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="SaveSystem\SRLEId.cs" />
         <Compile Include="SaveSystem\SRLEName.cs" />
+        <Compile Include="SaveSystem\SRLESave.cs" />
+        <Compile Include="SRLECommand.cs" />
+        <Compile Include="SRLEManager.cs" />
         <Compile Include="SRObjects.cs" />
+        <Compile Include="SRLEPlaceObjectsCommand.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />
