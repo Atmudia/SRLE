@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using DebuggingMod;
-using DebuggingMod.Extensions;
 using HarmonyLib;
 using SRLE.SaveSystem;
 using SRML;
