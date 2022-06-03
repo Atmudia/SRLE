@@ -67,12 +67,12 @@ namespace SRLE
                 objects = new Dictionary<SRLEId, List<SRLESave>>()
             }.Write(new FileInfo(Worlds.FullName + @"\Testing.srle").Open(FileMode.OpenOrCreate));
             */
+            
             SRCallbacks.PreSaveGameLoad += menu =>
             {
                 SRLEName name = new SRLEName();
                 var fileStream = new FileInfo(Worlds.FullName + @"\Testing.srle").Open(FileMode.Open);
                 name.Load(fileStream);
-                fileStream.Dispose();
                 Console.Log(name.nameOfLevel);
                 foreach (var VARIABLE in name.objects)
                 {
@@ -98,7 +98,10 @@ namespace SRLE
 
                         
                     }
+                    fileStream.Dispose();
+                    
                 }
+                
 
             };
             

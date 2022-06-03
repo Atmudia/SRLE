@@ -35,8 +35,7 @@ namespace SRLE
             (srleSave.scale = new Vector3V02()).value = instantiateInactive.transform.localScale;
             srleSaves.Add(srleSave); 
             instantiateInactive.SetActive(true);
-            SRLEId o = new SRLEId();
-            o.id = @ulong;
+            SRLEId o = new SRLEId {id = @ulong};
             srleName.objects.Add(o, srleSaves);            
             stream.Dispose();
 

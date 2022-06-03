@@ -15,14 +15,17 @@ namespace SRLE.SaveSystem
         public override void LoadData(BinaryReader reader)
         {
             nameOfLevel = reader.ReadString();
-            objects = base.LoadDictionary<SRLEId, List<SRLESave>>(reader, (BinaryReader r) => PersistedDataSet.LoadPersistable<SRLEId>(r), PersistedDataSet.LoadList<SRLESave>);
+            objects = base.LoadDictionary<SRLEId, List<SRLESave>>(reader, PersistedDataSet.LoadPersistable<SRLEId>, PersistedDataSet.LoadList<SRLESave>);
             Console.Log(objects.Count.ToString());
         }
 
         public override void WriteData(BinaryWriter writer)
         {
             writer.Write(nameOfLevel);
-            base.WriteDictionary<SRLEId, List<SRLESave>>(writer, this.objects, WritePersistable, PersistedDataSet.WriteList<SRLESave>);        }
+            base.WriteDictionary<SRLEId, List<SRLESave>>(writer, this.objects, WritePersistable, PersistedDataSet.WriteList<SRLESave>);
+            Console.Log(objects.Count.ToString());
+
+        }
         
 
         public string nameOfLevel;
