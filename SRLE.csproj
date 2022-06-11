@@ -12,6 +12,7 @@
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <LangVersion>9</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -418,16 +419,24 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Components\SRLECamera.cs" />
         <Compile Include="EntryPoint.cs" />
+        <Compile Include="Extensions.cs" />
         <Compile Include="IdClass.cs" />
+        <Compile Include="Patch\Patch_AutoSaveDirector__SaveAllNow.cs" />
+        <Compile Include="Patch\Patch_IntroUI_Awake.cs" />
+        <Compile Include="Patch\Patch_RegionLoader_ForceUpdate.cs" />
+        <Compile Include="Patch\Patch_SavedGame_CreateNew.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="SaveSystem\SRLEId.cs" />
         <Compile Include="SaveSystem\SRLEName.cs" />
         <Compile Include="SaveSystem\SRLESave.cs" />
         <Compile Include="SRLECommand.cs" />
+        <Compile Include="SRLEUIManager.cs" />
+        <Compile Include="SRLE_CreateLevelCommand.cs" />
         <Compile Include="SRLEManager.cs" />
+        <Compile Include="SRLE_LoadLevelCommand.cs" />
         <Compile Include="SRObjects.cs" />
-        <Compile Include="SRLEPlaceObjectsCommand.cs" />
+        <Compile Include="SRLE_PlaceObjectCommand.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />

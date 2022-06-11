@@ -10,6 +10,11 @@ namespace SRLE
 
     }
 
+    public class ModdedIdClass : IdClass
+    {
+        public string modid;
+    }
+
     public class Category
     {
         public string CategoryName;

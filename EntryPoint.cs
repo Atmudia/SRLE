@@ -24,11 +24,12 @@ namespace SRLE
 {
     public class EntryPoint : ModEntryPoint
     {
+        
 
         public override void PreLoad()
         {
             DirectoryInfo SRLE = new DirectoryInfo(Environment.CurrentDirectory + "/SRLE");
-            DirectoryInfo Worlds = new DirectoryInfo(Environment.CurrentDirectory + "/SRLE/Worlds");
+            Console.Log("Test");
 
             if (!SRLE.Exists)
             {
@@ -40,72 +41,50 @@ namespace SRLE
             TranslationPatcher.AddUITranslation("l.srle.window_title", "SRLE - Slime Rancher Level Editor");
             TranslationPatcher.AddUITranslation("l.srle.load_a_level", "Load a Level");
             TranslationPatcher.AddUITranslation("l.srle.create_a_level", "Create a Level");
-
-            Console.RegisterCommand(new SRLEPlaceObjectsCommand());
+            Console.RegisterCommand(new SRLE_CreateLevelCommand());
+            //Console.RegisterCommand(new SRLE_PlaceObjectCommand());
+            //Console.RegisterCommand(new SRLE_LoadLevelCommand());
 
             SRLEManager.LoadObjectsFromBuildObjects();
 
 
-                /*SRLEName srleName = new SRLEName
+
+
+            SRCallbacks.OnMainMenuLoaded += menu =>
             {
-                nameOfLevel = "SRLETest", 
-                objects = new Dictionary<ulong, List<SRLESave>>()
-            };*/
-            /*var srleSaves = new List<SRLESave>
-            {
-                new SRLESave(new Vector3(74.1034F, 15.5003f, -63.4266f), new Vector3(0, 1, 0), new Vector3(10, 10, 10))
+
+                SRLEManager.currentData = null;
+                SRLEManager.isSRLELevel = false;
+                
+                
             };
-            
-            srleName.objects.Add(64, srleSaves);
-            //srleName.objects.Add(1415, srleSaves);
-            */
-
-
-            /*new SRLEName
+            SRCallbacks.PreSaveGameLoad += context =>
             {
-                nameOfLevel = "SRLETest", 
-                objects = new Dictionary<SRLEId, List<SRLESave>>()
-            }.Write(new FileInfo(Worlds.FullName + @"\Testing.srle").Open(FileMode.OpenOrCreate));
-            */
-            
-            SRCallbacks.PreSaveGameLoad += menu =>
-            {
-                SRLEName name = new SRLEName();
-                var fileStream = new FileInfo(Worlds.FullName + @"\Testing.srle").Open(FileMode.Open);
-                name.Load(fileStream);
-                Console.Log(name.nameOfLevel);
-                foreach (var VARIABLE in name.objects)
+                
+  
+                if (SRLEManager.isSRLELevel)
                 {
-                    Console.Log(VARIABLE.Key.id.ToString());
-                    SRLEManager.BuildObjects.TryGetValue(VARIABLE.Key.id, out var idClass);
-                    if (idClass != null)
+                    SRLEUIManager.LoadUIData();
+                    /*foreach (var currentDataObject in SRLEManager.currentData.objects)
                     {
-                        var instantiateInactive = GameObjectUtils.InstantiateInactive(GameObject.Find(idClass.Path));
-                        Vector3 position = Vector3.zero;
-                        Vector3 rotation = Vector3.zero;
-                        Vector3 scale = Vector3.zero;
+                        if (SRLEManager.BuildObjects.TryGetValue(currentDataObject.Key, out var @idClass))
+                        {
+                            foreach (var VARIABLE in currentDataObject.Value)
+                            {
 
-                        VARIABLE.Value.ForEach(save => position = save.position.value);
-                        VARIABLE.Value.ForEach(save => rotation = save.rotation.value);
-                        VARIABLE.Value.ForEach(save => scale = save.scale.value);
+                                var instantiateInactive = GameObjectUtils.InstantiateInactive(GameObject.Find(@idClass.Path));
+                                instantiateInactive.transform.localPosition = VARIABLE.position.value;
+                                instantiateInactive.transform.localRotation = Quaternion.Euler(VARIABLE.rotation.value);
+                                instantiateInactive.transform.localScale = VARIABLE.scale.value;
+                                instantiateInactive.SetActive(true);
 
-
-                        instantiateInactive.transform.position = position;
-                        instantiateInactive.transform.rotation = Quaternion.Euler(rotation);
-                        instantiateInactive.transform.localScale = scale;
-                        
-                        instantiateInactive.SetActive(true);
-
-                        
+                            }
+                        }
                     }
-                    fileStream.Dispose();
-                    
+                    */
                 }
                 
-
             };
-            
-                SRCallbacks.PreSaveGameLoad += context => { };
             
         }
     }

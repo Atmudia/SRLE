@@ -10,12 +10,9 @@ namespace SRLE.SaveSystem
     {
         public override string Identifier => "SRLESave";
         public override uint Version => 4U;
+        
 
 
-        public SRLESave()
-        {}
-        
-        
         public override void LoadData(BinaryReader reader)
         {
             position = PersistedDataSet.LoadPersistable<Vector3V02>(reader);
@@ -26,7 +23,6 @@ namespace SRLE.SaveSystem
 
         public override void WriteData(BinaryWriter writer)
         {
-            Console.Log(position.value.ToString());
             WritePersistable(writer, position);
             WritePersistable(writer, rotation);
             WritePersistable(writer, scale);
@@ -36,5 +32,6 @@ namespace SRLE.SaveSystem
         public Vector3V02 position;
         public Vector3V02 rotation;
         public Vector3V02 scale;
+        public string modid = "none";
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using MonomiPark.SlimeRancher.Persist;
-using MonomiPark.SlimeRancher.Serializable.Optional;
-using SRML.Console;
 
 namespace SRLE.SaveSystem
 {
@@ -15,20 +13,23 @@ namespace SRLE.SaveSystem
         public override void LoadData(BinaryReader reader)
         {
             nameOfLevel = reader.ReadString();
-            objects = base.LoadDictionary<SRLEId, List<SRLESave>>(reader, PersistedDataSet.LoadPersistable<SRLEId>, PersistedDataSet.LoadList<SRLESave>);
-            Console.Log(objects.Count.ToString());
-        }
+            isUsingModdedObjects = reader.ReadBoolean();
+            this.objects = base.LoadDictionary<ulong, List<SRLESave>>(reader, (BinaryReader r) => r.ReadUInt64(), (BinaryReader r) => PersistedDataSet.LoadList<SRLESave>(r));        }
 
         public override void WriteData(BinaryWriter writer)
         {
             writer.Write(nameOfLevel);
-            base.WriteDictionary<SRLEId, List<SRLESave>>(writer, this.objects, WritePersistable, PersistedDataSet.WriteList<SRLESave>);
-            Console.Log(objects.Count.ToString());
+            writer.Write(isUsingModdedObjects);
 
+            base.WriteDictionary<ulong, List<SRLESave>>(writer, this.objects, delegate(BinaryWriter w, ulong k)
+            {
+                w.Write(k);
+            }, PersistedDataSet.WriteList<SRLESave>);
         }
         
 
         public string nameOfLevel;
-        public Dictionary<SRLEId, List<SRLESave>> objects;
+        public bool isUsingModdedObjects = false;
+        public Dictionary<ulong, List<SRLESave>> objects = new Dictionary<ulong, List<SRLESave>>();
     }
 }
