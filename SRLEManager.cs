@@ -19,12 +19,12 @@ namespace SRLE
 
         internal static void LoadObjectsFromBuildObjects()
         {
-            JsonSerializer o = new JsonSerializer();
+           
         
-            List<Category> categories = null;
-            using (StreamReader streamReader = new StreamReader(EntryPoint.execAssembly.GetManifestResourceStream(typeof(EntryPoint), "buildobjects.txt")))
+            List<Category> categories;
+            using (StreamReader streamReader = new StreamReader(EntryPoint.execAssembly!.GetManifestResourceStream(typeof(EntryPoint), "buildobjects.txt")!))
             {
-                categories = o.Deserialize<List<Category>>(new JsonTextReader(streamReader));
+                categories =  new JsonSerializer().Deserialize<List<Category>>(new JsonTextReader(streamReader));
             }
 
             foreach (var category in categories)

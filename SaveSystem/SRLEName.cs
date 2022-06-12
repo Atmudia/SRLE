@@ -9,6 +9,10 @@ namespace SRLE.SaveSystem
         public override string Identifier => "SRLEName";
         public override uint Version => 0U;
 
+        public static SRLEName Create(string nameOFLevel) => new()
+        {
+            nameOfLevel = nameOFLevel
+        };
 
         public override void LoadData(BinaryReader reader)
         {
@@ -21,10 +25,10 @@ namespace SRLE.SaveSystem
             writer.Write(nameOfLevel);
             writer.Write(isUsingModdedObjects);
 
-            base.WriteDictionary<ulong, List<SRLESave>>(writer, this.objects, delegate(BinaryWriter w, ulong k)
+            base.WriteDictionary(writer, this.objects, delegate(BinaryWriter w, ulong k)
             {
                 w.Write(k);
-            }, PersistedDataSet.WriteList<SRLESave>);
+            }, WriteList);
         }
         
 
