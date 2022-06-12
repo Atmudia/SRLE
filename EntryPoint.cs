@@ -26,16 +26,19 @@ namespace SRLE
     {
         
 
+        public static Assembly execAssembly = Assembly.GetExecutingAssembly();
         public override void PreLoad()
         {
-            DirectoryInfo SRLE = new DirectoryInfo(Environment.CurrentDirectory + "/SRLE");
-            Console.Log("Test");
+        
+            
 
-            if (!SRLE.Exists)
+
+            /*if (!SRLEManager.SRLE.Exists)
             {
-                SRLE.Create();
-                SRLE.CreateSubdirectory("Worlds");
+                SRLEManager.SRLE.Create();
+                SRLEManager.SRLE.CreateSubdirectory("Worlds");
             }
+            */
 
             HarmonyInstance.PatchAll();
             TranslationPatcher.AddUITranslation("l.srle.window_title", "SRLE - Slime Rancher Level Editor");

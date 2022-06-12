@@ -13,12 +13,16 @@ namespace SRLE
         public static Dictionary<string, Dictionary<ulong, IdClass>> BuildObjects = new Dictionary<string, Dictionary<ulong, IdClass>>();
         public static SRLEName currentData;
         public static bool isSRLELevel;
-        public static DirectoryInfo Worlds = new DirectoryInfo(Environment.CurrentDirectory + "/SRLE/Worlds");
+        public static DirectoryInfo SRLE = new DirectoryInfo(Application.streamingAssetsPath.Replace("/SlimeRancher_Data/StreamingAssets", string.Empty) + "\\SRLE");
+        public static DirectoryInfo Worlds = SRLE.CreateSubdirectory("Worlds");
 
 
         internal static void LoadObjectsFromBuildObjects()
         {
-            List<Category> categories = JsonConvert.DeserializeObject<List<Category>>(File.ReadAllText(@"E:\SteamLibrary\steamapps\common\Slime Rancher\SRLE\BuildObjects\buildobjects.txt"));
+            string text = "";
+            using (StreamReader streamReader = new StreamReader(EntryPoint.execAssembly.GetManifestResourceStream(typeof(EntryPoint), "buildobjects.txt")))
+                text =streamReader.ReadToEnd();
+            List<Category> categories = JsonConvert.DeserializeObject<List<Category>>(text);
             foreach (var category in categories)
             {
                 foreach (var idClass in category.Objects)

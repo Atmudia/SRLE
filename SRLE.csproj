@@ -444,6 +444,9 @@
     <ItemGroup>
       <EmbeddedResource Include="modinfo.json" />
     </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="buildobjects.txt" />
+    </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 <PropertyGroup>
 	<PostBuildEvent>xcopy "$(ProjectDir)bin\Debug\$(AssemblyName).dll" "E:\SteamLibrary\steamapps\common\Slime Rancher\SRML\Mods\$(AssemblyName)\" /F /R /Y /I</PostBuildEvent>
