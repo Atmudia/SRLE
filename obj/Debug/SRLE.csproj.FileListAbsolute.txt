@@ -102,7 +102,6 @@ E:\SlimeRancherModding\Rider\SRLE\obj\Debug\SRLE.pdb
 C:\Users\jayin\Source\Repos\SRLE\bin\Debug\SRLE.dll
 C:\Users\jayin\Source\Repos\SRLE\bin\Debug\SRLE.pdb
 C:\Users\jayin\Source\Repos\SRLE\bin\Debug\Assembly-CSharp-firstpass.dll
-C:\Users\jayin\Source\Repos\SRLE\bin\Debug\Assembly-CSharp.dll
 C:\Users\jayin\Source\Repos\SRLE\bin\Debug\DOTween.dll
 C:\Users\jayin\Source\Repos\SRLE\bin\Debug\InControl.dll
 C:\Users\jayin\Source\Repos\SRLE\bin\Debug\InControl.Examples.dll
@@ -199,3 +198,6 @@ C:\Users\jayin\Source\Repos\SRLE\obj\Debug\SRLE.csproj.CoreCompileInputs.cache
 C:\Users\jayin\Source\Repos\SRLE\obj\Debug\SRLE.csproj.CopyComplete
 C:\Users\jayin\Source\Repos\SRLE\obj\Debug\SRLE.dll
 C:\Users\jayin\Source\Repos\SRLE\obj\Debug\SRLE.pdb
+C:\Users\jayin\source\repos\SRLE\bin\Debug\0Harmony.dll
+C:\Users\jayin\source\repos\SRLE\bin\Debug\Assembly-CSharp_old-Publicized.dll
+C:\Users\jayin\source\repos\SRLE\bin\Debug\Newtonsoft.Json.dll

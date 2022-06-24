@@ -5,7 +5,8 @@ using Newtonsoft.Json;
 using SRLE.SaveSystem;
 using SRML.Console;
 using UnityEngine;
-
+using System.Reflection;
+using System.Text;
 namespace SRLE
 {
     public static class SRLEManager
@@ -18,7 +19,7 @@ namespace SRLE
 
         internal static void LoadObjectsFromBuildObjects()
         {
-            List<Category> categories = JsonConvert.DeserializeObject<List<Category>>(File.ReadAllText(@"E:\SteamLibrary\steamapps\common\Slime Rancher\SRLE\BuildObjects\buildobjects.txt"));
+            List<Category> categories = JsonConvert.DeserializeObject<List<Category>>(Encoding.Default.GetString(Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(EntryPoint), "buildobjects.txt").ReadAllBytes()));
             foreach (var category in categories)
             {
                 foreach (var idClass in category.Objects)
