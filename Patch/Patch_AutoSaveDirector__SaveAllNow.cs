@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using SRML.Console;
 
 namespace SRLE.Patch
 {

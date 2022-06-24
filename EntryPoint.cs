@@ -1,24 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
-using HarmonyLib;
-using MonomiPark.SlimeRancher.Persist;
 using SRLE.Components;
-using SRLE.SaveSystem;
 using SRML;
-using SRML.Console;
 using SRML.SR;
 using SRML.SR.UI.Utils;
-using SRML.Utils;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI; 
 using Console = SRML.Console.Console;
-using Object = UnityEngine.Object;
 
 namespace SRLE
 {

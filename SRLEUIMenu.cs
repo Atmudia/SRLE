@@ -1,11 +1,5 @@
-﻿using System.Linq;
-using DebuggingMod;
-using DebuggingMod.Extensions;
-using SRLE.Components;
-using SRML.Console;
-using SRML.SR;
+﻿using SRLE.Components;
 using SRML.Utils;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -1,8 +1,5 @@
 ﻿using SRLE.Components;
-using SRML.Console;
-using SRML.Utils;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SRLE
 {

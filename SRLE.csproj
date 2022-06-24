@@ -47,9 +47,6 @@
     <Reference Include="Assembly-CSharp_old-Publicized">
       <HintPath>..\..\..\Downloads\Slime.Rancher.v1.4.4\Slime.Rancher.v1.4.4\SlimeRancher_Data\Managed\Assembly-CSharp_old-Publicized.dll</HintPath>
     </Reference>
-    <Reference Include="DebuggingMod, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\AssembliesSRML\DebuggingMod.dll</HintPath>
-    </Reference>
     <Reference Include="DOTween, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\DOTween.dll</HintPath>
       <Private>True</Private>
@@ -425,7 +422,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\LevelSummaryEntry.cs" />
+    <Compile Include="Components\LevelSummaryPanel.cs" />
     <Compile Include="Components\SRLECamera.cs" />
+    <Compile Include="Components\SRLELoadLevelUI.cs" />
+    <Compile Include="Components\SRLENewLevelUI.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IdClass.cs" />
@@ -437,7 +438,9 @@
     <Compile Include="SaveSystem\SRLEName.cs" />
     <Compile Include="SaveSystem\SRLESave.cs" />
     <Compile Include="SRLECommand.cs" />
+    <Compile Include="SRLESaveManager.cs" />
     <Compile Include="SRLEUIManager.cs" />
+    <Compile Include="SRLEUIMenu.cs" />
     <Compile Include="SRLE_CreateLevelCommand.cs" />
     <Compile Include="SRLEManager.cs" />
     <Compile Include="SRLE_LoadLevelCommand.cs" />

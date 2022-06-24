@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using MonomiPark.SlimeRancher;
-using SRML.Console;
 
 namespace SRLE.Patch
 {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using DebuggingMod.Extensions;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -36,8 +35,6 @@ namespace SRLE
             catch (UnityException e)
             {
                 Console.Log(e.Message);
-                gObject.PrintComponents();
-
                 return null;
             }
 

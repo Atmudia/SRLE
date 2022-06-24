@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using SRLE.SaveSystem;
-using SRML.Console;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

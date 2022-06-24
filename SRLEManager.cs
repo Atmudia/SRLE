@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using SRLE.SaveSystem;
-using SRML.Console;
 using UnityEngine;
-using System.Reflection;
-using System.Text;
+
 namespace SRLE
 {
     public static class SRLEManager

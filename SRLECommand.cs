@@ -4,7 +4,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using SRML.Console;
 using UnityEngine;
-using static SRLE.EntryPoint;
 
 namespace SRLE
 {
