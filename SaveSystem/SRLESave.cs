@@ -1,8 +1,5 @@
 ﻿using System.IO;
 using MonomiPark.SlimeRancher.Persist;
-using SRML.Console;
-using SRML.SR.SaveSystem.Data.Partial;
-using UnityEngine;
 
 namespace SRLE.SaveSystem
 {

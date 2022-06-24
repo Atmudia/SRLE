@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using DebuggingMod.Extensions;
 using SRLE.SaveSystem;
 using SRML.SR;
-using Steamworks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
-using Console = SRML.Console.Console;
 
 namespace SRLE.Components
 {

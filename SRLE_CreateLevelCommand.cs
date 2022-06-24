@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using SRLE.SaveSystem;
 using SRML.Console;
-using UnityEngine;
 using static SRLE.SRLEManager;
 
 namespace SRLE
