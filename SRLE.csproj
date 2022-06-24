@@ -1,438 +1,452 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D0EDB89A-E9CB-496D-8BF0-65A36DD7850D}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SRLE</RootNamespace>
-    <AssemblyName>SRLE</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <LangVersion>9</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\AssembliesSRML\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Assembly-CSharp-firstpass.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="DebuggingMod, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\AssembliesSRML\DebuggingMod.dll</HintPath>
-    </Reference>
-    <Reference Include="DOTween, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\DOTween.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="InControl, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\InControl.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="InControl.Examples, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\InControl.Examples.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Logger, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Logger.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Mono.Data.Sqlite.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Mono.Posix, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Mono.Posix.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Mono.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Mono.Security.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\mscorlib.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="SRML, Version=0.1.8.2, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\AssembliesSRML\SRML-Publicized.dll</HintPath>
-    </Reference>
-    <Reference Include="SRML-Publicized, Version=0.1.8.2, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SlimyFoliage\SlimyFoliage\bin\Debug\SRML-Publicized.dll</HintPath>
-    </Reference>
-    <Reference Include="System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.ComponentModel.DataAnnotations, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.ComponentModel.DataAnnotations.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Configuration.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Data.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Drawing.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.EnterpriseServices, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.EnterpriseServices.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Numerics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Numerics.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization.Formatters.Soap, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Runtime.Serialization.Formatters.Soap.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Security.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Transactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Transactions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Web.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.ApplicationServices, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Web.ApplicationServices.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Services, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Web.Services.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Xml.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Unity.Analytics.DataPrivacy, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.Analytics.DataPrivacy.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Unity.Analytics.StandardEvents, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.Analytics.StandardEvents.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Unity.Analytics.Tracker, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.Analytics.Tracker.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Unity.Recorder, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.Recorder.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Unity.Recorder.Base, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.Recorder.Base.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.TextMeshPro.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Unity.Timeline, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.Timeline.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.AccessibilityModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.AccessibilityModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.AIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.AIModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.AndroidJNIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.AndroidJNIModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.AnimationModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ARModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ARModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.AssetBundleModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.AudioModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ClothModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ClothModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ClusterInputModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ClusterInputModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ClusterRendererModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ClusterRendererModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.CoreModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.CrashReportingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.CrashReportingModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.DirectorModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.DirectorModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.DSPGraphModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.DSPGraphModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.GameCenterModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.GameCenterModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.GridModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.GridModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.HotReloadModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.HotReloadModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ImageConversionModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.IMGUIModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.InputLegacyModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.InputModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.InputModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.JSONSerializeModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.LocalizationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.LocalizationModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ParticleSystemModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.PerformanceReportingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.PerformanceReportingModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.Physics2DModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.PhysicsModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ProfilerModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ProfilerModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ScreenCaptureModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ScreenCaptureModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.SharedInternalsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.SharedInternalsModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.SpriteMaskModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.SpriteMaskModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.SpriteShapeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.SpriteShapeModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.StreamingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.StreamingModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.SubstanceModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.SubstanceModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.SubsystemsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.SubsystemsModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TerrainModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.TerrainModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TerrainPhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.TerrainPhysicsModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TextCoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.TextCoreModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.TextRenderingModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TilemapModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.TilemapModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TLSModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.TLSModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UI.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UIElementsModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UIModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UmbraModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UmbraModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UNETModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UNETModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UnityAnalyticsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityAnalyticsModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UnityConnectModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityConnectModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UnityTestProtocolModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityTestProtocolModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestAudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityWebRequestModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestTextureModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestWWWModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.VehiclesModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.VehiclesModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.VFXModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.VFXModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.VideoModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.VideoModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.VRModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.VRModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.WindModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.WindModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="UnityEngine.XRModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.XRModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="EntryPoint.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SRObjects.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <EmbeddedResource Include="srle_replaced" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="modinfo.json" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{D0EDB89A-E9CB-496D-8BF0-65A36DD7850D}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>SRLE</RootNamespace>
+        <AssemblyName>SRLE</AssemblyName>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+        <LangVersion>9</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="0Harmony, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\..\AssembliesSRML\0Harmony.dll</HintPath>
+        </Reference>
+        <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\..\AssembliesSRML\Assembly-CSharp_old-Publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Assembly-CSharp-firstpass.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="DebuggingMod, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\..\AssembliesSRML\DebuggingMod.dll</HintPath>
+        </Reference>
+        <Reference Include="DOTween, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\DOTween.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="InControl, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\InControl.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="InControl.Examples, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\InControl.Examples.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Logger, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Logger.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Mono.Data.Sqlite.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Mono.Posix, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Mono.Posix.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Mono.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Mono.Security.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\mscorlib.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+          <HintPath>..\..\..\SteamLibrary\steamapps\common\Slime Rancher\SRML\Libs\Newtonsoft.Json.dll</HintPath>
+        </Reference>
+        <Reference Include="SRML, Version=0.1.8.2, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\..\AssembliesSRML\SRML-Publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.ComponentModel.DataAnnotations, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.ComponentModel.DataAnnotations.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Configuration.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Core.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Data.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Drawing.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.EnterpriseServices, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.EnterpriseServices.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.Numerics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Numerics.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.Runtime.Serialization.Formatters.Soap, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Runtime.Serialization.Formatters.Soap.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Security.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.Transactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Transactions.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.Web, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Web.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.Web.ApplicationServices, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Web.ApplicationServices.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.Web.Services, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Web.Services.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\System.Xml.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Unity.Analytics.DataPrivacy, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.Analytics.DataPrivacy.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Unity.Analytics.StandardEvents, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.Analytics.StandardEvents.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Unity.Analytics.Tracker, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.Analytics.Tracker.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Unity.Recorder, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.Recorder.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Unity.Recorder.Base, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.Recorder.Base.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.TextMeshPro.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Unity.Timeline, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\Unity.Timeline.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.AccessibilityModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.AccessibilityModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.AIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.AIModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.AndroidJNIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.AndroidJNIModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.AnimationModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ARModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ARModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.AssetBundleModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.AudioModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ClothModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ClothModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ClusterInputModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ClusterInputModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ClusterRendererModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ClusterRendererModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.CoreModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.CrashReportingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.CrashReportingModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.DirectorModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.DirectorModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.DSPGraphModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.DSPGraphModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.GameCenterModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.GameCenterModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.GridModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.GridModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.HotReloadModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.HotReloadModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ImageConversionModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.IMGUIModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.InputLegacyModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.InputModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.InputModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.JSONSerializeModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.LocalizationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.LocalizationModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ParticleSystemModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.PerformanceReportingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.PerformanceReportingModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.Physics2DModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.PhysicsModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ProfilerModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ProfilerModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ScreenCaptureModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.ScreenCaptureModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.SharedInternalsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.SharedInternalsModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.SpriteMaskModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.SpriteMaskModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.SpriteShapeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.SpriteShapeModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.StreamingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.StreamingModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.SubstanceModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.SubstanceModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.SubsystemsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.SubsystemsModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TerrainModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.TerrainModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TerrainPhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.TerrainPhysicsModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TextCoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.TextCoreModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.TextRenderingModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TilemapModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.TilemapModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TLSModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.TLSModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UI.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UIElementsModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UIModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UmbraModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UmbraModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UNETModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UNETModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UnityAnalyticsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityAnalyticsModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UnityConnectModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityConnectModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UnityTestProtocolModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityTestProtocolModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestAudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityWebRequestModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestTextureModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestWWWModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.VehiclesModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.VehiclesModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.VFXModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.VFXModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.VideoModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.VideoModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.VRModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.VRModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.WindModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.WindModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="UnityEngine.XRModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.XRModule.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="Components\SRLECamera.cs" />
+        <Compile Include="EntryPoint.cs" />
+        <Compile Include="Extensions.cs" />
+        <Compile Include="IdClass.cs" />
+        <Compile Include="Patch\Patch_AutoSaveDirector__SaveAllNow.cs" />
+        <Compile Include="Patch\Patch_IntroUI_Awake.cs" />
+        <Compile Include="Patch\Patch_RegionLoader_ForceUpdate.cs" />
+        <Compile Include="Patch\Patch_SavedGame_CreateNew.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="SaveSystem\SRLEName.cs" />
+        <Compile Include="SaveSystem\SRLESave.cs" />
+        <Compile Include="SRLECommand.cs" />
+        <Compile Include="SRLEUIManager.cs" />
+        <Compile Include="SRLE_CreateLevelCommand.cs" />
+        <Compile Include="SRLEManager.cs" />
+        <Compile Include="SRLE_LoadLevelCommand.cs" />
+        <Compile Include="SRObjects.cs" />
+        <Compile Include="SRLE_PlaceObjectCommand.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="packages.config" />
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="modinfo.json" />
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+<PropertyGroup>
+	<PostBuildEvent>xcopy "$(ProjectDir)bin\Debug\$(AssemblyName).dll" "E:\SteamLibrary\steamapps\common\Slime Rancher\SRML\Mods\$(AssemblyName)\" /F /R /Y /I</PostBuildEvent>
+	</PropertyGroup>
+
 </Project>
