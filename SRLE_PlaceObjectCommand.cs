@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using MonomiPark.SlimeRancher.Persist;
 using SRLE.SaveSystem;
 using SRML.Console;
 using SRML.Console.Commands;
 using SRML.Utils;
 using UnityEngine;
+using Console = SRML.Console.Console;
 
 namespace SRLE
 {
-    /*public class SRLE_PlaceObjectCommand : ConsoleCommand
+    public class SRLE_PlaceObjectCommand : ConsoleCommand
     {
         public override bool Execute(string[] args)
         {
@@ -18,11 +20,24 @@ namespace SRLE
 
 
             var currentData = SRLEManager.currentData;
-            DirectoryInfo Worlds = new DirectoryInfo(Environment.CurrentDirectory + "/SRLE/Worlds");
 
-            
-            SRLEManager.BuildObjects.TryGetValue(@ulong, out IdClass idClass);
+
+
+            IdClass idClass = null;
+            foreach (var keyValuePair in SRLEManager.BuildObjects)
+            {
+                if (keyValuePair.Value.TryGetValue(@ulong, out var idClass1))
+                {
+                    idClass = idClass1;
+                    Console.Log(idClass.Path);
+                    break;
+                }
+                
+            }
+            Console.Log(idClass.Path);
             var instantiateInactive = GameObjectUtils.InstantiateInactive(GameObject.Find(idClass.Path));
+            Console.Log("TEST");
+
             var transform = SRSingleton<SceneContext>.Instance.Player.transform;
             instantiateInactive.transform.position = transform.position;
             var srleSave = new SRLESave();
@@ -40,7 +55,7 @@ namespace SRLE
                 
             instantiateInactive.SetActive(true);
 
-            currentData.Write(new FileInfo(Worlds.FullName + @"\Testing.srle").Open(FileMode.OpenOrCreate));
+            currentData.Write(new FileInfo(SRLEManager.Worlds.FullName + currentData.nameOfLevel + ".srle").Open(FileMode.OpenOrCreate));
             
             
 
@@ -52,5 +67,5 @@ namespace SRLE
         public override string Usage => ID;
         public override string Description => ID;
     }
-    */
+    
 }

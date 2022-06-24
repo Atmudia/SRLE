@@ -14,9 +14,10 @@ namespace SRLE.Patch
                 var srleCamera = SRSingleton<SRLECamera>.Instance;
                 if (srleCamera.isActiveAndEnabled)
                 {
-                    __instance.UpdateProxied(srleCamera.transform.position);
-                    __instance.UpdateHibernated(srleCamera.transform.position);
-                    __instance.lastRegionCheckPos = srleCamera.transform.position;
+                    var position = srleCamera.transform.position;
+                    __instance.UpdateProxied(position);
+                    __instance.UpdateHibernated(position);
+                    __instance.lastRegionCheckPos = position;
                     return false;
                 }
                 return true;

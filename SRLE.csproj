@@ -45,7 +45,7 @@
           <Private>True</Private>
         </Reference>
         <Reference Include="DebuggingMod, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\..\AssembliesSRML\DebuggingMod.dll</HintPath>
+          <HintPath>..\..\..\SteamLibrary\steamapps\common\Slime Rancher\SRML\Mods\DebuggingMod\DebuggingMod.dll</HintPath>
         </Reference>
         <Reference Include="DOTween, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <HintPath>packages\SlimeRancherGameLibs.1.4.4\lib\DOTween.dll</HintPath>
@@ -419,11 +419,16 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Components\LevelSummaryEntry.cs" />
+        <Compile Include="Components\LevelSummaryPanel.cs" />
         <Compile Include="Components\SRLECamera.cs" />
+        <Compile Include="Components\SRLELoadLevelUI.cs" />
+        <Compile Include="Components\SRLENewLevelUI.cs" />
         <Compile Include="EntryPoint.cs" />
         <Compile Include="Extensions.cs" />
         <Compile Include="IdClass.cs" />
         <Compile Include="Patch\Patch_AutoSaveDirector__SaveAllNow.cs" />
+        <Compile Include="Patch\Patch_ExpoGameSelectUI_Close.cs" />
         <Compile Include="Patch\Patch_IntroUI_Awake.cs" />
         <Compile Include="Patch\Patch_RegionLoader_ForceUpdate.cs" />
         <Compile Include="Patch\Patch_SavedGame_CreateNew.cs" />
@@ -431,7 +436,9 @@
         <Compile Include="SaveSystem\SRLEName.cs" />
         <Compile Include="SaveSystem\SRLESave.cs" />
         <Compile Include="SRLECommand.cs" />
+        <Compile Include="SRLESaveManager.cs" />
         <Compile Include="SRLEUIManager.cs" />
+        <Compile Include="SRLEUIMenu.cs" />
         <Compile Include="SRLE_CreateLevelCommand.cs" />
         <Compile Include="SRLEManager.cs" />
         <Compile Include="SRLE_LoadLevelCommand.cs" />

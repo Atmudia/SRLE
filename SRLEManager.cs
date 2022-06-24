@@ -80,6 +80,7 @@ namespace SRLE
 
             fileStream.Dispose();
             return true;
+            
         }
 
         public static void AddModdedObject(GameObject gameObject)
