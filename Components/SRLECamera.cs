@@ -9,11 +9,6 @@ namespace SRLE.Components
     {
         public Camera camera;
         public GameObject player;
-        public float speedV = 2.0f;
-
-        private float yaw = 0.0f;
-        private float pitch = 0.0f;
-        public bool clickRight = false;
         public List<GameObject> listOfUIs = new List<GameObject>();
 
         // Token: 0x040000DF RID: 223
@@ -150,7 +145,7 @@ namespace SRLE.Components
 
         // Token: 0x040000E1 RID: 225
         private float rotation = 0f;
-        private float speed = 1;
+        private float speed = 4;
         private vp_FPInput _vpFpInput;
     }
     

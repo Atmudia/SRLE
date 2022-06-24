@@ -14,12 +14,20 @@ namespace SRLE
         public static Dictionary<string, Dictionary<ulong, IdClass>> BuildObjects = new Dictionary<string, Dictionary<ulong, IdClass>>();
         public static SRLEName currentData;
         public static bool isSRLELevel;
-        public static DirectoryInfo Worlds = new DirectoryInfo(Environment.CurrentDirectory + "/SRLE/Worlds");
+        public static DirectoryInfo SRLE = new DirectoryInfo(Application.streamingAssetsPath.Replace("/SlimeRancher_Data/StreamingAssets", string.Empty) + "\\SRLE");
+        public static DirectoryInfo Worlds = SRLE.CreateSubdirectory("Worlds");
 
 
         internal static void LoadObjectsFromBuildObjects()
         {
-            List<Category> categories = JsonConvert.DeserializeObject<List<Category>>(Encoding.Default.GetString(Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(EntryPoint), "buildobjects.txt").ReadAllBytes()));
+           
+        
+            List<Category> categories;
+            using (StreamReader streamReader = new StreamReader(EntryPoint.execAssembly!.GetManifestResourceStream(typeof(EntryPoint), "buildobjects.txt")!))
+            {
+                categories =  new JsonSerializer().Deserialize<List<Category>>(new JsonTextReader(streamReader));
+            }
+
             foreach (var category in categories)
             {
                 foreach (var idClass in category.Objects)
@@ -73,6 +81,7 @@ namespace SRLE
 
             fileStream.Dispose();
             return true;
+            
         }
 
         public static void AddModdedObject(GameObject gameObject)

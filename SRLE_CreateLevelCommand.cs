@@ -10,7 +10,7 @@ namespace SRLE
     {
         public override bool Execute(string[] args)
         {
-            SRLEName srleName = new SRLEName {nameOfLevel = args[0]};
+            SRLEName srleName = SRLEName.Create(args[0], WorldType.STANDARD);
             currentData = srleName;
             isSRLELevel = true;
             FileInfo fileInfo = new FileInfo(Worlds.FullName + "\\" + args[0] + ".srle");
