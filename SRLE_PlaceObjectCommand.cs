@@ -9,6 +9,7 @@ using SRML.Console.Commands;
 using SRML.Utils;
 using UnityEngine;
 using Console = SRML.Console.Console;
+using Object = UnityEngine.Object;
 
 namespace SRLE
 {
@@ -29,14 +30,17 @@ namespace SRLE
                 if (keyValuePair.Value.TryGetValue(@ulong, out var idClass1))
                 {
                     idClass = idClass1;
-                    Console.Log(idClass.Path);
                     break;
                 }
                 
             }
-            Console.Log(idClass.Path);
-            var instantiateInactive = GameObjectUtils.InstantiateInactive(GameObject.Find(idClass.Path));
-            Console.Log("TEST");
+
+
+            List<string> nameOfZones = Object.FindObjectsOfType<ZoneDirector>().Select(x => x.gameObject.name).ToList();
+            List<string> strings = idClass.Path.Split('/').ToList();
+            string nameOfZone = strings.FirstOrDefault(x => nameOfZones.Contains(x));
+            strings.Remove(nameOfZone);
+            var instantiateInactive = GameObjectUtils.InstantiateInactive(GameObject.Find(nameOfZone).transform.Find(strings.Aggregate("", (x, y) => x + "/" + y).Remove(0, 1)).gameObject);
 
             var transform = SRSingleton<SceneContext>.Instance.Player.transform;
             instantiateInactive.transform.position = transform.position;
@@ -56,7 +60,6 @@ namespace SRLE
             instantiateInactive.SetActive(true);
 
             currentData.Write(new FileInfo(SRLEManager.Worlds.FullName + currentData.nameOfLevel + ".srle").Open(FileMode.OpenOrCreate));
-            
             
 
             return true;

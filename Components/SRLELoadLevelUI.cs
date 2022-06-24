@@ -1,13 +1,17 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using DebuggingMod.Extensions;
+using MonomiPark.SlimeRancher.Regions;
 using SRLE.SaveSystem;
-using SRML.Console;
+using SRML.SR;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Console = SRML.Console.Console;
+using Object = UnityEngine.Object;
 
 namespace SRLE.Components
 {
@@ -139,7 +143,53 @@ namespace SRLE.Components
             var levelSummary = availLevels[selectedIdx];
             SRLEManager.currentData = levelSummary;
             SRLEManager.isSRLELevel = true;
+            SRCallbacks.PreSaveGameLoad += context =>
+            {
+                Console.Log("Test");
+                switch (levelSummary.worldType)
+                {
+                    case WorldType.STANDARD:
+                        return;
+                    case WorldType.SEA:
+                    {
+                        FindObjectsOfType<Region>().ToList().ForEach(x => x.gameObject.SetActive(false));
+                        break;
+                    }
+                    case WorldType.VOID:
+                    {
+                        FindObjectsOfType<Region>().ToList().ForEach(x => x.gameObject.SetActive(false));
+                        foreach (Transform o in GameObject.Find("zoneSEA").transform)
+                        {
+                            o.gameObject.SetActive(false);    
+                        }
+
+                        break;
+                    }
+                    case WorldType.DESERT:
+                    {
+                        FindObjectsOfType<Region>().ToList().ForEach(x => x.gameObject.SetActive(false));
+                        foreach (Transform o in GameObject.Find("zoneSEA").transform)
+                        {
+                            o.gameObject.SetActive(false);    
+
+                        }
+
+                        foreach (Transform o in GameObject.Find("zoneDESERT").transform)
+                        {
+                            if (o.gameObject.name == "SandSea")
+                            {
+                                o.transform.SetPositionAndRotation(new Vector3(0, 0,0), Quaternion.identity);
+                                o.gameObject.SetActive(true);
+                                o.GetComponent<ManageWithRegionSet>().setId = RegionRegistry.RegionSetId.HOME;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            };
             SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("", Identifiable.Id.HEN, PlayerState.GameMode.CASUAL, () => {});
+            
 
         }
         public GameObject CreateDeleteGameDialog(
