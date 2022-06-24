@@ -205,6 +205,8 @@ namespace SRLE
 
                 levelSummaryPanel.transform.Find("MainPanel/ValidPanel/InfoPanel/Panel").gameObject.SetActive(false);
 
+                
+                    
 
                 expoUI.GetComponent<ExpoGameSelectUI>().Close();
                 

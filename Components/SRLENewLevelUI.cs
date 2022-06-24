@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using DebuggingMod.Extensions;
 using SRLE.SaveSystem;
+using SRML.SR;
 using Steamworks;
 using TMPro;
 using UnityEngine;
@@ -171,7 +172,21 @@ namespace SRLE.Components
                 this.gameObject.SetActive(false);
 
                 SRLEUIMenu.playing = true;
-            
+
+
+                SRCallbacks.PreSaveGameLoad += context =>
+                {
+                    switch (selWorldType)
+                    {
+                        case WorldType.STANDARD:
+                            return;
+                        case WorldType.VOID:
+                        {
+                            FindObjectOfType<ZoneDirector>().gameObject.SetActive(false);
+                            break;
+                        }
+                    }
+                };
                 SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("", Identifiable.Id.HEN, PlayerState.GameMode.CASUAL,
                     () =>
                     {
