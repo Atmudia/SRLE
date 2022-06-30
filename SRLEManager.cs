@@ -13,6 +13,7 @@ namespace SRLE
         public static bool isSRLELevel;
         public static DirectoryInfo SRLE = new DirectoryInfo(Application.streamingAssetsPath.Replace("/SlimeRancher_Data/StreamingAssets", string.Empty) + "\\SRLE");
         public static DirectoryInfo Worlds = SRLE.CreateSubdirectory("Worlds");
+        public static DirectoryInfo Icons = SRLE.CreateSubdirectory("Icons");
 
 
         internal static void LoadObjectsFromBuildObjects()

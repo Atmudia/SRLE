@@ -6,7 +6,7 @@ namespace SRLE
     
     public static class SRLEUIManager
     {
-        private static AssetBundle UIData = AssetBundle.LoadFromFile(@"E:\SlimeRancherModding\Unity\SRLE\Assets\AssetBundles\srledata");
+        // private static AssetBundle UIData = AssetBundle.LoadFromFile(@"E:\SlimeRancherModding\Unity\SRLE\Assets\AssetBundles\srledata");
 
         public static void LoadUIData()
         {

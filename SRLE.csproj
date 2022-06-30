@@ -427,6 +427,7 @@
     <Compile Include="Components\SRLECamera.cs" />
     <Compile Include="Components\SRLELoadLevelUI.cs" />
     <Compile Include="Components\SRLENewLevelUI.cs" />
+    <Compile Include="Components\SRLECreatorUI.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IdClass.cs" />
