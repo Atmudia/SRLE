@@ -1,9 +1,6 @@
 E:\SlimeRancherModding\Rider\SRLE\bin\Debug\SRLE.dll
 E:\SlimeRancherModding\Rider\SRLE\bin\Debug\SRLE.pdb
-E:\SlimeRancherModding\Rider\SRLE\bin\Debug\0Harmony.dll
 E:\SlimeRancherModding\Rider\SRLE\bin\Debug\Assembly-CSharp-firstpass.dll
-E:\SlimeRancherModding\Rider\SRLE\bin\Debug\Assembly-CSharp_old-Publicized.dll
-E:\SlimeRancherModding\Rider\SRLE\bin\Debug\DebuggingMod.dll
 E:\SlimeRancherModding\Rider\SRLE\bin\Debug\DOTween.dll
 E:\SlimeRancherModding\Rider\SRLE\bin\Debug\InControl.dll
 E:\SlimeRancherModding\Rider\SRLE\bin\Debug\InControl.Examples.dll
@@ -12,7 +9,6 @@ E:\SlimeRancherModding\Rider\SRLE\bin\Debug\Mono.Data.Sqlite.dll
 E:\SlimeRancherModding\Rider\SRLE\bin\Debug\Mono.Posix.dll
 E:\SlimeRancherModding\Rider\SRLE\bin\Debug\Mono.Security.dll
 E:\SlimeRancherModding\Rider\SRLE\bin\Debug\mscorlib.dll
-E:\SlimeRancherModding\Rider\SRLE\bin\Debug\SRML-Publicized.dll
 E:\SlimeRancherModding\Rider\SRLE\bin\Debug\System.ComponentModel.DataAnnotations.dll
 E:\SlimeRancherModding\Rider\SRLE\bin\Debug\System.Configuration.dll
 E:\SlimeRancherModding\Rider\SRLE\bin\Debug\System.Data.dll
@@ -201,3 +197,4 @@ C:\Users\jayin\Source\Repos\SRLE\obj\Debug\SRLE.pdb
 C:\Users\jayin\source\repos\SRLE\bin\Debug\0Harmony.dll
 C:\Users\jayin\source\repos\SRLE\bin\Debug\Assembly-CSharp_old-Publicized.dll
 C:\Users\jayin\source\repos\SRLE\bin\Debug\Newtonsoft.Json.dll
+E:\SlimeRancherModding\Rider\SRLE\bin\Debug\SRML.Editor.dll

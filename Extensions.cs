@@ -87,17 +87,17 @@ namespace SRLE
                 : $"{Math.Round((double) value, decimalPlaces)}B";
             return chosenValue;
         }
-        public static void Log(this string str)
+        public static void Log(this object str)
         {
-            Console.Log(str);
+            Console.Log(str.ToString());
         }
-        public static void LogWarning(this string str)
+        public static void LogWarning(this object str)
         {
-            Console.LogWarning(str);
+            Console.LogWarning(str.ToString());
         }
-        public static void LogError(this string str)
+        public static void LogError(this object str)
         {
-            Console.LogError(str);
+            Console.LogError(str.ToString());
         }
     }
 }

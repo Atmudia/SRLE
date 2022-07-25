@@ -13,9 +13,11 @@ namespace SRLE
             var fileInfos = SRLEManager.Worlds.GetFiles();
             foreach (var fileInfo in fileInfos)
             {
+                if (fileInfo.Extension != ".srle") continue;
                 SRLEName srleName = new SRLEName();
                 using var fileStream = fileInfo.Open(FileMode.Open);
                 srleName.Load(fileStream);
+                srleName.nameOfFile = fileInfo.Name;
                 srleNames.Add(srleName.nameOfLevel, srleName);
             }
 

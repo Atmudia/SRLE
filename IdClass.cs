@@ -5,8 +5,9 @@ namespace SRLE
     public class IdClass
     {
         public string Name;
-        public ulong Id;
+        public string  Id;
         public string Path;
+        public int HashCode;
 
     }
 

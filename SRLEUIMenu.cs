@@ -1,4 +1,13 @@
-﻿using SRLE.Components;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using HarmonyLib;
+using MonomiPark.SlimeRancher.Persist;
+using SRLE.Components;
+using SRLE.SaveSystem;
+using SRML;
+using SRML.Console;
 using SRML.Utils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,14 +16,12 @@ namespace SRLE
 {
     public static class SRLEUIMenu
     {
-        public static bool playing = false;
         public static void SetAllButtonsEXPO(GameObject expoUI, MainMenuUI menu)
         {
             
             var panel = expoUI.transform.Find("Panel");
             panel.transform.Find("Window Title").GetComponentInChildren<XlateText>().SetKey("l.srle.window_title");
             panel = panel.transform.Find("Panel");
-            panel.GetChild(0).gameObject.SetActive(false);
             var loadALevel = panel.GetChild(1);
             
             
@@ -31,17 +38,10 @@ namespace SRLE
                 var gameUI = newGameUI.GetComponent<NewGameUI>();
                 var srleNewLevelUI = newGameUI.AddComponent<SRLE.Components.SRLENewLevelUI>();
                 srleNewLevelUI.gameIconPrefab = gameUI.gameIconPrefab;
-                /*newGameUI.GetComponentsInChildren<Button>().Select(x =>
-                {
-                    /*if (x.enabled)
-                        
-                        return false;
-                        */
-                //});
 
-                
-            
-                
+
+
+
                 var panel = newGameUI.transform.Find("Panel").gameObject;
                 
                 
@@ -99,8 +99,9 @@ namespace SRLE
 
                 srleNewLevelUI.onDestroy = () =>
                 {
-                    if (!playing)
-                        menu.gameObject.SetActive(true);
+	                Console.Log("Need to make that");
+	                    if (menu)
+		                    menu.gameObject.SetActive(true);
                 };
 
                 
@@ -116,8 +117,8 @@ namespace SRLE
             button = createALevel.GetComponent<Button>();
             button.RemoveAllListeners().onClick.AddListener(() =>
             {
-                
-                var loadLevelUI = GameObjectUtils.InstantiateInactive(menu.loadGameUI);
+	            expoUI.GetComponent<ExpoGameSelectUI>().Close();
+	            var loadLevelUI = GameObjectUtils.InstantiateInactive(menu.loadGameUI);
                 loadLevelUI.name = "SRLELoadLevelUI";
 
                 var srleNewLevelUI = loadLevelUI.AddComponent<SRLE.Components.SRLELoadLevelUI>();
@@ -131,8 +132,9 @@ namespace SRLE
                 
                 srleNewLevelUI.onDestroy = () =>
                 {
-                    if (!playing)
-                        menu.gameObject.SetActive(true);
+	                Console.Log("Need to make that");
+		                if (menu)
+			                menu.gameObject.SetActive(true);
                 };
                 var loadGameUI = loadLevelUI.GetComponent<LoadGameUI>();
                 srleNewLevelUI.loadingPanel = loadGameUI.loadingPanel;
@@ -202,7 +204,6 @@ namespace SRLE
                 
                     
 
-                expoUI.GetComponent<ExpoGameSelectUI>().Close();
                 
                 
 
@@ -210,18 +211,227 @@ namespace SRLE
 
 
                 Object.DestroyImmediate(loadGameUI);
-                
                 menu.gameObject.SetActive(false);
                 loadLevelUI.gameObject.SetActive(true);
 
             });
+            
+            
+            var srleConverter = panel.GetChild(0).gameObject;
+            srleConverter.transform.SetSiblingIndex(3);
+            srleConverter.GetComponentInChildren<XlateText>().SetKey("l.srle.srle_converter");
+            var buttonFromBB = srleConverter.GetComponent<Button>();
+            
+            
+            if (SRModLoader.IsModPresent("betterbuild"))
+            {
+	            var replace = Application.streamingAssetsPath.Replace("/SlimeRancher_Data/StreamingAssets", string.Empty);
+
+                var fileInfos = new DirectoryInfo(Path.Combine(replace, "BetterBuild")).GetFiles();
+                if (fileInfos.Length == 0 || fileInfos.FirstOrDefault(x => x.Extension == ".world") == null)
+                {
+                    buttonFromBB.interactable = false;
+                    buttonFromBB.gameObject.GetChild(1).GetComponentInChildren<XlateText>().SetKey("l.srle.betterbuild.notfoundanysave");
+                    return;
+
+                }
+                
+
+                buttonFromBB.RemoveAllListeners().onClick.AddListener(() =>
+                {
+	                expoUI.GetComponent<ExpoGameSelectUI>().Close();
+	                var idEntry = SRSingleton<SceneContext>.Instance.PediaDirector.entries.First(x => x.id == PediaDirector.Id.GADGETMODE).icon;
+
+                    
+                    List<PurchaseUI.Purchasable> purchaseUis = new List<PurchaseUI.Purchasable>();
+                    GameObject purchaseUI = null;
+                    foreach (var VARIABLE in fileInfos)             
+                    {
+                        if (VARIABLE.Extension == ".world")
+                        {
+                            var s = VARIABLE.Name.Replace(".world", string.Empty);
+                            purchaseUis.Add(new PurchaseUI.Purchasable(s, idEntry, idEntry, s, 1, null, () =>
+                            {
+	                            if (File.Exists(Path.Combine(SRLEManager.Worlds.FullName, VARIABLE.Name.Replace(".world", ".srle"))))
+	                            {
+		                            SRSingleton<GameContext>.Instance.UITemplates.CreateConfirmDialog("m.srle.replaceoldworld", () => ConvertBetterBuildToSRLE(VARIABLE, purchaseUI));
+		                            return;
+	                            }
+
+	                            ConvertBetterBuildToSRLE(VARIABLE, purchaseUI);
 
 
 
-
-
-
+                            }, () => true, () => true));
+                        }
+                    }
+	                purchaseUI = SRSingleton<GameContext>.Instance.UITemplates.CreatePurchaseUI(idEntry, "t.srle.srle_converter", purchaseUis.ToArray(), true,
+		                () =>
+		                {
+			                Console.Log("Need to make that");
+				                if (menu)
+					                menu.gameObject.SetActive(true);
+		                });
+                    
+                });
+            }
+            else
+            {
+                buttonFromBB.interactable = false;
+                
+            }
         }
         
+        private static void ConvertBetterBuildToSRLE(FileInfo pathOfFile, GameObject purchaseUI)
+        {
+            var invoke = AccessTools.TypeByName("PmkWqSqDqhyzqncfhFgkeiIeqAFfA").GetConstructor(System.Type.EmptyTypes)?.Invoke(System.Array.Empty<object>());
+				if (invoke != null)
+				{
+					invoke.GetType().GetMethod("Load", new[]
+						{
+							typeof(Stream)
+						})
+						?.Invoke(invoke, new object[]
+						{
+							new FileStream(
+								pathOfFile.FullName,
+								FileMode.Open),
+						});
+
+					var type = invoke.GetType();
+					var name = (string) type.GetField("NxbuhdGOoXjvYKGyvWOfJIkcIILn").GetValue(invoke);
+					var value = type.GetField("PwuTlNLrWfEhoBKNfoDdbApcvSLW").GetValue(invoke);
+					var type1 = value as System.Collections.IDictionary;
+
+
+					var o = AccessTools.TypeByName("TMaFbmDBkLulRlsTCbClfQhfWwmCA").GetProperty("oMvEVShoQppTDOlWISWTPYakJbFL")?.GetValue(null) as IDictionary;
+					List<object> objectsList1 = new List<object>();
+					List<object> objectsList2 =new List<object>();
+					foreach (var VARIABLE in type1.Keys)
+					{
+						objectsList1.Add(VARIABLE);
+					}
+					foreach (var VARIABLE in type1.Values)
+					{
+						objectsList2.Add(VARIABLE);
+					}
+					
+
+					Dictionary<string, List<SRLESave>> objects = new Dictionary<string, List<SRLESave>>();
+
+					var srleName = SRLEName.Create(pathOfFile.Name.Replace(".world", string.Empty), WorldType.STANDARD);
+
+
+					var numbersAndWords = objectsList1.Zip(objectsList2, (n, w) => new {Key = n, Value = w});
+					foreach (var nw in numbersAndWords)
+					{
+						if (o.Contains(nw.Key))
+						{
+							var o1 = o[nw.Key];
+							var renderId = (int) o[nw.Key].GetType().GetField("RenderID").GetValue(o1);
+							var path = (string) o[nw.Key].GetType().GetField("Path").GetValue(o1);
+							var nameOfBB = (string) o[nw.Key].GetType().GetField("Name").GetValue(o1);
+							var id = (uint) o[nw.Key].GetType().GetField("ID").GetValue(o1);
+
+
+							foreach (var VARIABLE in (IList) nw.Value)
+							{
+								var type2 = VARIABLE.GetType();
+								var value1 = type2.GetField("vnFsBQTGupjuJrOIzDrdnTGobnzCA").GetValue(VARIABLE);
+								var position = value1.GetType().GetField("value").GetValue(value1);
+
+								var value2 = type2.GetField("JGTZUTDwWNbSmlKDfhazTgObuUFf").GetValue(VARIABLE);
+								var rotation = value2.GetType().GetField("value").GetValue(value2);
+
+								var value3 = type2.GetField("oLhvsYqBzOpNVnXFhvqYIEWDabkJA").GetValue(VARIABLE);
+								var scale = value3.GetType().GetField("value").GetValue(value3);
+
+								var objectByHashCode = SRLEManager.GetObjectByHashCode(renderId, path, nameOfBB);
+
+								if (nameOfBB == "Water 1")
+								{
+									objectByHashCode = "62";
+								}
+
+								var dictionary = type2.GetField("nWpPVSldMKqITEYvahfGlTmpFdlH").GetValue(VARIABLE) as IDictionary;
+
+								List<object> objectsList3 = new List<object>();
+								List<object> objectsList4 =new List<object>();
+								foreach (var VARIABLE1 in dictionary.Keys)
+								{
+									objectsList3.Add(VARIABLE1);
+								}
+								foreach (var VARIABLE1 in dictionary.Values)
+								{
+									objectsList4.Add(VARIABLE1);
+								}
+								
+								var keyValue = objectsList3.Zip(objectsList4, (n, w) => new {Key = n, Value = w});
+		
+
+								
+								
+								if (string.IsNullOrEmpty(objectByHashCode)) continue;
+								SRLESave srleSaveToAdd = new SRLESave();
+								(srleSaveToAdd.position = new Vector3V02()).value = (Vector3) position;
+								(srleSaveToAdd.rotation = new Vector3V02()).value = (Vector3) rotation;
+								(srleSaveToAdd.scale = new Vector3V02()).value = (Vector3) scale;
+								
+								foreach (var VARIABLE1 in keyValue)
+								{
+									
+									var o2 = VARIABLE1.Value.GetType().GetField("IywkVfFOJnkxgsjKznhRmgZTQrlm").GetValue(VARIABLE1.Value);
+
+									if (VARIABLE1.Key.ToString() == "journaltext")
+									{
+										(srleSaveToAdd.dictionaryWithProperties["JournalText"] = new SRLEProperty()).property = o2.ToString();
+									}
+									if (VARIABLE1.Key.ToString() == "tpdestination")
+									{
+										(srleSaveToAdd.dictionaryWithProperties["TeleportDestination"] = new SRLEProperty()).property = o2.ToString();
+									}
+									if (VARIABLE1.Key.ToString() == "tpsource")
+									{
+										(srleSaveToAdd.dictionaryWithProperties["TeleportSource"] = new SRLEProperty()).property = o2.ToString();
+									}
+									
+									
+									//Console.Log(VARIABLE1.Key + " : " + VARIABLE1.Value);	
+								}
+								
+								
+								
+								
+								
+								
+								
+								if (objects.TryGetValue(objectByHashCode, out List<SRLESave> srleSave))
+								{
+									srleSave.Add(srleSaveToAdd);
+								}
+								else
+								{
+									objects.Add(objectByHashCode, new List<SRLESave> {srleSaveToAdd});
+								}
+								
+							}
+						}
+					}
+
+					srleName.objects = objects;
+					using (FileStream fileStream =
+						new FileStream(Path.Combine(SRLEManager.Worlds.FullName, pathOfFile.Name.Replace(".world", ".srle")), FileMode.Create))
+						srleName.Write(fileStream);
+
+					SRSingleton<GameContext>.Instance.UITemplates.CreateConfirmDialog("m.srle.completedsuccesfull",
+						() =>
+						{
+							purchaseUI.GetComponent<PurchaseUI>().Close();
+							
+						});
+				}
+        }  
     }
+
+    
 }

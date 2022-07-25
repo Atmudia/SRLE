@@ -31,7 +31,8 @@ namespace SRLE.SaveSystem
 
             isUsingModdedObjects = reader.ReadBoolean();
             
-            this.objects = base.LoadDictionary(reader, r => r.ReadUInt64(), LoadList<SRLESave>);        }
+            this.objects = base.LoadDictionary(reader, r => r.ReadString(), LoadList<SRLESave>);        
+        }
 
         public override void WriteData(BinaryWriter writer)
         {
@@ -41,7 +42,7 @@ namespace SRLE.SaveSystem
             writer.Write(spriteType);
             writer.Write(isUsingModdedObjects);
 
-            base.WriteDictionary(writer, this.objects, delegate(BinaryWriter w, ulong k)
+            base.WriteDictionary(writer, this.objects, delegate(BinaryWriter w, string k)
             {
                 w.Write(k);
             }, WriteList);
@@ -52,7 +53,8 @@ namespace SRLE.SaveSystem
         public bool isUsingModdedObjects = false;
         public WorldType worldType = WorldType.STANDARD;
         public int spriteType = 0;
+        public string nameOfFile;
 
-        public Dictionary<ulong, List<SRLESave>> objects = new Dictionary<ulong, List<SRLESave>>();
+        public Dictionary<string, List<SRLESave>> objects = new Dictionary<string, List<SRLESave>>();
     }
 }

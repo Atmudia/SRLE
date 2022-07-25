@@ -9,9 +9,11 @@ namespace SRLE.Components
     {
         public TMP_Text gameNameText;
         public Image gameIcon;
+        public string nameOfFile;
 
         public void Init(SRLEName levelSummaryEntry)
         {
+            nameOfFile = levelSummaryEntry.nameOfFile;
             gameNameText.text = levelSummaryEntry.nameOfLevel;
             gameIcon.sprite = SRLENewLevelUI.allSprites[levelSummaryEntry.spriteType];
         }

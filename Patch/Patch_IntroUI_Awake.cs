@@ -3,7 +3,7 @@
 namespace SRLE.Patch
 {
     [HarmonyPatch(typeof(IntroUI), nameof(IntroUI.Awake))]
-    public class Patch_IntroUI_Awake
+    public static class Patch_IntroUI_Awake
     {
         public static bool Prefix(IntroUI __instance)
         {

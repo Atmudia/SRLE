@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using SRLE.SaveSystem;
+using SRML.Console;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,10 +16,10 @@ namespace SRLE.Components
         public TMP_Text objectsAmountText;
         public TMP_Text fileSizeText;
 
+
         public void Init(SRLEName srleName)
         {
-            
-            
+
             var bundle = SRSingleton<GameContext>.Instance.MessageDirector.GetBundle("ui");
             this.levelNameText.text = srleName.nameOfLevel;
             
@@ -38,7 +39,8 @@ namespace SRLE.Components
             
             this.objectsAmountText.text = bundle.Xlate(MessageUtil.Tcompose("l.srle.object_count", (object) num));
 
-            var combine = Path.Combine(SRLEManager.Worlds.FullName, srleName.nameOfLevel + ".srle");
+            Console.Log("Hello: " + srleName.nameOfFile);
+            var combine = Path.Combine(SRLEManager.Worlds.FullName, srleName.nameOfFile);
            
             this.fileSizeText.text =  bundle.Xlate(MessageUtil.Tcompose("l.srle.filesize", (object)  new FileInfo(combine).Length.ToPrettySize()));
 

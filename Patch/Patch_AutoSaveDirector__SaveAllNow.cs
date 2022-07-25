@@ -3,7 +3,7 @@
 namespace SRLE.Patch
 {
     [HarmonyPatch(typeof(AutoSaveDirector), nameof(AutoSaveDirector.SaveAllNow))]
-    public class Patch_AutoSaveDirector__SaveAllNow
+    public static class Patch_AutoSaveDirector__SaveAllNow
     {
         public static bool Prefix(ref bool __result)
         {

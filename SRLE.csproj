@@ -422,8 +422,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\ContainersOfObject.cs" />
     <Compile Include="Components\LevelSummaryEntry.cs" />
     <Compile Include="Components\LevelSummaryPanel.cs" />
+    <Compile Include="Components\ObjectAddedBySRLE.cs" />
     <Compile Include="Components\SRLECamera.cs" />
     <Compile Include="Components\SRLELoadLevelUI.cs" />
     <Compile Include="Components\SRLENewLevelUI.cs" />
@@ -432,10 +434,14 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="IdClass.cs" />
     <Compile Include="Patch\Patch_AutoSaveDirector__SaveAllNow.cs" />
+    <Compile Include="Patch\Patch_IdHandler_id.cs" />
     <Compile Include="Patch\Patch_IntroUI_Awake.cs" />
+    <Compile Include="Patch\Patch_JournalUI_SetJournalKey.cs" />
     <Compile Include="Patch\Patch_RegionLoader_ForceUpdate.cs" />
     <Compile Include="Patch\Patch_SavedGame_CreateNew.cs" />
+    <Compile Include="Patch\Patch_SpawnResource_Update.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SaveSystem\SRLEProperty.cs" />
     <Compile Include="SaveSystem\SRLEName.cs" />
     <Compile Include="SaveSystem\SRLESave.cs" />
     <Compile Include="SRLECommand.cs" />

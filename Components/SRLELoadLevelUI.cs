@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MonomiPark.SlimeRancher.Persist;
 using MonomiPark.SlimeRancher.Regions;
+using rail;
 using SRLE.SaveSystem;
 using SRML.SR;
+using SRML.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -17,7 +20,7 @@ namespace SRLE.Components
     internal class SRLELoadLevelUI : BaseUI
     {
         public List<SRLEName> availLevels = new List<SRLEName>();
-        public List<Toggle> levelToggles = new List<Toggle>();
+        public List<Toggle> levelToggles = new();
         public GameObject noSavesPanel;
         public GameObject loadingPanel;
         public GameObject summaryPanel;
@@ -30,6 +33,8 @@ namespace SRLE.Components
 
         public override void Awake()
         {
+            
+
             base.Awake();
             UpdateAvailLevels();
         }
@@ -41,6 +46,7 @@ namespace SRLE.Components
             foreach (Toggle gameToggle in this.levelToggles)
                 Destroyer.Destroy((UnityEngine.Object) gameToggle.gameObject, "SRLELoadLevelUI.UpdateAvailLevels");
             this.levelToggles.Clear();
+            availLevels.Clear();
             this.noSavesPanel.SetActive(true);
             this.loadingPanel.SetActive(true);
 
@@ -49,6 +55,7 @@ namespace SRLE.Components
 
         public IEnumerator FinishUpdateAvailGames()
         {
+            
             SRLELoadLevelUI loadGameUi = this;
             yield return (object) new WaitForSeconds(0.0f);
             loadGameUi.availLevels.Clear();
@@ -125,7 +132,7 @@ namespace SRLE.Components
                 var levelSummary = availLevels[selectedIdx];
                 CreateDeleteGameDialog(levelSummary, () =>
                 {
-                    new FileInfo(Path.Combine(SRLEManager.Worlds.FullName, levelSummary.nameOfLevel + ".srle")).Delete();
+                    new FileInfo(Path.Combine(SRLEManager.Worlds.FullName, levelSummary.nameOfFile)).Delete();
                     this.gameObject.SetActive(true);
                 }, () =>
                 {
@@ -141,13 +148,13 @@ namespace SRLE.Components
             var levelSummary = availLevels[selectedIdx];
             SRLEManager.currentData = levelSummary;
             SRLEManager.isSRLELevel = true;
+            levelSummary.worldType = WorldType.STANDARD;
             SRCallbacks.PreSaveGameLoad += context =>
             {
-                Console.Log("Test");
                 switch (levelSummary.worldType)
                 {
                     case WorldType.STANDARD:
-                        return;
+                        break;
                     case WorldType.SEA:
                     {
                         FindObjectsOfType<Region>().ToList().ForEach(x => x.gameObject.SetActive(false));
@@ -183,6 +190,60 @@ namespace SRLE.Components
                         }
 
                         break;
+                    }
+                }
+
+                foreach (var levelSummaryObject in levelSummary.objects)
+                {
+
+                    IdClass idClass = null;
+                    foreach (var keyValuePair in SRLEManager.BuildObjects)
+                    {
+                        if (keyValuePair.Value.TryGetValue(@levelSummaryObject.Key, out var idClass1))
+                        {
+                            idClass = idClass1;
+                            break;
+                        }
+                    }
+                    foreach (var srleSave in levelSummaryObject.Value)
+                    {
+                       
+                        var original = SRSingleton<ContainersOfObject>.Instance.GetObject(idClass.Id);
+                        if (original is null) continue;
+
+                        
+                        var instantiateInactive = GameObjectUtils.InstantiateInactive(original).transform;
+                        foreach (var VARIABLE in srleSave.dictionaryWithProperties)
+                        {
+                            switch (VARIABLE.Key)
+                            {
+                                
+                                case "JournalText":
+                                    instantiateInactive.GetComponent<JournalEntry>().entryKey = "srle." + VARIABLE.Value.property;
+                                    break;
+                                case "TeleportDestination":
+                                    instantiateInactive.GetComponentInChildren<TeleportDestination>().teleportDestinationName = VARIABLE.Value.property;
+                                    break;
+                                case "TeleportSource":
+                                    instantiateInactive.GetComponentInChildren<TeleportSource>().destinationSetName = VARIABLE.Value.property;
+                                    break;
+                                
+                            }   
+                        }
+                        
+                        instantiateInactive.localPosition = srleSave.position.value;
+                        instantiateInactive.localEulerAngles = srleSave.rotation.value;
+                        instantiateInactive.transform.localScale = srleSave.scale.value;
+                        instantiateInactive.gameObject.AddComponent<ObjectAddedBySRLE>().id = idClass.Id;
+                        instantiateInactive.gameObject.SetActive(true);
+                        
+                        
+
+
+
+
+
+
                     }
                 }
             };

@@ -167,7 +167,6 @@ namespace SRLE.Components
                 button.interactable = false;
                 this.gameObject.SetActive(false);
 
-                SRLEUIMenu.playing = true;
 
 
                 SRCallbacks.PreSaveGameLoad += context =>
@@ -188,7 +187,6 @@ namespace SRLE.Components
                     {
                         button.interactable = true;
                         this.gameObject.SetActive(true);
-                        SRLEUIMenu.playing = false;
                     });
             }
            

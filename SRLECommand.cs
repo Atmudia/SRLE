@@ -12,9 +12,11 @@ namespace SRLE
         public override bool Execute(string[] args)
         {
             List<string> sectors =
-                "Main Nav|Crystals|Cliffs|Mountains|Solid Filler|Rocks|Ranch Features|Doors|Trees|Ceiling|Flora|Grass|Deco|Constructs|Resources|Slimes|FX|Lights|Water|Colliders|Loot|Audio|Build Sites|Interactives|Upgrades|Cave Roof|Race Waypoints|ValleyAmmoSwapTrigger|Giant Trees|Main Nav Internal|Solid FIller|Constructions|".Split('|').ToList();
+                "Main Nav|Crystals|Cliffs|Mountains|Solid Filler|Rocks|Ranch Features|Doors|Trees|Ceiling|Flora|Grass|Deco|Constructs|Resources|Slimes|FX|Lights|Water|Colliders|Loot|Audio|Build Sites|Interactives|Upgrades|Cave Roof|Race Waypoints|ValleyAmmoSwapTrigger|Giant Trees|Main Nav Internal|Solid FIller|Constructions".Split('|').ToList();
+          
+            List<string> upgradesNames = "lab_lv0|lab_lv1|lab_silos_lv1|lab_tech_lv1|pathLabPassage_lv1|docks_lv0|docks_lv1|grotto_lv1|overgrowth_lv0|overgrowth_lv1|porch_lv0|proch_lv1|gateEast_lv0|gateWest_lv0|gateEast_lv1|gateWest_lv1|gateMain_lv1|fenceEast_lv0|fenceWest_lv0|fenceEast_lv1|fenceWest_lv1|pathEast_lv0|pathWest_lv0|pathCorrals_lv0|pathEast_lv1|pathWest_lv1|pathCorrals_lv1".Split('|').ToList();
             List<int> hashcodes = new List<int>();
-            List<GameObject> listOfCategory = new List<GameObject>();
+            Dictionary<GameObject, int> listOfCategory = new Dictionary<GameObject, int>();
 
                 foreach (var cellDirector in Resources.FindObjectsOfTypeAll<CellDirector>())
                 {
@@ -35,9 +37,12 @@ namespace SRLE
                                 bool ignore = true;
                   
                                 int num2 = -1;
-                                if (element.name is "overgrowth_lv0" or "overgrowth_lv1" or "grotto_lv1" or "docks_lv1" or "docks_lv0")
+
+
+
+                                if (upgradesNames.Exists(s => s == element.gameObject.name))
                                 {
-                                    ignore = false;
+                                     ignore = false;
                                     
                                     
                                     foreach (Transform miniElement in element)
@@ -74,16 +79,15 @@ namespace SRLE
                                         
                                         if (num2 != -1)
                                         {
-                                            listOfCategory.Add(miniElement.gameObject);   
+                                            listOfCategory.Add(miniElement.gameObject, num2);   
                                         }
                                         
                                         
 
                   
                                     }
-
-
                                 }
+                                
                                 
                                 if (element.childCount <= 0 && ignore)
                                 {
@@ -134,7 +138,7 @@ namespace SRLE
                                 }
                                 if (num2 != -1 && ignore)
                                 {
-                                    listOfCategory.Add(element.gameObject);   
+                                    listOfCategory.Add(element.gameObject, num2);   
                                 }
                     
 
@@ -186,14 +190,16 @@ namespace SRLE
 
                 foreach (var element in listOfCategory)
                 {
-                    var path = element.GetFullName();
+                    var path = element.Key.GetFullName();
                     var strings = path.Split('/', '/');
                     var category = InBounds(3, strings) ? strings[3] : "None";
-                    var idClass = new IdClass {Id = aa, Name = element.gameObject.name, Path = path};
+                    var idClass = new IdClass {Id = aa.ToString(), Name = element.Key.name, Path = path, HashCode = element.Value};
                     FindCategory(category, categories).Objects.Add(idClass);
                     aa++;
                 }
 
+              
+               
                 File.WriteAllText(@"E:\SteamLibrary\steamapps\common\Slime Rancher\SRLE\BuildObjects\buildobjects.txt", JsonConvert.SerializeObject(categories, Formatting.Indented));
                 return true;
         }

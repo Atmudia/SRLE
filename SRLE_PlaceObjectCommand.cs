@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using MonomiPark.SlimeRancher.Persist;
+using SRLE.Components;
 using SRLE.SaveSystem;
 using SRML.Console;
 using SRML.Utils;
@@ -14,7 +15,7 @@ namespace SRLE
     {
         public override bool Execute(string[] args)
         {
-            var @ulong = ulong.Parse(args[0]);
+            var @ulong = args[0];
 
 
             var currentData = SRLEManager.currentData;
@@ -33,13 +34,18 @@ namespace SRLE
             }
 
 
-            List<string> nameOfZones = Object.FindObjectsOfType<ZoneDirector>().Select(x => x.gameObject.name).ToList();
-            List<string> strings = idClass.Path.Split('/').ToList();
-            string nameOfZone = strings.FirstOrDefault(x => nameOfZones.Contains(x));
-            strings.Remove(nameOfZone);
-            var instantiateInactive = GameObjectUtils.InstantiateInactive(GameObject.Find(nameOfZone).transform.Find(strings.Aggregate("", (x, y) => x + "/" + y).Remove(0, 1)).gameObject);
+            var gameObject = SRSingleton<ContainersOfObject>.Instance.GetObject(@ulong);
+            if (gameObject is null)
+            {
+                Console.Log("Please use the property id");
+                return false;
+            }
+            var instantiateInactive = GameObjectUtils.InstantiateInactive(gameObject);
 
+            
             var transform = SRSingleton<SceneContext>.Instance.Player.transform;
+            
+            
             instantiateInactive.transform.position = transform.position;
             var srleSave = new SRLESave();
             (srleSave.position = new Vector3V02()).value = transform.position;
