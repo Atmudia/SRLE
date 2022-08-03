@@ -35,7 +35,7 @@ namespace SRLE
             }
             catch (UnityException e)
             {
-                Console.Log(e.Message);
+                EntryPoint.SRLEConsoleInstance.Log(e.Message);
                 return null;
             }
 
@@ -89,15 +89,15 @@ namespace SRLE
         }
         public static void Log(this object str)
         {
-            Console.Log(str.ToString());
+            EntryPoint.SRLEConsoleInstance.Log(str.ToString());
         }
         public static void LogWarning(this object str)
         {
-            Console.LogWarning(str.ToString());
+            EntryPoint.SRLEConsoleInstance.LogWarning(str.ToString());
         }
         public static void LogError(this object str)
         {
-            Console.LogError(str.ToString());
+            EntryPoint.SRLEConsoleInstance.LogError(str.ToString());
         }
     }
 }

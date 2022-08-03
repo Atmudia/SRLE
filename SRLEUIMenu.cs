@@ -4,19 +4,37 @@ using System.IO;
 using System.Linq;
 using HarmonyLib;
 using MonomiPark.SlimeRancher.Persist;
+//using MonomiPark.SlimeRancher.Persist;
 using SRLE.Components;
 using SRLE.SaveSystem;
 using SRML;
 using SRML.Console;
 using SRML.Utils;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace SRLE
 {
     public static class SRLEUIMenu
     {
-        public static void SetAllButtonsEXPO(GameObject expoUI, MainMenuUI menu)
+	    public static bool oldReturnToMenu;
+
+	    public static bool returnToMenu
+	    {
+		    get
+		    {
+			    EntryPoint.SRLEConsoleInstance.Log($"Getter:{oldReturnToMenu}" );
+			    return oldReturnToMenu;
+		    }
+		    set
+		    {
+			    EntryPoint.SRLEConsoleInstance.Log($"Setter:{value}" );
+			    oldReturnToMenu = value;
+		    }
+	    }
+
+	    public static void SetAllButtonsEXPO(GameObject expoUI, MainMenuUI menu)
         {
             
             var panel = expoUI.transform.Find("Panel");
@@ -31,12 +49,21 @@ namespace SRLE
             button.RemoveAllListeners();
             button.onClick.AddListener(() =>
             {
+	            returnToMenu = false;
+
+	            EntryPoint.SRLEConsoleInstance.Log("SRLENewLevel");
                 var newGameUI = GameObjectUtils.InstantiateInactive(menu.newGameUI);
                 newGameUI.name = "SRLENewLevel";
 
 
                 var gameUI = newGameUI.GetComponent<NewGameUI>();
                 var srleNewLevelUI = newGameUI.AddComponent<SRLE.Components.SRLENewLevelUI>();
+                srleNewLevelUI.onDestroy = () =>
+                { 
+	                if (SRLEUIMenu.returnToMenu)
+		                menu?.gameObject.SetActive(true);
+	                SRLEUIMenu.returnToMenu = true;
+                };
                 srleNewLevelUI.gameIconPrefab = gameUI.gameIconPrefab;
 
 
@@ -49,7 +76,12 @@ namespace SRLE
                 panel.GetChild(2).GetChild(1).GetComponent<Button>().RemoveAllListeners().onClick.AddListener(() => srleNewLevelUI.CreateNewLevel(panel.GetChild(2).GetChild(0).GetComponent<Button>()));
 
                 GameObject infoPanel = panel.FindChild("InfoPanel");
-                panel.FindChild("BackButton", true).GetComponent<Button>().RemoveAllListeners().onClick.AddListener(() => srleNewLevelUI.Close());
+                panel.FindChild("BackButton", true).GetComponent<Button>().RemoveAllListeners().onClick.AddListener(
+	                () =>
+	                {
+		                returnToMenu = true;
+		                srleNewLevelUI.Close();
+	                });
             
 
                 infoPanel.GetChild(0).GetComponent<XlateText>().SetKey("l.srle.level_name");
@@ -97,19 +129,14 @@ namespace SRLE
 
 
 
-                srleNewLevelUI.onDestroy = () =>
-                {
-	                Console.Log("Need to make that");
-	                    if (menu)
-		                    menu.gameObject.SetActive(true);
-                };
+               
 
-                
                 expoUI.GetComponent<ExpoGameSelectUI>().Close();
+                
+                
                 menu.gameObject.SetActive(false);
                 Object.DestroyImmediate(gameUI);
                 newGameUI.SetActive(true);
-
             });
 
             var createALevel = panel.GetChild(2);
@@ -117,11 +144,19 @@ namespace SRLE
             button = createALevel.GetComponent<Button>();
             button.RemoveAllListeners().onClick.AddListener(() =>
             {
+	            EntryPoint.SRLEConsoleInstance.Log("SRLELoadLevelUI");
+	            returnToMenu = false;
 	            expoUI.GetComponent<ExpoGameSelectUI>().Close();
 	            var loadLevelUI = GameObjectUtils.InstantiateInactive(menu.loadGameUI);
                 loadLevelUI.name = "SRLELoadLevelUI";
 
                 var srleNewLevelUI = loadLevelUI.AddComponent<SRLE.Components.SRLELoadLevelUI>();
+                srleNewLevelUI.onDestroy = () =>
+                { 
+	                if (SRLEUIMenu.returnToMenu)
+		                menu?.gameObject.SetActive(true);
+
+                };
                 GameObject panel = loadLevelUI.GetChild(0).gameObject;
                 panel.GetChild(0).GetComponent<XlateText>().SetKey("l.srle.load_a_level");
                 panel.transform.Find("CloseButton").GetComponent<Button>().RemoveAllListeners().onClick.AddListener(
@@ -130,12 +165,7 @@ namespace SRLE
                         srleNewLevelUI.Close();
                     });
                 
-                srleNewLevelUI.onDestroy = () =>
-                {
-	                Console.Log("Need to make that");
-		                if (menu)
-			                menu.gameObject.SetActive(true);
-                };
+               
                 var loadGameUI = loadLevelUI.GetComponent<LoadGameUI>();
                 srleNewLevelUI.loadingPanel = loadGameUI.loadingPanel;
                 srleNewLevelUI.noSavesPanel = loadGameUI.noSavesPanel;
@@ -214,6 +244,7 @@ namespace SRLE
                 menu.gameObject.SetActive(false);
                 loadLevelUI.gameObject.SetActive(true);
 
+
             });
             
             
@@ -239,6 +270,7 @@ namespace SRLE
 
                 buttonFromBB.RemoveAllListeners().onClick.AddListener(() =>
                 {
+	                returnToMenu = false;
 	                expoUI.GetComponent<ExpoGameSelectUI>().Close();
 	                var idEntry = SRSingleton<SceneContext>.Instance.PediaDirector.entries.First(x => x.id == PediaDirector.Id.GADGETMODE).icon;
 
@@ -254,12 +286,25 @@ namespace SRLE
                             {
 	                            if (File.Exists(Path.Combine(SRLEManager.Worlds.FullName, VARIABLE.Name.Replace(".world", ".srle"))))
 	                            {
-		                            SRSingleton<GameContext>.Instance.UITemplates.CreateConfirmDialog("m.srle.replaceoldworld", () => ConvertBetterBuildToSRLE(VARIABLE, purchaseUI));
+		                            SRSingleton<GameContext>.Instance.UITemplates.CreateConfirmDialog(
+			                            "m.srle.replaceoldworld",
+			                            () =>
+			                            {
+				                            SceneManager.LoadScene("worldGenerated");
+				                            SceneContext.onSceneLoaded += ctx =>
+				                            {
+					                            ConvertBetterBuildToSRLE(VARIABLE, purchaseUI);
+
+				                            };
+
+			                            });
+		                           
 		                            return;
 	                            }
 
-	                            ConvertBetterBuildToSRLE(VARIABLE, purchaseUI);
-
+	                            SceneManager.LoadScene("worldGenerated");
+	                            SceneContext.onSceneLoaded += ctx =>  ConvertBetterBuildToSRLE(VARIABLE, purchaseUI);
+	                            
 
 
                             }, () => true, () => true));
@@ -267,10 +312,12 @@ namespace SRLE
                     }
 	                purchaseUI = SRSingleton<GameContext>.Instance.UITemplates.CreatePurchaseUI(idEntry, "t.srle.srle_converter", purchaseUis.ToArray(), true,
 		                () =>
-		                {
-			                Console.Log("Need to make that");
-				                if (menu)
+		                { 
+			                if (SRLEUIMenu.returnToMenu)
+				                if (menu.gameObject is not null)
 					                menu.gameObject.SetActive(true);
+			                SRLEUIMenu.returnToMenu = true;
+
 		                });
                     
                 });
@@ -284,6 +331,8 @@ namespace SRLE
         
         private static void ConvertBetterBuildToSRLE(FileInfo pathOfFile, GameObject purchaseUI)
         {
+	        
+	        EntryPoint.SRLEConsoleInstance.Log("SceneContext.onSceneLoaded");
             var invoke = AccessTools.TypeByName("PmkWqSqDqhyzqncfhFgkeiIeqAFfA").GetConstructor(System.Type.EmptyTypes)?.Invoke(System.Array.Empty<object>());
 				if (invoke != null)
 				{
@@ -325,96 +374,96 @@ namespace SRLE
 					var numbersAndWords = objectsList1.Zip(objectsList2, (n, w) => new {Key = n, Value = w});
 					foreach (var nw in numbersAndWords)
 					{
-						if (o.Contains(nw.Key))
+						EntryPoint.SRLEConsoleInstance.Log(nw.Key.ToString());
+						if (!o.Contains(nw.Key)) continue;
+						var o1 = o[nw.Key];
+						var renderId = (int) o[nw.Key].GetType().GetField("RenderID").GetValue(o1);
+						var path = (string) o[nw.Key].GetType().GetField("Path").GetValue(o1);
+						var nameOfBB = (string) o[nw.Key].GetType().GetField("Name").GetValue(o1);
+						var id = (uint) o[nw.Key].GetType().GetField("ID").GetValue(o1);
+
+
+						foreach (var VARIABLE in (IList) nw.Value)
 						{
-							var o1 = o[nw.Key];
-							var renderId = (int) o[nw.Key].GetType().GetField("RenderID").GetValue(o1);
-							var path = (string) o[nw.Key].GetType().GetField("Path").GetValue(o1);
-							var nameOfBB = (string) o[nw.Key].GetType().GetField("Name").GetValue(o1);
-							var id = (uint) o[nw.Key].GetType().GetField("ID").GetValue(o1);
+							var type2 = VARIABLE.GetType();
+							var value1 = type2.GetField("vnFsBQTGupjuJrOIzDrdnTGobnzCA").GetValue(VARIABLE);
+							var position = value1.GetType().GetField("value").GetValue(value1);
 
+							var value2 = type2.GetField("JGTZUTDwWNbSmlKDfhazTgObuUFf").GetValue(VARIABLE);
+							var rotation = value2.GetType().GetField("value").GetValue(value2);
 
-							foreach (var VARIABLE in (IList) nw.Value)
-							{
-								var type2 = VARIABLE.GetType();
-								var value1 = type2.GetField("vnFsBQTGupjuJrOIzDrdnTGobnzCA").GetValue(VARIABLE);
-								var position = value1.GetType().GetField("value").GetValue(value1);
+							var value3 = type2.GetField("oLhvsYqBzOpNVnXFhvqYIEWDabkJA").GetValue(VARIABLE);
+							var scale = value3.GetType().GetField("value").GetValue(value3);
 
-								var value2 = type2.GetField("JGTZUTDwWNbSmlKDfhazTgObuUFf").GetValue(VARIABLE);
-								var rotation = value2.GetType().GetField("value").GetValue(value2);
-
-								var value3 = type2.GetField("oLhvsYqBzOpNVnXFhvqYIEWDabkJA").GetValue(VARIABLE);
-								var scale = value3.GetType().GetField("value").GetValue(value3);
-
-								var objectByHashCode = SRLEManager.GetObjectByHashCode(renderId, path, nameOfBB);
-
-								if (nameOfBB == "Water 1")
-								{
-									objectByHashCode = "62";
-								}
-
-								var dictionary = type2.GetField("nWpPVSldMKqITEYvahfGlTmpFdlH").GetValue(VARIABLE) as IDictionary;
-
-								List<object> objectsList3 = new List<object>();
-								List<object> objectsList4 =new List<object>();
-								foreach (var VARIABLE1 in dictionary.Keys)
-								{
-									objectsList3.Add(VARIABLE1);
-								}
-								foreach (var VARIABLE1 in dictionary.Values)
-								{
-									objectsList4.Add(VARIABLE1);
-								}
 								
-								var keyValue = objectsList3.Zip(objectsList4, (n, w) => new {Key = n, Value = w});
+							var objectByHashCode = SRLEManager.GetObjectByHashCode(nameOfBB, path, renderId );
+
+							if (nameOfBB == "Water 1")
+							{
+								objectByHashCode = "62";
+							}
+
+							var dictionary = type2.GetField("nWpPVSldMKqITEYvahfGlTmpFdlH").GetValue(VARIABLE) as IDictionary;
+
+							List<object> objectsList3 = new List<object>();
+							List<object> objectsList4 =new List<object>();
+							foreach (var VARIABLE1 in dictionary.Keys)
+							{
+								objectsList3.Add(VARIABLE1);
+							}
+							foreach (var VARIABLE1 in dictionary.Values)
+							{
+								objectsList4.Add(VARIABLE1);
+							}
+								
+							var keyValue = objectsList3.Zip(objectsList4, (n, w) => new {Key = n, Value = w});
 		
 
 								
 								
-								if (string.IsNullOrEmpty(objectByHashCode)) continue;
-								SRLESave srleSaveToAdd = new SRLESave();
-								(srleSaveToAdd.position = new Vector3V02()).value = (Vector3) position;
-								(srleSaveToAdd.rotation = new Vector3V02()).value = (Vector3) rotation;
-								(srleSaveToAdd.scale = new Vector3V02()).value = (Vector3) scale;
+							if (string.IsNullOrEmpty(objectByHashCode)) continue;
+							SRLESave srleSaveToAdd = new SRLESave();
+							(srleSaveToAdd.position = new Vector3V02()).value = (Vector3) position;
+							(srleSaveToAdd.rotation = new Vector3V02()).value = (Vector3) rotation;
+							(srleSaveToAdd.scale = new Vector3V02()).value = (Vector3) scale;
 								
-								foreach (var VARIABLE1 in keyValue)
-								{
+							foreach (var VARIABLE1 in keyValue)
+							{
 									
-									var o2 = VARIABLE1.Value.GetType().GetField("IywkVfFOJnkxgsjKznhRmgZTQrlm").GetValue(VARIABLE1.Value);
+								var o2 = VARIABLE1.Value.GetType().GetField("IywkVfFOJnkxgsjKznhRmgZTQrlm").GetValue(VARIABLE1.Value);
 
-									if (VARIABLE1.Key.ToString() == "journaltext")
-									{
-										(srleSaveToAdd.dictionaryWithProperties["JournalText"] = new SRLEProperty()).property = o2.ToString();
-									}
-									if (VARIABLE1.Key.ToString() == "tpdestination")
-									{
-										(srleSaveToAdd.dictionaryWithProperties["TeleportDestination"] = new SRLEProperty()).property = o2.ToString();
-									}
-									if (VARIABLE1.Key.ToString() == "tpsource")
-									{
-										(srleSaveToAdd.dictionaryWithProperties["TeleportSource"] = new SRLEProperty()).property = o2.ToString();
-									}
+								if (VARIABLE1.Key.ToString() == "journaltext")
+								{
+									(srleSaveToAdd.dictionaryWithProperties["JournalText"] = new SRLEProperty()).property = o2.ToString();
+								}
+								if (VARIABLE1.Key.ToString() == "tpdestination")
+								{
+									(srleSaveToAdd.dictionaryWithProperties["TeleportDestination"] = new SRLEProperty()).property = o2.ToString();
+								}
+								if (VARIABLE1.Key.ToString() == "tpsource")
+								{
+									(srleSaveToAdd.dictionaryWithProperties["TeleportSource"] = new SRLEProperty()).property = o2.ToString();
+								}
 									
 									
-									//Console.Log(VARIABLE1.Key + " : " + VARIABLE1.Value);	
-								}
-								
-								
-								
-								
-								
-								
-								
-								if (objects.TryGetValue(objectByHashCode, out List<SRLESave> srleSave))
-								{
-									srleSave.Add(srleSaveToAdd);
-								}
-								else
-								{
-									objects.Add(objectByHashCode, new List<SRLESave> {srleSaveToAdd});
-								}
-								
+								//Console.Log(VARIABLE1.Key + " : " + VARIABLE1.Value);	
 							}
+								
+								
+								
+								
+								
+								
+								
+							if (objects.TryGetValue(objectByHashCode, out List<SRLESave> srleSave))
+							{
+								srleSave.Add(srleSaveToAdd);
+							}
+							else
+							{
+								objects.Add(objectByHashCode, new List<SRLESave> {srleSaveToAdd});
+							}
+								
 						}
 					}
 
@@ -422,13 +471,7 @@ namespace SRLE
 					using (FileStream fileStream =
 						new FileStream(Path.Combine(SRLEManager.Worlds.FullName, pathOfFile.Name.Replace(".world", ".srle")), FileMode.Create))
 						srleName.Write(fileStream);
-
-					SRSingleton<GameContext>.Instance.UITemplates.CreateConfirmDialog("m.srle.completedsuccesfull",
-						() =>
-						{
-							purchaseUI.GetComponent<PurchaseUI>().Close();
-							
-						});
+					SceneManager.LoadScene("MainMenu");
 				}
         }  
     }

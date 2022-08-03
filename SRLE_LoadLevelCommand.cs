@@ -16,7 +16,6 @@ namespace SRLE
             SRLEName srleName = new SRLEName();
             srleName.Load(fileStream);
             currentData = srleName;
-            isSRLELevel = true;
             srleName.Write(fileStream);
             fileStream.Dispose();
             SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("", Identifiable.Id.HEN, PlayerState.GameMode.CASUAL, () => {});

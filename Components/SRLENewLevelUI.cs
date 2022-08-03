@@ -174,7 +174,7 @@ namespace SRLE.Components
                     switch (selWorldType)
                     {
                         case WorldType.STANDARD:
-                            return;
+                            break;
                         case WorldType.VOID:
                         {
                             FindObjectOfType<ZoneDirector>().gameObject.SetActive(false);

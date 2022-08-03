@@ -9,8 +9,9 @@ namespace SRLE.Patch
     {
         public static bool Prefix(IdHandler __instance, ref string __result)
         {
-            if (__instance.gameObject.TryGetComponent(out ObjectAddedBySRLE _component))
+            foreach (var objectAddedBySrle in __instance.gameObject.GetComponentsInParent<ObjectAddedBySRLE>())
             {
+                EntryPoint.SRLEConsoleInstance.Log(objectAddedBySrle.name);
                 __result = __instance.IdPrefix() + idOfIdHandler;
                 idOfIdHandler++;
                 return false;

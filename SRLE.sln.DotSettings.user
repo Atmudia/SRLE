@@ -9,4 +9,6 @@
   &lt;Assembly Path="E:\SlimeRancherModding\Rider\SRLE\packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.HotReloadModule.dll" /&gt;&#xD;
   &lt;Assembly Path="E:\SlimeRancherModding\Rider\SRLE\packages\SlimeRancherGameLibs.1.4.4\lib\mscorlib.dll" /&gt;&#xD;
   &lt;Assembly Path="E:\SlimeRancherModding\Rider\SRLE\packages\SlimeRancherGameLibs.1.4.4\lib\UnityEngine.SharedInternalsModule.dll" /&gt;&#xD;
-&lt;/AssemblyExplorer&gt;</s:String></wpf:ResourceDictionary>
+  &lt;Assembly Path="E:\SlimeRancherModding\AssembliesSRML\0Harmony.dll" /&gt;&#xD;
+&lt;/AssemblyExplorer&gt;</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=SRLE/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

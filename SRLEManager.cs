@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Web.Compilation;
+
 using HarmonyLib;
 using MonomiPark.SlimeRancher.Persist;
 using Newtonsoft.Json;
@@ -25,7 +25,7 @@ namespace SRLE
         public static SRLEName currentData;
         public static bool isSRLELevel;
 
-        public static DirectoryInfo SRLE = new DirectoryInfo(Application.streamingAssetsPath.Replace("/SlimeRancher_Data/StreamingAssets", string.Empty) + "\\SRLE");
+        public static DirectoryInfo SRLE = new DirectoryInfo(System.Environment.CurrentDirectory + "\\SRLE");
 
         public static DirectoryInfo Worlds = SRLE.CreateSubdirectory("Worlds");
         public static DirectoryInfo Icons = SRLE.CreateSubdirectory("Icons");
@@ -36,38 +36,26 @@ namespace SRLE
 
 
 
-        internal static string GetObjectByHashCode(int hashCode, string path, string name)
+        internal static string GetObjectByHashCode(string name, string path, int hashCode)
         {
-            foreach (var buildObjectsKey in SRLEManager.BuildObjects.Values)
+            foreach (var keyValue in from buildObjectsKey in SRLEManager.BuildObjects.Values from keyValue in buildObjectsKey where keyValue.Value.HashCode == hashCode select keyValue)
             {
-                foreach (var keyValue in buildObjectsKey)
-                {
-                    if (keyValue.Value.HashCode == hashCode)
-                    {
-                        return keyValue.Value.Id;
-                    }
-                }
+                return keyValue.Value.Id;
             }
 
-            return GetObjectByName(name, path, hashCode);
+            return GetObjectByPath(hashCode, path, name );
         }
 
 
 
         public static IdClass GetObjectById(string id)
         {
-            Console.Log($"Trying to find object with id: {id}");
-            foreach (var buildObjectsKey in SRLEManager.BuildObjects.Values)
+            EntryPoint.SRLEConsoleInstance.Log($"Trying to find object with id: {id}");
+            foreach (var keyValue in from buildObjectsKey in SRLEManager.BuildObjects.Values from keyValue in buildObjectsKey where keyValue.Value.Id == id select keyValue)
             {
-                foreach (var keyValue in buildObjectsKey)
-                {
-                    if (keyValue.Value.Id == id)
-                    {
-                        Console.Log($"Found id is: {keyValue.Value.Id} by method id");
+                EntryPoint.SRLEConsoleInstance.Log($"Found id is: {keyValue.Value.Id} by method id");
 
-                        return keyValue.Value;
-                    }
-                }
+                return keyValue.Value;
             }
 
             return null;
@@ -75,40 +63,29 @@ namespace SRLE
 
         internal static string GetObjectByName(string name, string path, int hashCode)
         {
-            Console.Log($"Trying other method: {name}");
-            foreach (var buildObjectsKey in SRLEManager.BuildObjects.Values)
+
+            EntryPoint.SRLEConsoleInstance.Log($"Trying other method: {name}");
+            foreach (var keyValue in from buildObjectsKey in SRLEManager.BuildObjects.Values from keyValue in buildObjectsKey where keyValue.Value.Name == name select keyValue)
             {
-                foreach (var keyValue in buildObjectsKey)
-                {
-                    if (keyValue.Value.Name == name)
-                    {
-                        Console.Log($"Found id is: {keyValue.Value.Id} by method name");
+                EntryPoint.SRLEConsoleInstance.Log($"Found id is: {keyValue.Value.Id} by method name");
 
-                        return keyValue.Value.Id;
-                    }
-                }
+                return keyValue.Value.Id;
             }
-
-            return GetObjectByPath(path);
-        }
-
-        internal static string GetObjectByPath(string path)
-        {
-            foreach (var buildObjectsKey in SRLEManager.BuildObjects.Values)
-            {
-                foreach (var keyValue in buildObjectsKey)
-                {
-                    if (keyValue.Value.Path == path)
-                    {
-                        Console.Log($"Found id is: {keyValue.Value.Id} by method path");
-                        return keyValue.Value.Id;
-                    }
-                }
-            }
-
-            Console.Log($"Please contact with SRLE Team to resolve this problem " + $" #Path {path}");
+            EntryPoint.SRLEConsoleInstance.Log($"Please contact with SRLE Team to resolve this problem " + $" #Path {path}");
 
             return string.Empty;
+        }
+
+        internal static string GetObjectByPath(int hashCode, string path, string name)
+        {
+            foreach (var keyValue in from buildObjectsKey in SRLEManager.BuildObjects.Values from keyValue in buildObjectsKey where keyValue.Value.Path == path select keyValue)
+            {
+                EntryPoint.SRLEConsoleInstance.Log($"Found id is: {keyValue.Value.Id} by method path");
+                return keyValue.Value.Id;
+            }
+
+
+            return GetObjectByName(name, path, hashCode);
         }
 
         internal static void LoadObjectsFromBuildObjects()
@@ -118,9 +95,7 @@ namespace SRLE
             SRLEManager.DontDestroyObjects = new GameObject("[SRLE] DontDestroyObject", typeof(ContainersOfObject));
             Object.DontDestroyOnLoad(SRLEManager.DontDestroyObjects);
             List<Category> categories;
-            using (StreamReader streamReader =
-                new StreamReader(
-                    EntryPoint.execAssembly!.GetManifestResourceStream(typeof(EntryPoint), "buildobjects.txt")!))
+            using (var streamReader = new StreamReader(EntryPoint.execAssembly!.GetManifestResourceStream(typeof(EntryPoint), "buildobjects.txt")!))
             {
                 categories = new JsonSerializer().Deserialize<List<Category>>(new JsonTextReader(streamReader));
             }
@@ -149,18 +124,7 @@ namespace SRLE
 
             foreach (var objects in currentData.objects)
             {
-                objects.Value.ForEach(save =>
-                {
-
-                    if (save.modid != "none")
-                    {
-                        currentData.isUsingModdedObjects = true;
-                    }
-                    else
-                    {
-                        currentData.isUsingModdedObjects = false;
-                    }
-                });
+                objects.Value.ForEach(save => { currentData.isUsingModdedObjects = save.modid != "none"; });
 
 
             }
@@ -180,37 +144,58 @@ namespace SRLE
 
 
 
-        public static void AddModdedObject(GameObject objectToAdd)
+        public static int GetRenderId(GameObject objectToGetHashCode)
         {
+            MeshFilter[] meshFilters = objectToGetHashCode.GetComponentsInChildren<MeshFilter>();
+            Renderer[] renderers = objectToGetHashCode.GetComponentsInChildren<Renderer>();
+            string text = meshFilters.Where(meshFilter => meshFilter.sharedMesh is not null).Aggregate("", (current, meshFilter) => current + meshFilter.sharedMesh.name);
+
+            text = renderers.Where(renderer => renderer.material is not null).Aggregate(text, (current, renderer) => current + renderer.material.name);
+
+            if (text == "")
+            {
+                return 0;
+            }
+
+            var num2 = text.GetHashCode();
+            return num2 != -1 ? num2 : 0;
+        }
+        
+
+        internal static void AddModdedObject(GameObject objectToAdd)
+        {
+            var modInfoName = IntermodCommunication.CallingMod;
+          
+
+            if (BuildObjects.ContainsKey("Mods"))
+            {
+                var name = $"[{modInfoName}] " + objectToAdd.name;
+                if (BuildObjects["Mods"].ContainsKey(name)) return;
+            }
             
-                var instantiateInactive = GameObjectUtils.InstantiateInactive(objectToAdd);
-                instantiateInactive.name = instantiateInactive.name.Replace("(Clone)", string.Empty);
-                instantiateInactive.transform.SetParent(DontDestroyObjects.transform);
+            
+            var instantiateInactive = GameObjectUtils.InstantiateInactive(objectToAdd);
+            var instantiateInactiveName = $"[{modInfoName}] " + instantiateInactive.name.Replace("(Clone)", string.Empty);
+            instantiateInactive.name = instantiateInactiveName;
+            instantiateInactive.transform.SetParent(SRLEManager.DontDestroyObjects.transform);
 
-                var modInfoName = SRMod.GetCurrentMod().ModInfo.Id;
-                if (!BuildObjects.ContainsKey("Mods"))
-                {
+            if (!BuildObjects.ContainsKey("Mods"))
+            {
+                ModdedIdClass moddedIdClass = new ModdedIdClass {modid = modInfoName, Id = $"mod.1", Name = instantiateInactive.name, Path = instantiateInactive.GetFullName(), HashCode = GetRenderId(objectToAdd)};
+                BuildObjects.Add("Mods", new Dictionary<string, IdClass> {{moddedIdClass.Id, moddedIdClass}}); 
+            }
+            else
+            {
+                var count = BuildObjects["Mods"].Count;
+                count++;
 
-                    ModdedIdClass moddedIdClass = new ModdedIdClass
-                        {modid = modInfoName, Id = $"mod.1", Name = objectToAdd.name, Path = objectToAdd.GetFullName()};
+                string idOfSRLE = $"mod.{count}";
+                ModdedIdClass moddedIdClass = new ModdedIdClass
+                    {modid = modInfoName, Id = idOfSRLE, Name = instantiateInactive.name, Path = instantiateInactive.GetFullName(), HashCode = GetRenderId(objectToAdd)};
 
-                    BuildObjects.Add("Mods", new Dictionary<string, IdClass>
-                    {
-                        {moddedIdClass.Id, moddedIdClass}
-                    });
-                }
-                else
-                {
-                    var count = BuildObjects["Mods"].Count;
-                    count++;
-
-                    string idOfSRLE = $"mod.{count}";
-                    ModdedIdClass moddedIdClass = new ModdedIdClass
-                        {modid = modInfoName, Id = idOfSRLE, Name = objectToAdd.name, Path = objectToAdd.GetFullName()};
-
-                    BuildObjects["Mods"].Add(moddedIdClass.Id, moddedIdClass);
-                }
-
+                BuildObjects["Mods"].Add(moddedIdClass.Id, moddedIdClass);
+            }
+            
         }
     }
 }

@@ -1,4 +1,8 @@
 ﻿using System.Collections.Generic;
+using RuntimeGizmos;
+using SRML;
+using SRML.Console;
+using SRML.Console.Commands;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -9,6 +13,11 @@ namespace SRLE.Components
         public Camera camera;
         public GameObject player;
         public List<GameObject> listOfUIs = new List<GameObject>();
+        
+        public static GameObject selectedGameObject { get; set; }
+
+        public TransformGizmo controller;
+
 
         // Token: 0x040000DF RID: 223
 
@@ -23,6 +32,7 @@ namespace SRLE.Components
 
         public void OnDisable()
         {
+            Console.commands["noclip"].Execute(new string[] { });
             player.GetComponent<vp_FPController>().MotorFreeFly = false;
             foreach (Transform child in player.transform.GetChild(0))
             {
@@ -42,6 +52,7 @@ namespace SRLE.Components
                 objects.SetActive(false);
             }
             SRSingleton<SceneContext>.Instance.Player.transform.localPosition = this.transform.localPosition;
+            controller.enabled = false;
 
 
 
@@ -50,7 +61,7 @@ namespace SRLE.Components
 
         public void OnEnable()
         {
-            
+            Console.commands["noclip"].Execute(new string[] { });
             base.transform.position = player.transform.position;
             this.transform.localPosition = player.transform.localPosition;
             player.GetComponent<vp_FPController>().MotorFreeFly = true;
@@ -71,12 +82,12 @@ namespace SRLE.Components
             {
                 objects.SetActive(true);
             }
+            controller.enabled = true;
 
         }
 
         public void Update()
         {
-
 
             if (Input.GetAxis("Mouse ScrollWheel") > 0f) // forward
             {
@@ -123,20 +134,37 @@ namespace SRLE.Components
                 this.lastRotation += 2f * Input.GetAxis("Mouse X");
                 this.rotation -= 2f * Input.GetAxis("Mouse Y");
                 this.rotation = Mathf.Clamp(this.rotation, -90f, 90f);
-                base.transform.eulerAngles = new Vector3(this.rotation,
-                    this.lastRotation, 0f);
+                base.transform.eulerAngles = new Vector3(this.rotation, this.lastRotation, 0f);
 
             }
 
-            if (Input.GetMouseButtonDown(0))
+            /*if (Input.GetMouseButtonDown(0))
             {
+                
                 if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hitInfo))
                 {
+                    selectedGameObject = hitInfo.collider.transform.gameObject;
+
+                    
                 }
 
+                /*if (selectedGameObject != null)
+                {
+                }
+                
+                
             }
+
+            if (selectedGameObject != null)
+            {
+                ControlObject();
+            }
+            */
+            
+            
             
         }
+        
 
 
         // Token: 0x040000E0 RID: 224

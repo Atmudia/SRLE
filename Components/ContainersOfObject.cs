@@ -13,15 +13,15 @@ namespace SRLE.Components
             if (objectById is null) return null;
             if (transform.Find(objectById.Name) is null)
             {
-                List<string> nameOfZones = Object.FindObjectsOfType<ZoneDirector>().Select(x => x.gameObject.name).ToList();
-                List<string> strings = objectById.Path.Split('/').ToList();
+                var nameOfZones = Object.FindObjectsOfType<ZoneDirector>().Select(x => x.gameObject.name).ToList();
+                var strings = objectById.Path.Split('/').ToList();
                 string nameOfZone = strings.FirstOrDefault(x => nameOfZones.Contains(x));
                 strings.Remove(nameOfZone);
 
                 var partOfTransform = strings.Aggregate("", (x, y) => x + "/" + y).Remove(0, 1);
                 if ( GameObject.Find(nameOfZone).transform.Find(partOfTransform) is null)
                 {
-                    Console.Log($"Please contact with the SRLE team to resolve this. {objectById.Id}");
+                    EntryPoint.SRLEConsoleInstance.Log($"Please contact with the SRLE team to resolve this. {objectById.Id}");
                     return null;
 
                 }

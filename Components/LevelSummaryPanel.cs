@@ -27,7 +27,7 @@ namespace SRLE.Components
             string lowerInvariant = srleName.worldType.ToString().ToLowerInvariant();
             
             
-            this.modeText.text = bundle.Xlate("l.srle.world_type_" + lowerInvariant); 
+            this.modeText.text = bundle.Xlate("l.srle.world_type." + lowerInvariant); 
             this.modeDescText.text = bundle.Xlate("m.srle.desc.worldType." + lowerInvariant);
 
 
@@ -39,7 +39,7 @@ namespace SRLE.Components
             
             this.objectsAmountText.text = bundle.Xlate(MessageUtil.Tcompose("l.srle.object_count", (object) num));
 
-            Console.Log("Hello: " + srleName.nameOfFile);
+            EntryPoint.SRLEConsoleInstance.Log("Hello: " + srleName.nameOfFile);
             var combine = Path.Combine(SRLEManager.Worlds.FullName, srleName.nameOfFile);
            
             this.fileSizeText.text =  bundle.Xlate(MessageUtil.Tcompose("l.srle.filesize", (object)  new FileInfo(combine).Length.ToPrettySize()));

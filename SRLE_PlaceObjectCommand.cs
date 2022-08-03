@@ -37,7 +37,7 @@ namespace SRLE
             var gameObject = SRSingleton<ContainersOfObject>.Instance.GetObject(@ulong);
             if (gameObject is null)
             {
-                Console.Log("Please use the property id");
+                EntryPoint.SRLEConsoleInstance.Log("Please use the property id");
                 return false;
             }
             var instantiateInactive = GameObjectUtils.InstantiateInactive(gameObject);
@@ -51,6 +51,9 @@ namespace SRLE
             (srleSave.position = new Vector3V02()).value = transform.position;
             (srleSave.rotation = new Vector3V02()).value = instantiateInactive.transform.rotation.eulerAngles;
             (srleSave.scale = new Vector3V02()).value = instantiateInactive.transform.localScale;
+            var objectAddedBySrle = instantiateInactive.AddComponent<ObjectAddedBySRLE>();
+            objectAddedBySrle.srleSave = srleSave;
+            objectAddedBySrle.id = @ulong;
 
 
             if (currentData.objects.ContainsKey(@ulong))

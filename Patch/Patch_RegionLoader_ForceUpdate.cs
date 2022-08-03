@@ -12,7 +12,7 @@ namespace SRLE.Patch
         {
             if (SRLEManager.isSRLELevel)
             {
-                /*if (SRLEManager.currentData is {worldType: WorldType.SEA}) return true;
+                if (SRLEManager.currentData is {worldType: WorldType.SEA}) return true;
                 var srleCamera = SRSingleton<SRLECamera>.Instance;
                 if (srleCamera.isActiveAndEnabled)
                 {
@@ -23,7 +23,7 @@ namespace SRLE.Patch
                     return false;
                 }
                 return true;
-                */
+                
             }
 
             return true;
