@@ -26,13 +26,78 @@ namespace SRLE
 {
 	
 	//[EnumHolder]
-	public class RegionSet
+	public class ConsoleInstance
 	{
+		internal object ConsoleInstanceSRML = null;
+		internal MethodInfo LogMethod = null;
+		internal MethodInfo LogWarningMethod = null;
+		internal MethodInfo LogErrorMethod = null;
+
+		internal ConsoleInstance(string modName)
+		{
+			foreach (var type in AccessTools.GetTypesFromAssembly(typeof(SRML.Console.Console).Assembly))
+			{
+				if (type.Name == "ConsoleInstance")
+				{
+					ConsoleInstanceSRML = type.GetConstructor(new[]
+					{
+						typeof(string)
+					})?.Invoke(new object[] {modName});
+					var type1 = ConsoleInstanceSRML.GetType();
+					LogMethod = type1.GetMethod("Log");
+					LogWarningMethod = type1.GetMethod("LogWarning");
+					LogErrorMethod = type1.GetMethod("LogError");
+					break;
+				}
+			}
+		}
+
+		internal void Log(object str, bool savetofile = true)
+		{
+			if (ConsoleInstanceSRML is not null)
+			{
+				LogMethod.Invoke(ConsoleInstanceSRML, new[]
+				{
+					str, savetofile
+				});
+				return;
+			}
+#pragma warning disable 618
+			Console.Log("[SRLE] " + str.ToString(), savetofile);
+		}
+
+		internal void LogWarning(object str, bool savetofile = true)
+		{
+			if (ConsoleInstanceSRML is not null)
+			{
+				LogWarningMethod.Invoke(ConsoleInstanceSRML, new[]
+				{
+					str, savetofile
+				});
+				return;
+			}
+			Console.Log("[SRLE] " + str.ToString(), savetofile);		
+		}
+
+		internal void LogError(object str, bool savetofile = true)
+		{
+			if (ConsoleInstanceSRML is not null)
+			{
+				LogErrorMethod.Invoke(ConsoleInstanceSRML, new[]
+				{
+					str, savetofile
+				});
+				return;
+			}
+			Console.Log("[SRLE] " + str.ToString(), savetofile);
+		}
+#pragma warning restore 618
+
 
 	}
 	public class EntryPoint : ModEntryPoint
 	{
-		public static Console.ConsoleInstance SRLEConsoleInstance = new("SRLE");
+		public static ConsoleInstance SRLEConsoleInstance = new("SRLE");
 
 		public static Assembly execAssembly = Assembly.GetExecutingAssembly();
 		public static AssetBundle srleDate;
@@ -53,6 +118,8 @@ namespace SRLE
 
 			HarmonyInstance.PatchAll();
 			HarmonyInstance.GetPatchedMethods().ToList().ForEach(x => x.Log());
+			
+
 			TranslationPatcher.AddUITranslation("l.srle.window_title", "SRLE - Slime Rancher Level Editor");
 			TranslationPatcher.AddUITranslation("l.srle.load_a_level", "Load a Level");
 			TranslationPatcher.AddUITranslation("l.srle.create_a_level", "Create a Level");
@@ -86,10 +153,10 @@ namespace SRLE
 			TranslationPatcher.AddUITranslation("m.srle.no_saved_levels", "No Saved Levels Available");
 			TranslationPatcher.AddUITranslation("m.srle.confirm_delete", "Are you sure you wish to permanently delete this level?");
 			
-			TranslationPatcher.AddGlobalTranslation("l.srle.presence", "SRLE: {0}");
+			TranslationPatcher.AddTranslationKey("global","l.srle.presence", "SRLE: {0}");
 			
-			TranslationPatcher.AddGlobalTranslation("l.srle.richpresence.testing", "Testing the map: {0}");
-			TranslationPatcher.AddGlobalTranslation("l.srle.richpresence.editing", "Editing the map: {0}");
+			TranslationPatcher.AddTranslationKey("global","l.srle.richpresence.testing", "Testing the map: {0}");
+			TranslationPatcher.AddTranslationKey("global", "l.srle.richpresence.editing", "Editing the map: {0}");
 
 
 			
@@ -191,11 +258,12 @@ namespace SRLE
 			};
 			SRCallbacks.PreSaveGameLoad += context =>
 			{
-				var gameObject = new GameObject("SRLECamera", new []
+				/*var gameObject = new GameObject("SRLECamera", new []
 				{
 					typeof(Camera)
 				});
 				gameObject.AddComponent<SRLECamera>().controller = gameObject.AddComponent<TransformGizmo>();
+				*/
 
 				;
 				//SRLEManager.isSRLELevel = true;
@@ -207,6 +275,7 @@ namespace SRLE
 
 		public override void Load()
 		{
+			
 			//PediaRegistry.RegisterIdEntry(RegionSet.SOMETHING1, null);
 		}
 
