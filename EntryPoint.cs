@@ -26,78 +26,10 @@ namespace SRLE
 {
 	
 	//[EnumHolder]
-	public class ConsoleInstance
-	{
-		internal object ConsoleInstanceSRML = null;
-		internal MethodInfo LogMethod = null;
-		internal MethodInfo LogWarningMethod = null;
-		internal MethodInfo LogErrorMethod = null;
 
-		internal ConsoleInstance(string modName)
-		{
-			foreach (var type in AccessTools.GetTypesFromAssembly(typeof(SRML.Console.Console).Assembly))
-			{
-				if (type.Name == "ConsoleInstance")
-				{
-					ConsoleInstanceSRML = type.GetConstructor(new[]
-					{
-						typeof(string)
-					})?.Invoke(new object[] {modName});
-					var type1 = ConsoleInstanceSRML.GetType();
-					LogMethod = type1.GetMethod("Log");
-					LogWarningMethod = type1.GetMethod("LogWarning");
-					LogErrorMethod = type1.GetMethod("LogError");
-					break;
-				}
-			}
-		}
-
-		internal void Log(object str, bool savetofile = true)
-		{
-			if (ConsoleInstanceSRML is not null)
-			{
-				LogMethod.Invoke(ConsoleInstanceSRML, new[]
-				{
-					str, savetofile
-				});
-				return;
-			}
-#pragma warning disable 618
-			Console.Log("[SRLE] " + str.ToString(), savetofile);
-		}
-
-		internal void LogWarning(object str, bool savetofile = true)
-		{
-			if (ConsoleInstanceSRML is not null)
-			{
-				LogWarningMethod.Invoke(ConsoleInstanceSRML, new[]
-				{
-					str, savetofile
-				});
-				return;
-			}
-			Console.Log("[SRLE] " + str.ToString(), savetofile);		
-		}
-
-		internal void LogError(object str, bool savetofile = true)
-		{
-			if (ConsoleInstanceSRML is not null)
-			{
-				LogErrorMethod.Invoke(ConsoleInstanceSRML, new[]
-				{
-					str, savetofile
-				});
-				return;
-			}
-			Console.Log("[SRLE] " + str.ToString(), savetofile);
-		}
-#pragma warning restore 618
-
-
-	}
 	public class EntryPoint : ModEntryPoint
 	{
-		public static ConsoleInstance SRLEConsoleInstance = new("SRLE");
+		public static Console.ConsoleInstance SRLEConsoleInstance = new("SRLE");
 
 		public static Assembly execAssembly = Assembly.GetExecutingAssembly();
 		public static AssetBundle srleDate;
@@ -169,6 +101,7 @@ namespace SRLE
 
 
 
+				
 			Console.RegisterCommand(new SRLE_CreateLevelCommand());
 			Console.RegisterCommand(new SRLE_PlaceObjectCommand());
 			Console.RegisterCommand(new SRLE_CreatePropertyForObjectCommand());
@@ -204,6 +137,7 @@ namespace SRLE
 			}
 			SRCallbacks.OnMainMenuLoaded += menu =>
 			{
+				
 				//Discord.RichPresenceHandlerImpl
 				
 				IntermodCommunication.CallIMCMethod("srle", "AddModdedObject", GameObject.Find("Art/BeatrixMainMenu"));
