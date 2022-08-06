@@ -32,7 +32,7 @@ namespace SRLE.Components
 
         public void OnDisable()
         {
-            Console.commands["noclip"].Execute(new string[] { });
+            //Console.commands["noclip"].Execute(new string[] { });
             player.GetComponent<vp_FPController>().MotorFreeFly = false;
             foreach (Transform child in player.transform.GetChild(0))
             {
@@ -61,7 +61,7 @@ namespace SRLE.Components
 
         public void OnEnable()
         {
-            Console.commands["noclip"].Execute(new string[] { });
+            //Console.commands["noclip"].Execute(new string[] { });
             base.transform.position = player.transform.position;
             this.transform.localPosition = player.transform.localPosition;
             player.GetComponent<vp_FPController>().MotorFreeFly = true;
