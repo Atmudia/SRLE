@@ -34,11 +34,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.2.1.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\AssembliesSRML\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Downloads\Slime.Rancher.v1.4.4\Slime.Rancher.v1.4.4\SRML\Libs\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\AssembliesSRML\Assembly-CSharp_old-Publicized.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp_old-Publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Downloads\Slime.Rancher.v1.4.4\Slime.Rancher.v1.4.4\SlimeRancher_Data\Managed\Assembly-CSharp_old-Publicized.dll</HintPath>
     </Reference>
     <Reference Include="InControl, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\AssembliesSRML\InControl.dll</HintPath>
@@ -46,8 +51,15 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\Slime Rancher\SRML\Libs\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="SlimeTranslationAPI">
+      <HintPath>..\EarthSlimes\EarthElementalTree\EmbeddedAssembly\SlimeTranslationAPI.dll</HintPath>
+    </Reference>
     <Reference Include="SRML, Version=0.1.9.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\AssembliesSRML\SRML-Publicized-LatestBeta.dll</HintPath>
+    </Reference>
+    <Reference Include="SRML-Publicized, Version=0.1.8.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SlimyFoliage\SlimyFoliage\bin\Debug\SRML-Publicized.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Web.Services, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -81,6 +93,10 @@
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\AssembliesSRML\UnityEngine.UI.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Downloads\Slime.Rancher.v1.4.4\Slime.Rancher.v1.4.4\SlimeRancher_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\ContainersOfObject.cs" />
@@ -94,8 +110,6 @@
     <Compile Include="Components\SRLECreatorUI.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Extensions.cs" />
-	
-	
     <Compile Include="GizmoHandler\AxisInfo.cs" />
     <Compile Include="GizmoHandler\AxisVectors.cs" />
     <Compile Include="GizmoHandler\Commands\SelectCommand.cs" />
@@ -116,7 +130,6 @@
     <Compile Include="GizmoHandler\UndoRedo\ICommand.cs" />
     <Compile Include="GizmoHandler\UndoRedo\UndoRedo.cs" />
     <Compile Include="GizmoHandler\UndoRedo\UndoRedoManager.cs" />
-	
     <Compile Include="IdClass.cs" />
     <Compile Include="Patch\Patch_AutoSaveDirector__SaveAllNow.cs" />
     <Compile Include="Patch\Patch_IdHandler_id.cs" />
@@ -155,11 +168,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="buildobjects.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\..\Unity\SRLE\Assets\AssetBundles\srledata">
-      <Link>srledata</Link>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

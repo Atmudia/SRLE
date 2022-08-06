@@ -188,6 +188,8 @@ namespace SRLE
 			//Console.RegisterCommand(new SRLE_LoadLevelCommand());
 
 			SRLEManager.LoadObjectsFromBuildObjects();
+			SRLEManager.LoadCustomObjects();
+
 			//RegionSetRegistry.RegisterRegion(RegionSet.VOID, new BoundsQuadtree<Region>(2000f, Vector3.up * 1000f, 250f, 1.2f));
 			IntermodCommunication.RegisterIntermodMethod("AddModdedObject", new Action<GameObject>(SRLEManager.AddModdedObject));
 

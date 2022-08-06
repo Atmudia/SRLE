@@ -116,7 +116,8 @@ namespace RuntimeGizmos
 		AxisVectors circlesLines = new AxisVectors();
 
 		//We use a HashSet and a List for targetRoots so that we get fast lookup with the hashset while also keeping track of the order with the list.
-		List<Transform> targetRootsOrdered = new List<Transform>();
+		// Making this public so we can use it to find out which objects are selected.
+		public List<Transform> targetRootsOrdered = new List<Transform>();
 		Dictionary<Transform, TargetInfo> targetRoots = new Dictionary<Transform, TargetInfo>();
 		HashSet<Renderer> highlightedRenderers = new HashSet<Renderer>();
 		HashSet<Transform> children = new HashSet<Transform>();
