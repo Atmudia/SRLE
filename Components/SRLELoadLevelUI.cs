@@ -151,7 +151,11 @@ namespace SRLE.Components
 			var levelSummary = availLevels[selectedIdx];
 			SRLEManager.currentData = levelSummary;
 			SRLEManager.isSRLELevel = true;
-			SceneContext.onSceneLoaded += ctx => SRLELevelUtils.LoadLevel(levelSummary);
+			SceneContext.onSceneLoaded += ctx =>
+			{
+				SRLELevelUtils.LoadLevel(levelSummary);
+				UnityEngine.Object.Instantiate(EntryPoint.srle.LoadAsset<GameObject>("CreatorUI"));
+			};
 			SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("", Identifiable.Id.HEN, PlayerState.GameMode.CASUAL, () => {});
 			Close();
 		}

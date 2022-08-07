@@ -4,20 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using Assets.Script.Util.Extensions;
-using HarmonyLib;
-using MonomiPark.SlimeRancher.Persist;
-using MonomiPark.SlimeRancher.Regions;
-using Newtonsoft.Json;
-using RuntimeGizmos;
 using SRLE.Components;
-using SRLE.SaveSystem;
 using SRML;
 using SRML.SR;
-using SRML.SR.Patches;
 using SRML.SR.UI.Utils;
-using SRML.Utils.Enum;
 using UnityEngine;
 using Console = SRML.Console.Console;
 using Object = UnityEngine.Object;
@@ -34,6 +24,7 @@ namespace SRLE
 		public static Assembly execAssembly = Assembly.GetExecutingAssembly();
 		public static AssetBundle srleDate;
 		public static AssetBundle srlegizmo;
+		public static AssetBundle srle;
 		public static Dictionary<string, Shader> shaders = new Dictionary<string, Shader>();
 
 
@@ -44,8 +35,8 @@ namespace SRLE
 		{
 
 			srleDate = AssetBundle.LoadFromStream(EntryPoint.execAssembly.GetManifestResourceStream(typeof(EntryPoint), "srledata"));
-			srlegizmo = AssetBundle.LoadFromFile(@"E:\SlimeRancherModding\Unity\GIzmoHandle\Assets\AssetBundles\srlegizmo");
-			
+			srlegizmo = AssetBundle.LoadFromStream(EntryPoint.execAssembly.GetManifestResourceStream(typeof(EntryPoint), "srlegizmo"));
+			srle = AssetBundle.LoadFromStream(EntryPoint.execAssembly.GetManifestResourceStream(typeof(EntryPoint), "srle"));
 
 
 			HarmonyInstance.PatchAll();

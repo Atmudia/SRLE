@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MonomiPark.SlimeRancher.Persist;
+using SRLE.SaveSystem;
+using System;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -10,6 +12,15 @@ namespace SRLE
 {
     internal static class Extensions
     {
+        public static SRLESave ToSRLESave(this Transform t)
+        {
+            SRLESave save = new SRLESave();
+            var srleSave = new SRLESave();
+            (srleSave.position = new Vector3V02()).value = t.position;
+            (srleSave.rotation = new Vector3V02()).value = t.rotation.eulerAngles;
+            (srleSave.scale = new Vector3V02()).value = t.transform.localScale;
+            return save;
+        }
 
         public static Button RemoveAllListeners(this Button button)
         {

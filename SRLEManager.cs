@@ -25,14 +25,14 @@ namespace SRLE
 		public static SRLEName currentData;
 		public static bool isSRLELevel;
 
-		public static DirectoryInfo SRLE = new DirectoryInfo(System.Environment.CurrentDirectory + "\\SRLE");
+		public static DirectoryInfo SRLE = new DirectoryInfo(SRML.FileSystem.LibPath.Replace("/SRML/Libs", "") + "\\SRLE");
 
 		public static DirectoryInfo Worlds = SRLE.CreateSubdirectory("Worlds");
 		public static DirectoryInfo Icons = SRLE.CreateSubdirectory("Icons");
 
 		public static GameObject DontDestroyObjects;
 
-		public static Dictionary<string, List<SRLESave>> customObjects = new Dictionary<string, List<SRLESave>>();
+		public static Dictionary<uint, List<SRLESave>> customObjects = new Dictionary<uint, List<SRLESave>>();
 
 
 		internal static string GetObjectByHashCode(string name, string path, int hashCode)
@@ -118,7 +118,9 @@ namespace SRLE
 		
 		internal static void LoadCustomObjects()
         {
-			customObjects = JsonConvert.DeserializeObject<Dictionary<string, List<SRLESave>>>(SRLE.FullName + "\\" + "customobjects.json");
+			if (File.Exists(SRLE.FullName + "\\" + "customobjects.json"))
+				customObjects = JsonConvert.DeserializeObject<Dictionary<uint, List<SRLESave>>>(SRLE.FullName + "\\" + "customobjects.json");
+			else customObjects = new Dictionary<uint, List<SRLESave>>();
         }
 
 		internal static bool SaveLevel()

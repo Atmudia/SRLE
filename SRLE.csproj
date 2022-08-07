@@ -59,7 +59,7 @@
     </Reference>
     <Reference Include="SRML-Publicized, Version=0.1.8.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SlimyFoliage\SlimyFoliage\bin\Debug\SRML-Publicized.dll</HintPath>
+      <HintPath>..\..\..\Downloads\SRML-Publicized.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Web.Services, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -81,8 +81,13 @@
     <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\AssembliesSRML\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\AssembliesSRML\UnityEngine.InputLegacyModule.dll</HintPath>
+    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Downloads\Slime.Rancher.v1.4.4\Slime.Rancher.v1.4.4\SlimeRancher_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Downloads\Slime.Rancher.v1.4.4\Slime.Rancher.v1.4.4\SlimeRancher_Data\Managed\UnityEngine.InputModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\AssembliesSRML\UnityEngine.Physics2DModule.dll</HintPath>
@@ -160,8 +165,10 @@
     <Compile Include="StreamExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="srledata" />
     <None Include="packages.config" />
-    <EmbeddedResource Include="srle_replaced" />
+    <EmbeddedResource Include="srlegizmo" />
+    <EmbeddedResource Include="srle" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="modinfo.json" />
