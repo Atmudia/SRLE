@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using MonomiPark.SlimeRancher.Regions;
 using SRLE.Components;
+using SRLE.Patch;
 using SRML;
 using SRML.SR;
 using SRML.SR.UI.Utils;
@@ -113,6 +115,15 @@ namespace SRLE
 
 			SRLEManager.LoadObjectsFromBuildObjects();
 			SRLEManager.LoadCustomObjects();
+			
+			RegionSetRegistry.RegisterRegion(RegionSetEnum.VOID, new BoundsQuadtree<Region>(2000f, Vector3.zero, 250f, 1.2f));
+			
+			/*foreach (var VARIABLE in listofZones)
+			{
+				//RegionSetRegistry.RegisterZoneIntoRegion(VARIABLE,  );
+			}
+			*/
+
 
 			//RegionSetRegistry.RegisterRegion(RegionSet.VOID, new BoundsQuadtree<Region>(2000f, Vector3.up * 1000f, 250f, 1.2f));
 			IntermodCommunication.RegisterIntermodMethod("AddModdedObject", new Action<GameObject>(SRLEManager.AddModdedObject));
@@ -189,8 +200,9 @@ namespace SRLE
 				{
 					typeof(Camera)
 				});
-				gameObject.AddComponent<SRLECamera>().controller = gameObject.AddComponent<TransformGizmo>();
+				gameObject.AddComponent<SRLECamera>().controller = gameObject.AddComponent<RuntimeGizmos.TransformGizmo>();
 				*/
+				
 
 				;
 				//SRLEManager.isSRLELevel = true;

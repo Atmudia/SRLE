@@ -6,6 +6,7 @@ using System.Threading;
 using MonomiPark.SlimeRancher.Persist;
 using MonomiPark.SlimeRancher.Regions;
 using rail;
+using SRLE.Patch;
 using SRLE.SaveSystem;
 using SRML.SR;
 using SRML.Utils;
@@ -151,11 +152,16 @@ namespace SRLE.Components
 			var levelSummary = availLevels[selectedIdx];
 			SRLEManager.currentData = levelSummary;
 			SRLEManager.isSRLELevel = true;
-			SceneContext.onSceneLoaded += ctx =>
+			SRCallbacksUtils.AddSRCallbacksAndDeleteAfterLoading(context =>
 			{
+				var srleCamera = new GameObject("SRLECamera", new[]
+				{
+					typeof(Camera)
+				});
+				srleCamera.AddComponent<SRLECamera>().controller = srleCamera.AddComponent<RuntimeGizmos.TransformGizmo>();
 				SRLELevelUtils.LoadLevel(levelSummary);
 				UnityEngine.Object.Instantiate(EntryPoint.srle.LoadAsset<GameObject>("CreatorUI")).AddComponent<SRLECreatorUI>();
-			};
+			});
 			SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("", Identifiable.Id.HEN, PlayerState.GameMode.CASUAL, () => {});
 			Close();
 		}

@@ -25,7 +25,7 @@ namespace SRLE
 		public static SRLEName currentData;
 		public static bool isSRLELevel;
 
-		public static DirectoryInfo SRLE = new DirectoryInfo(SRML.FileSystem.LibPath.Replace("/SRML/Libs", "") + "\\SRLE");
+		public static DirectoryInfo SRLE = new DirectoryInfo(SRML.FileSystem.LibPath).Parent.Parent.CreateSubdirectory("SRLE");
 
 		public static DirectoryInfo Worlds = SRLE.CreateSubdirectory("Worlds");
 		public static DirectoryInfo Icons = SRLE.CreateSubdirectory("Icons");

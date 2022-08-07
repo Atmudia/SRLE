@@ -54,9 +54,6 @@
     <Reference Include="SlimeTranslationAPI">
       <HintPath>..\EarthSlimes\EarthElementalTree\EmbeddedAssembly\SlimeTranslationAPI.dll</HintPath>
     </Reference>
-    <Reference Include="SRML, Version=0.1.9.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\AssembliesSRML\SRML-Publicized-LatestBeta.dll</HintPath>
-    </Reference>
     <Reference Include="SRML-Publicized, Version=0.1.8.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Downloads\SRML-Publicized.dll</HintPath>
@@ -140,17 +137,18 @@
     <Compile Include="Patch\Patch_IdHandler_id.cs" />
     <Compile Include="Patch\Patch_IntroUI_Awake.cs" />
     <Compile Include="Patch\Patch_JournalUI_SetJournalKey.cs" />
-    <Compile Include="Patch\Patch_RegionLoader_ForceUpdate.cs" />
+    <Content Include="Patch\Patch_RegionLoader_ForceUpdate.cs" />
     <Compile Include="Patch\Patch_RichPresenceHandlerImpl_SetRichPresence.cs" />
     <Compile Include="Patch\Patch_SavedGame_CreateNew.cs" />
     <Compile Include="Patch\Patch_SpawnResource_Update.cs" />
     <Compile Include="Patch\Patch_TeleportDestination_Awake.cs" />
-    <Content Include="Patch\Patch_ZoneDirector_GetRegionSetId.cs" />
+    <Compile Include="Patch\Patch_ZoneDirector_GetRegionSetId.cs" />
     <Compile Include="Patch\Patch_UIDetector_Update.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SaveSystem\SRLEProperty.cs" />
     <Compile Include="SaveSystem\SRLEName.cs" />
     <Compile Include="SaveSystem\SRLESave.cs" />
+    <Compile Include="SRCallbacksUtils.cs" />
     <Compile Include="SRLECommand.cs" />
     <Compile Include="SRLELevelUtils.cs" />
     <Compile Include="SRLESaveManager.cs" />

@@ -78,10 +78,10 @@ namespace SRLE.Components
 			"13".Log();
 			quitButton.GetComponent<Button>().onClick.AddListener(() =>
 			{
-				SRLEManager.SaveLevel();
+				//SRLEManager.SaveLevel();
+				SRSingleton<PauseMenu>.Instance.Quit();
 				SRLEManager.currentData = null;
 				SRLEManager.isSRLELevel = false;
-				SRSingleton<GameContext>.Instance.AutoSaveDirector.RevertToMainMenu(() => {});
 				Destroyer.Destroy(gameObject, "quitButton.onClick");
 			});
 			"14".Log();

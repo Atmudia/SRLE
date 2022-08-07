@@ -105,25 +105,25 @@ namespace SRLE
 
                 var SeaToggle = ModeOuterPanel.GetChild(0);
                 SeaToggle.name = "SeaToggle";
-                SeaToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type_sea");
+                SeaToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type.sea");
                 srleNewLevelUI.SeaToggle = SeaToggle.GetComponent<SRToggle>();
 
                 var DesertToggle = ModeOuterPanel.GetChild(1);
                 DesertToggle.name = "DesertToggle";
-                DesertToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type_desert");
+                DesertToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type.desert");
                 srleNewLevelUI.DesertToggle = DesertToggle.GetComponent<SRToggle>();
 
                 
                 var VoidToggle = ModeOuterPanel.GetChild(2);
                 VoidToggle.name = "VoidToggle";
-                VoidToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type_void");
+                VoidToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type.void");
                 srleNewLevelUI.VoidToggle = VoidToggle.GetComponent<SRToggle>();
 
                 
                 
                 var StandardToggle = Object.Instantiate(ModeOuterPanel.GetChild(0).gameObject, ModeOuterPanel.transform);
                 StandardToggle.name = "StandardToggle";
-                StandardToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type_standard");
+                StandardToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type.standard");
                 srleNewLevelUI.StandardToggle = StandardToggle.GetComponent<SRToggle>();
                 StandardToggle.transform.SetSiblingIndex(0);
 
@@ -256,9 +256,8 @@ namespace SRLE
             
             if (SRModLoader.IsModPresent("betterbuild"))
             {
-	            var replace = Application.streamingAssetsPath.Replace("/SlimeRancher_Data/StreamingAssets", string.Empty);
-
-                var fileInfos = new DirectoryInfo(Path.Combine(replace, "BetterBuild")).GetFiles();
+	            var parentFullName = new DirectoryInfo(SRML.FileSystem.LibPath).Parent.Parent.FullName;
+	            var fileInfos = new DirectoryInfo(Path.Combine(parentFullName, "BetterBuild")).GetFiles();
                 if (fileInfos.Length == 0 || fileInfos.FirstOrDefault(x => x.Extension == ".world") == null)
                 {
                     buttonFromBB.interactable = false;
@@ -291,9 +290,10 @@ namespace SRLE
 			                            () =>
 			                            {
 				                            SceneManager.LoadScene("worldGenerated");
+				                            SRCallbacksUtils.AddSRCallbacksAndDeleteAfterLoading(context => ConvertBetterBuildToSRLE(VARIABLE, purchaseUI));
+				                            
 				                            SceneContext.onSceneLoaded += ctx =>
 				                            {
-					                            ConvertBetterBuildToSRLE(VARIABLE, purchaseUI);
 
 				                            };
 
@@ -303,7 +303,7 @@ namespace SRLE
 	                            }
 
 	                            SceneManager.LoadScene("worldGenerated");
-	                            SceneContext.onSceneLoaded += ctx =>  ConvertBetterBuildToSRLE(VARIABLE, purchaseUI);
+	                            SRCallbacksUtils.AddSRCallbacksAndDeleteAfterLoading(context => ConvertBetterBuildToSRLE(VARIABLE, purchaseUI));
 	                            
 
 

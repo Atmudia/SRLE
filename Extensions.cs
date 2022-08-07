@@ -1,8 +1,10 @@
 ﻿using MonomiPark.SlimeRancher.Persist;
 using SRLE.SaveSystem;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SRML.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -20,6 +22,12 @@ namespace SRLE
             (srleSave.rotation = new Vector3V02()).value = t.rotation.eulerAngles;
             (srleSave.scale = new Vector3V02()).value = t.transform.localScale;
             return save;
+        }
+
+        public static List<T> ToEnumList<T>(this List<string> list) where T : Enum
+        {
+            var listOfT = list.Select(VARIABLE => EnumUtils.Parse<T>(VARIABLE)).ToList();
+            return listOfT;
         }
 
         public static Button RemoveAllListeners(this Button button)

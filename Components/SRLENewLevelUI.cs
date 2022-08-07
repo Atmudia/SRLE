@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SRLE.Patch;
 using SRLE.SaveSystem;
 using SRML.SR;
 using TMPro;
@@ -167,26 +168,17 @@ namespace SRLE.Components
 
 				button.interactable = false;
 				this.gameObject.SetActive(false);
-
-
-
-				SRCallbacks.PreSaveGameLoad += context =>
+				SRCallbacksUtils.AddSRCallbacksAndDeleteAfterLoading(context =>
 				{
-					switch (selWorldType)
+					var srleCamera = new GameObject("SRLECamera", new []
 					{
-						case WorldType.STANDARD:
-							break;
-						case WorldType.VOID:
-						{
-							FindObjectOfType<ZoneDirector>().gameObject.SetActive(false);
-							break;
-						}
-					}
+						typeof(Camera)
+					});
+					srleCamera.AddComponent<SRLECamera>().controller = srleCamera.AddComponent<RuntimeGizmos.TransformGizmo>();
 					UnityEngine.Object.Instantiate(EntryPoint.srle.LoadAsset<GameObject>("CreatorUI")).AddComponent<SRLECreatorUI>();
-				};
+				});
 				SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("", Identifiable.Id.HEN, PlayerState.GameMode.CASUAL,
-					() =>
-					{
+					() => {
 						button.interactable = true;
 						this.gameObject.SetActive(true);
 					});

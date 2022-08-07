@@ -33,6 +33,7 @@ namespace SRLE.Components
         public void OnDisable()
         {
             //Console.commands["noclip"].Execute(new string[] { });
+            
             player.GetComponent<vp_FPController>().MotorFreeFly = false;
             foreach (Transform child in player.transform.GetChild(0))
             {

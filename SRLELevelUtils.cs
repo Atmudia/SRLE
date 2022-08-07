@@ -118,10 +118,10 @@ namespace SRLE
                     {
                         
                         
-                        foreach (var region in Object.FindObjectsOfType<Region>())
-                        {
+                        //foreach (var region in Object.FindObjectsOfType<Region>())
+                        //{
                             //region.cellDir.zoneDirector.regionSetId =
-                        }
+                        //}
                         /*foreach (Transform o in GameObject.Find("zoneSEA").transform)
                         {
                             o.gameObject.SetActive(false);
