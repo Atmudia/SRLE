@@ -154,7 +154,7 @@ namespace SRLE.Components
 			SceneContext.onSceneLoaded += ctx =>
 			{
 				SRLELevelUtils.LoadLevel(levelSummary);
-				UnityEngine.Object.Instantiate(EntryPoint.srle.LoadAsset<GameObject>("CreatorUI"));
+				UnityEngine.Object.Instantiate(EntryPoint.srle.LoadAsset<GameObject>("CreatorUI")).AddComponent<SRLECreatorUI>();
 			};
 			SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("", Identifiable.Id.HEN, PlayerState.GameMode.CASUAL, () => {});
 			Close();

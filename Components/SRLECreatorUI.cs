@@ -34,19 +34,31 @@ namespace SRLE.Components
 		public override void Awake()
 		{
 			base.Awake();
+			"1".Log();
 			Transform t = gameObject.transform;
+			"2".Log();
 			categoryContent = t.Find("Object Panel/Categories/Viewport/Content");
+			"3".Log();
 			categoryPrefab = null; // add this when prefab completed
+			"4".Log();
 			exportButton = t.Find("Toolbar/ExportButton").gameObject;
+			"5".Log();
 			objectContent = t.Find("Object Panel/Objects/Viewport/Content");
+			"6".Log();
 			objectPrefab = null; // add this when prefab completed
+			"7".Log();
 			playButton = t.Find("Toolbar/Play").gameObject;
-			saveButton = t.Find("Toolbar.Save").gameObject;
+			"8".Log();
+			saveButton = t.Find("Toolbar/Save").gameObject;
+			"9".Log();
 			quitButton = t.Find("Toolbar/Save and Quit").gameObject;
+			"10".Log();
 			undoButton = t.Find("Toolbar/Undo").gameObject;
+			"11".Log();
 			redoButton = t.Find("Toolbar/Redo").gameObject;
-			categories = JsonConvert.DeserializeObject<List<Category>>(
-				Encoding.Default.GetString(Assembly.GetExecutingAssembly().GetManifestResourceStream("buildobjects.txt").ReadAllBytes()));
+			"12".Log();
+			// categories = JsonConvert.DeserializeObject<List<Category>>(
+			//	Encoding.Default.GetString(Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(EntryPoint), "buildobjects.txt").ReadAllBytes()));
 			/* foreach (var category in categories)
 			{
 				var categoryButton = Object.Instantiate(categoryPrefab, categoryContent);
@@ -63,6 +75,7 @@ namespace SRLE.Components
 			{
 				SRLEManager.SaveLevel();
 			});
+			"13".Log();
 			quitButton.GetComponent<Button>().onClick.AddListener(() =>
 			{
 				SRLEManager.SaveLevel();
@@ -71,11 +84,13 @@ namespace SRLE.Components
 				SRSingleton<GameContext>.Instance.AutoSaveDirector.RevertToMainMenu(() => {});
 				Destroyer.Destroy(gameObject, "quitButton.onClick");
 			});
+			"14".Log();
 			playButton.GetComponent<Button>().onClick.AddListener(() => 
 			{
 				gameObject.GetComponent<Canvas>().enabled = false;
 				SRSingleton<SRLECamera>.Instance.enabled = false;
 			});
+			"15".Log();
 			exportButton.GetComponent<Button>().onClick.AddListener(() =>
 			{
 				TransformGizmo gizmo = SRSingleton<SRLECamera>.Instance.controller;
@@ -98,6 +113,7 @@ namespace SRLE.Components
                 }
 				SRLEManager.customObjects.Add((uint)SRLEManager.customObjects.Count, saves);
 			});
+			"16".Log();
 		}
 	}
 }
