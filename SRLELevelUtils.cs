@@ -104,7 +104,7 @@ namespace SRLE
         }
         public  static void LoadLevel(SRLEName levelSummary)
         {
-
+            
             switch (levelSummary.worldType)
                 {
                     case WorldType.STANDARD:
@@ -163,6 +163,7 @@ namespace SRLE
                             break;
                         }
                     }
+                    if (idClass.IsNotNull())
 
                     foreach (var srleSave in levelSummaryObject.Value)
                     {

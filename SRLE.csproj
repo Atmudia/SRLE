@@ -134,6 +134,7 @@
     <Compile Include="GizmoHandler\UndoRedo\UndoRedoManager.cs" />
     <Compile Include="IdClass.cs" />
     <Compile Include="Patch\Patch_AutoSaveDirector__SaveAllNow.cs" />
+    <Compile Include="Patch\Patch_BaseUI_OnCancelPressed.cs" />
     <Compile Include="Patch\Patch_IdHandler_id.cs" />
     <Compile Include="Patch\Patch_IntroUI_Awake.cs" />
     <Compile Include="Patch\Patch_JournalUI_SetJournalKey.cs" />
