@@ -170,10 +170,6 @@ namespace SRLE
 
 					foreach (var srleSave in levelSummaryObject.Value)
 					{
-						if (srleSave.modid != "none" && !SRModLoader.IsModPresent(srleSave.modid))
-						{
-							"Modded object found without mod present. Skipping loading.".LogError();
-						}
 						var original = SRSingleton<ContainersOfObject>.Instance.GetObject(idClass.Id);
 						if (original is null) continue;
 
