@@ -142,7 +142,7 @@ namespace SRLE
 			var jsonStr = JsonConvert.SerializeObject(customObjects);
 			"Saving SRLE Level".LogWarning();
 			currentData.Write(fileStream);
-			File.WriteAllText(jsonStr, SRLE.FullName + "\\" + "customobjects.json");
+			File.WriteAllText(SRLE.FullName + "\\" + "customobjects.json", jsonStr);
 			"Completed SRLE Level".LogWarning();
 			fileStream.Dispose();
 			return true;
