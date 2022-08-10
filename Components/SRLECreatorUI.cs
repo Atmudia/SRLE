@@ -78,7 +78,7 @@ namespace SRLE.Components
 			"13".Log();
 			quitButton.GetComponent<Button>().onClick.AddListener(() =>
 			{
-				//SRLEManager.SaveLevel();
+				SRLEManager.SaveLevel(); // save and quit
 				SRSingleton<PauseMenu>.Instance.Quit();
 				SRLEManager.currentData = null;
 				SRLEManager.isSRLELevel = false;

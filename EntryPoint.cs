@@ -30,7 +30,6 @@ namespace SRLE
 		public static Dictionary<string, Shader> shaders = new Dictionary<string, Shader>();
 
 
-
 		
 		
 		public override void PreLoad()

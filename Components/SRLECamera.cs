@@ -33,7 +33,7 @@ namespace SRLE.Components
         public void OnDisable()
         {
             //Console.commands["noclip"].Execute(new string[] { });
-            
+            SRSingleton<SceneContext>.Instance.TimeDirector.DisableCursor(_vpFpInput);
             player.GetComponent<vp_FPController>().MotorFreeFly = false;
             foreach (Transform child in player.transform.GetChild(0))
             {
@@ -54,7 +54,7 @@ namespace SRLE.Components
             }
             SRSingleton<SceneContext>.Instance.Player.transform.localPosition = this.transform.localPosition;
             controller.enabled = false;
-
+            camera.enabled = false;
 
 
 
@@ -63,6 +63,7 @@ namespace SRLE.Components
         public void OnEnable()
         {
             //Console.commands["noclip"].Execute(new string[] { });
+            SRSingleton<SceneContext>.Instance.TimeDirector.EnableCursor(_vpFpInput);
             base.transform.position = player.transform.position;
             this.transform.localPosition = player.transform.localPosition;
             player.GetComponent<vp_FPController>().MotorFreeFly = true;
@@ -84,7 +85,7 @@ namespace SRLE.Components
                 objects.SetActive(true);
             }
             controller.enabled = true;
-
+            camera.enabled = true;
         }
 
         public void Update()
@@ -92,11 +93,11 @@ namespace SRLE.Components
 
             if (Input.GetAxis("Mouse ScrollWheel") > 0f) // forward
             {
-                speed = Mathf.Clamp(this.speed + 0.1f, 0.1f, 10f);
+                speed = Mathf.Clamp(this.speed + 1f, 0.1f, 50f);
             }
             else if (Input.GetAxis("Mouse ScrollWheel") < 0f )
             {
-                speed = Mathf.Clamp(this.speed - 0.1f, 0.1f, 10f);
+                speed = Mathf.Clamp(this.speed - 1f, 0.1f, 50f);
             }
             
             if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))

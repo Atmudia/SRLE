@@ -25,7 +25,7 @@ namespace SRLE
 		public static SRLEName currentData;
 		public static bool isSRLELevel;
 
-		public static DirectoryInfo SRLE = new DirectoryInfo(SRML.FileSystem.LibPath).Parent.Parent.CreateSubdirectory("SRLE");
+		public static DirectoryInfo SRLE = new DirectoryInfo(FileSystem.LibPath).Parent.Parent.CreateSubdirectory("SRLE");
 
 		public static DirectoryInfo Worlds = SRLE.CreateSubdirectory("Worlds");
 		public static DirectoryInfo Icons = SRLE.CreateSubdirectory("Icons");
@@ -33,6 +33,7 @@ namespace SRLE
 		public static GameObject DontDestroyObjects;
 
 		public static Dictionary<uint, List<SRLESave>> customObjects = new Dictionary<uint, List<SRLESave>>();
+		public static Camera mainCamera;
 
 
 		internal static string GetObjectByHashCode(string name, string path, int hashCode)
