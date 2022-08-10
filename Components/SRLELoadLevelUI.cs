@@ -154,7 +154,7 @@ namespace SRLE.Components
 			var levelSummary = availLevels[selectedIdx];
 			SRLEManager.currentData = levelSummary;
 			SRLEManager.isSRLELevel = true;
-			var (item1, item2) = SRLESaveManager.GetRequirementOfLevel(levelSummary);
+			/* var (item1, item2) = SRLESaveManager.GetRequirementOfLevel(levelSummary);
 			if (item1)
 			{
 				foreach (var VARIABLE in item2)
@@ -163,7 +163,7 @@ namespace SRLE.Components
 				}
 
 				return;
-			}
+			} */
 
 			SRCallbacksUtils.AddSRCallbacksAndDeleteAfterLoading(context =>
 			{

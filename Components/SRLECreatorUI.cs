@@ -31,6 +31,7 @@ namespace SRLE.Components
 		// Prefabs from unity that we will use
 		public GameObject categoryPrefab;
 		public GameObject objectPrefab;
+		public bool playing;
 		public override void Awake()
 		{
 			base.Awake();
@@ -89,31 +90,42 @@ namespace SRLE.Components
 			{
 				gameObject.GetComponent<Canvas>().enabled = false;
 				SRSingleton<SRLECamera>.Instance.enabled = false;
+				playing = true;
 			});
 			"15".Log();
 			exportButton.GetComponent<Button>().onClick.AddListener(() =>
 			{
 				TransformGizmo gizmo = SRSingleton<SRLECamera>.Instance.controller;
 				if (!gizmo.mainTargetRoot)
-                {
+				{
 					"Can't export as custom object without anything selected. Select an object first.".LogError();
 					return;
-                }
+				}
 				List<SRLESave> saves = new List<SRLESave>();
 				Transform mainTransform = gizmo.mainTargetRoot;
 				saves.Add(mainTransform.ToSRLESave());
 				foreach (Transform t in gizmo.targetRootsOrdered)
-                {
+				{
 					if (t == mainTransform) continue;
 					Vector3 pos = t.position;
 					// to get relative pos
 					t.position = mainTransform.position - t.position;
 					saves.Add(t.ToSRLESave());
 					t.position = pos;
-                }
+				}
 				SRLEManager.customObjects.Add((uint)SRLEManager.customObjects.Count, saves);
 			});
 			"16".Log();
 		}
+		public override void Update()
+        {
+			base.Update();
+			if (playing && SRInput.Actions.menu.WasPressed)
+            {
+				gameObject.GetComponent<Canvas>().enabled = true;
+				SRSingleton<SRLECamera>.Instance.enabled = true;
+				playing = false;
+			}
+        }
 	}
 }

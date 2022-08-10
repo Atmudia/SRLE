@@ -139,6 +139,7 @@
     <Compile Include="Patch\Patch_IntroUI_Awake.cs" />
     <Compile Include="Patch\Patch_JournalUI_SetJournalKey.cs" />
     <Content Include="Patch\Patch_RegionLoader_ForceUpdate.cs" />
+    <Compile Include="Patch\Patch_PauseMenu_Update.cs" />
     <Compile Include="Patch\Patch_RichPresenceHandlerImpl_SetRichPresence.cs" />
     <Compile Include="Patch\Patch_SavedGame_CreateNew.cs" />
     <Compile Include="Patch\Patch_SpawnResource_Update.cs" />
