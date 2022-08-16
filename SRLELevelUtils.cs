@@ -125,11 +125,11 @@ namespace SRLE
 						//{
 							//region.cellDir.zoneDirector.regionSetId =
 						//}
-						/*foreach (Transform o in GameObject.Find("zoneSEA").transform)
+						foreach (Transform o in GameObject.Find("zoneSEA").transform)
 						{
 							o.gameObject.SetActive(false);
 						}
-						*/
+						
 
 						break;
 					}

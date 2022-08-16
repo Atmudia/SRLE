@@ -86,6 +86,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Downloads\Slime.Rancher.v1.4.4\Slime.Rancher.v1.4.4\SlimeRancher_Data\Managed\UnityEngine.InputModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Downloads\Slime.Rancher.v1.4.4\Slime.Rancher.v1.4.4\SlimeRancher_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\AssembliesSRML\UnityEngine.Physics2DModule.dll</HintPath>
     </Reference>
@@ -105,7 +109,9 @@
     <Compile Include="Components\LevelSummaryEntry.cs" />
     <Compile Include="Components\LevelSummaryPanel.cs" />
     <Compile Include="Components\ObjectAddedBySRLE.cs" />
+    <Compile Include="Components\RuntimePreviewGenerator.cs" />
     <Compile Include="Components\Selector.cs" />
+    <Compile Include="Components\SnapshotCamera.cs" />
     <Compile Include="Components\SRLECamera.cs" />
     <Compile Include="Components\SRLELoadLevelUI.cs" />
     <Compile Include="Components\SRLENewLevelUI.cs" />

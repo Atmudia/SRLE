@@ -58,9 +58,9 @@ namespace SRLE.Components
 			"11".Log();
 			redoButton = t.Find("Toolbar/Redo").gameObject;
 			"12".Log();
-			// categories = JsonConvert.DeserializeObject<List<Category>>(
-			//	Encoding.Default.GetString(Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(EntryPoint), "buildobjects.txt").ReadAllBytes()));
-			/* foreach (var category in categories)
+			//categories = JsonConvert.DeserializeObject<List<Category>>(
+			/*Encoding.Default.GetString(Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(EntryPoint), "buildobjects.txt").ReadAllBytes()));
+			foreach (var category in categories)
 			{
 				var categoryButton = Object.Instantiate(categoryPrefab, categoryContent);
 				categoryButton.GetComponentInChildren<Text>().text = category.CategoryName;
@@ -71,7 +71,7 @@ namespace SRLE.Components
 						
 					}
 				});
-			} */
+			}*/
 			saveButton.GetComponent<Button>().onClick.AddListener(() =>
 			{
 				SRLEManager.SaveLevel();
@@ -95,6 +95,32 @@ namespace SRLE.Components
 			"15".Log();
 			exportButton.GetComponent<Button>().onClick.AddListener(() =>
 			{
+				//SnapshotCamera s = SnapshotCamera.MakeSnapshotCamera("Default");
+				foreach (var kvp in SRLEManager.BuildObjects.Values)
+                {
+					foreach (var idClass in kvp.Values)
+                    {
+						GameObject gameObject = GameObject.Find(idClass.Path);
+						/*bool active = gameObject.activeSelf;
+						gameObject.SetActive(true);
+						Bounds bounds = new Bounds();
+						foreach (MeshCollider child in gameObject.GetComponentsInChildren<MeshCollider>())
+                        {
+							bounds.Encapsulate(child.bounds);
+                        }
+						var boundPoint1 = bounds.min;
+						var boundPoint2 = bounds.max;
+						var boundPoint3 = new Vector3(boundPoint1.x, boundPoint1.y, boundPoint2.z);
+						var boundPoint4 = new Vector3(boundPoint1.x, boundPoint2.y, boundPoint1.z);
+						var boundPoint5 = new Vector3(boundPoint2.x, boundPoint1.y, boundPoint1.z);
+						var boundPoint6 = new Vector3(boundPoint1.x, boundPoint2.y, boundPoint2.z);
+						var boundPoint7 = new Vector3(boundPoint2.x, boundPoint1.y, boundPoint2.z);
+						var boundPoint8 = new Vector3(boundPoint2.x, boundPoint2.y, boundPoint1.z);*/
+						SnapshotCamera.SavePNG(RuntimePreviewGenerator.GenerateModelPreview(gameObject.transform, shouldCloneModel:true).ToReadable(), 
+							idClass.Name, SRLEManager.Icons.FullName);
+						// gameObject.SetActive(active);
+                    }
+                }
 				TransformGizmo gizmo = SRSingleton<SRLECamera>.Instance.controller;
 				if (!gizmo.mainTargetRoot)
 				{

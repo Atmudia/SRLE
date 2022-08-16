@@ -119,9 +119,16 @@ namespace SRLE
 		
 		internal static void LoadCustomObjects()
         {
-			if (File.Exists(SRLE.FullName + "\\" + "customobjects.json"))
-				customObjects = JsonConvert.DeserializeObject<Dictionary<uint, List<SRLESave>>>(SRLE.FullName + "\\" + "customobjects.json");
-			else customObjects = new Dictionary<uint, List<SRLESave>>();
+			try
+			{
+				if (File.Exists(SRLE.FullName + "\\" + "customobjects.json"))
+					customObjects = JsonConvert.DeserializeObject<Dictionary<uint, List<SRLESave>>>(SRLE.FullName + "\\" + "customobjects.json");
+				else customObjects = new Dictionary<uint, List<SRLESave>>();
+			}
+			catch 
+			{
+				customObjects = new Dictionary<uint, List<SRLESave>>();
+			}
         }
 
 		internal static bool SaveLevel()
