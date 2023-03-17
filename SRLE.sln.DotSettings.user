@@ -1,0 +1,34 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSlimeRancherModding_005CIL2CPP_0020Rider_005CSlime_0020Rancher_00202_005CMelonSRML_005CMelonSRML_005Cbin_005CDebug_005CMelonSRML_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005C0Harmony_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CIl2CppAssemblies_005CAssembly_002DCSharp_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CIl2CppAssemblies_005CIl2Cppmscorlib_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CIl2CppAssemblies_005CUnityEngine_002EAssetBundleModule_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CIl2CppAssemblies_005CUnityEngine_002ECoreModule_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CIl2CppAssemblies_005CUnityEngine_002EImageConversionModule_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CIl2CppAssemblies_005CUnityEngine_002EIMGUIModule_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CIl2CppAssemblies_005CUnityEngine_002EPhysicsModule_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CIl2CppAssemblies_005CUnity_002EAddressables_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CIl2CppAssemblies_005CUnity_002ELocalization_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CIl2CppAssemblies_005CUnity_002EResourceManager_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CIl2CppAssemblies_005CUnity_002ETextMeshPro_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CManaged_005CAssembly_002DCSharp_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CManaged_005CNewtonsoft_002EJson_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CManaged_005CUnity_002EResourceManager_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005CMelonLoader_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005Cnet6_005C0Harmony_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005Cnet6_005CIl2CppInterop_002ECommon_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005Cnet6_005CIl2CppInterop_002ERuntime_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMelonLoader_005Cnet6_005CMelonLoader_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMods_005CDebuggingMod_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CMods_005CMelonSRML_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=E_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CSlime_0020Rancher_00202_005CUserLibs_005CUniverseLib_002EIL2CPP_002EInterop_002EML_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
+  &lt;Assembly Path="E:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Managed\Assembly-CSharp.dll" /&gt;&#xD;
+  &lt;Assembly Path="E:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Managed\Unity.Addressables.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\mscorlib.dll" /&gt;&#xD;
+  &lt;Assembly Path="E:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll" /&gt;&#xD;
+  &lt;Assembly Path="E:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.ResourceManager.dll" /&gt;&#xD;
+  &lt;Assembly Path="E:\SteamLibrary\steamapps\common\Slime Rancher 2\UserLibs\UniverseLib.IL2CPP.Interop.ML.dll" /&gt;&#xD;
+  &lt;Assembly Path="E:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll" /&gt;&#xD;
+&lt;/AssemblyExplorer&gt;</s:String></wpf:ResourceDictionary>
