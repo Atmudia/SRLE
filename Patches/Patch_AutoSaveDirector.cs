@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using SRLE.Components;
 using UnityEngine;
 
 namespace SRLE.Patches;
@@ -10,9 +11,11 @@ internal static class Patch_AutoSaveDirector
     [HarmonyPrefix]
     public static bool SaveGame()
     {
-        if (SRLEMod.Instance.IsBuildMode)
+
+        if (SRLEMod.CurrentMode == SRLEMod.Mode.BUILD)
         {
-            //TODO Saving World
+            
+            SRLESaveSystem.SaveLevel(SRLEMod.CurrentLevelPath);
             //World.Save();
             return false;
         }
@@ -23,10 +26,11 @@ internal static class Patch_AutoSaveDirector
     [HarmonyPrefix]
     public static void OnGameLoaded()
     {
-        if (SRLEMod.Instance.IsBuildMode)
+        
+        
+        if (SRLEMod.CurrentMode == SRLEMod.Mode.BUILD)
         {
-            GameObject worldObj = new GameObject("World");
-            worldObj.hideFlags |= HideFlags.HideAndDontSave;
+
 
         }
     }

@@ -11,7 +11,7 @@ using UnityEngine.Localization;
 namespace SRLE
 {
     [HarmonyPatch(typeof(MainMenuLandingRootUI), nameof(MainMenuLandingRootUI.CreateModels))]
-    public static class MainMenuLandingRootUIInitPatch
+    public static class Patch_MainMenuLandingRootUI
     {
         public static void Postfix(MainMenuLandingRootUI __instance)
         {

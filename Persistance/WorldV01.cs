@@ -9,7 +9,7 @@ using BinaryWriter = Il2CppSystem.IO.BinaryWriter;
 
 namespace SRLE.Persistance
 {
-    [RegisterInIL2CPP]
+    //[RegisterInIL2CPP]
     public class WorldV01 : PersistedDataSet
     {
         public string name;

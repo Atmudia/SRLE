@@ -1,234 +1,164 @@
 ﻿global using Il2Cpp;
-using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
-using Il2CppMonomiPark.SlimeRancher.Player.CharacterController;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppMonomiPark.SlimeRancher.SceneManagement;
-using Il2CppMonomiPark.SlimeRancher.Script.Util;
-using Il2CppMonomiPark.SlimeRancher.UI.Localization;
+using Il2CppMonomiPark.SlimeRancher.UI.Popup;
 using Il2CppSystem;
-using Il2CppSystem.Collections;
 using Il2CppSystem.IO;
 using MelonLoader;
-using MelonLoader.TinyJSON;
+using SRLE.Components;
 using SRLE.Patches;
-using SRLE.Persistance;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AddressableAssets.ResourceLocators;
-using UnityEngine.Localization;
-using UnityEngine.Localization.Tables;
-using UnityEngine.Playables;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceLocations;
+using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
-using Console = System.Console;
-using Exception = System.Exception;
-using IEnumerator = System.Collections.IEnumerator;
+using DirectoryInfo = System.IO.DirectoryInfo;
 using Object = Il2CppSystem.Object;
 
  
 namespace SRLE
 {
 
-   
-
-    
-
-    public static class Extensions
+    [HarmonyPatch(typeof(DecoInstanceManager), nameof(DecoInstanceManager.OnBeginContextRendering))]
+    public class DecoInstanceManagerStart
     {
-        public static void Log(this object @this) => MelonLogger.Msg(@this.ToString());
-        public static void LogWarning(this object @this) => MelonLogger.Warning(@this.ToString());
-        public static void LogError(this object @this) => MelonLogger.Error(@this.ToString());
-        public static void PrintComponent(this GameObject obj)
+        
+        public static bool Prefix(DecoInstanceManager __instance)
         {
-            Log(obj.name);
-            foreach (Component component in obj.GetComponentsInChildren<Component>(true))
-            {
-                Log("   " + component.ToString());
-            }
-        }
-        public static GameObject FindChild(this GameObject obj, string name, bool dive = false)
-        {
-            if (!dive)
-                return obj.transform.Find(name).gameObject;
-
-            GameObject child = null;
-            if (obj.transform != null)
-                foreach (var o in obj.transform)
-                {
-                    Transform transform = o.Cast<Transform>();
-
-                    if (!(transform == null))
-                    {
-                        if (transform.name.Equals(name))
-                        {
-                            child = transform.gameObject;
-                            break;
-                        }
-
-                        if (transform.childCount > 0)
-                        {
-                            child = transform.gameObject.FindChild(name, dive);
-                            if (child != null)
-                                break;
-                        }
-                    }
-                }
-
-            return child;
-        }
-        public static string GetFullName(this GameObject obj)
-        {
-            string str = obj.name;
-            for (Transform parent = obj.transform.parent;
-                 parent != null;
-                 parent = parent.parent)
-            {
-                str = parent.gameObject.name + "/" + str;
-            }
-
-            return str;
-        }
-        public static bool TryGetResourceLocator(Object key, out IResourceLocator result)
-        {
-            if (key != null)
-            {
-                foreach (IResourceLocator resourceLocator in new Il2CppSystem.Collections.Generic.List<IResourceLocator>(Addressables.ResourceLocators).ToArray())
-                {
-                    
-                    var first = resourceLocator.Keys.ToArray().FirstOrDefault(x => x.Equals(key));
-                    if (first == null) continue;
-                    result = resourceLocator;
-                    return true;
-                }
-            }
-            result = null;
-            return false;
-        }
-
-        public static Dictionary<TK, TV> ToMonoDictionary<TK, TV>(this Il2CppSystem.Collections.Generic.Dictionary<TK, TV> @this)
-        {
-            Dictionary<TK, TV> dictionary = new Dictionary<TK, TV>();
-            foreach (var keyValuePair in @this)
-            {
-                dictionary.Add(keyValuePair.Key, keyValuePair.Value);
-            }
-
-            return dictionary;
-        }
-        public static Il2CppSystem.Collections.Generic.Dictionary<TK, TV> ToIL2CPPDictionary<TK, TV>(this Dictionary<TK, TV> @this)
-        {
-
-            Il2CppSystem.Collections.Generic.Dictionary<TK, TV> dictionary =
-                new Il2CppSystem.Collections.Generic.Dictionary<TK, TV>();
-            foreach (var keyValuePair in @this)
-            {
-                dictionary.Add(keyValuePair.Key, keyValuePair.Value);
-            }
-
-            return dictionary;
             
-        }
-        public static List<T> ToMonoList<T>(this Il2CppSystem.Collections.Generic.List<T> @this)
-        {
-            List<T> list = new List<T>();
-            foreach (var t in @this)
+            if (__instance.gameObject.GetComponent<BuildObjectId>() || __instance.gameObject.GetComponentInParent<BuildObjectId>() || __instance.gameObject.GetComponentInChildren<BuildObjectId>())
             {
-                list.Add(t);
+                UnityEngine.Object.Destroy(__instance);
+                return false;
             }
-
-            return list;
+            return true;
         }
-        public static Il2CppSystem.Collections.Generic.List<T> ToIL2CPPList<T>(this System.Collections.Generic.List<T> @this)
-        {
-            //UnityEngine.GUI.BeginScrollView
-            Il2CppSystem.Collections.Generic.List<T> list = new Il2CppSystem.Collections.Generic.List<T>();
-            foreach (var t in @this)
-            {
-                list.Add(t);
-            }
-
-            return list;
-        }
-
-
-
-
     }
+    
+    
     public class EntryPoint : MelonMod
-    { 
+    {
         public const string Version = "1.0.0";
-
+        
         public override void OnInitializeMelon()
         {
-            var executingAssembly = System.Reflection.Assembly.GetExecutingAssembly();
-          
-
-
-            var loadFromFile = AssetBundle.LoadFromFile(@"E:\SlimeRancherModding\Unity\SRLE2\Assets\AssetBundles\srle");
-            UnityEngine.Object.Instantiate(loadFromFile.LoadAsset("SRLEToolbar").Cast<GameObject>()).hideFlags |=
-                HideFlags.HideAndDontSave;
-
-
-
-
-
-
+            
             var directoryInfo = new DirectoryInfo(SRLEMod.SRLEDataPath);
             if (!directoryInfo.Exists)
                 directoryInfo.Create();
             ClassInjector.RegisterTypeInIl2Cpp<SRLEMod>();
+            ClassInjector.RegisterTypeInIl2Cpp<BuildObjectId>();
+            ClassInjector.RegisterTypeInIl2Cpp<SRLECamera>();
+
             var gSRLE = new GameObject("SRLE");
             gSRLE.AddComponent<SRLEMod>();
             gSRLE.hideFlags |= HideFlags.HideAndDontSave;
-
-  
-
-        }
-
-       
-        public static List<string> excluded = "GameCore|StandaloneStart|AllZones|XboxOneStart|MainMenu|MainMenuFromBoot|CompanyLogoWithLoadingScreen|UITesting".Split('|').ToList();
-        public static GameObject allSceneRelated;
-        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
-        {
-            //sceneName.Log();
             
-            switch (sceneName)
+            SRLEManager.LoadBuildObjects();
+
+
+            /*
+            SRLESaveSystem.WorldV01 worldV01 = new SRLESaveSystem.WorldV01
             {
-                case "MainMenuEnvironment":
-                    SRLEMod.IsLoaded = true;
-                    SRLEMod.Instance.IsBuildMode = false;
-                    
-                    break;
-                case "GameCore":
+                worldName = "Tester",
+                buildObjects = new Dictionary<uint, List<SRLESaveSystem.BuildObject>>(),
+                dependencies = new Dictionary<string, string>()
                 {
-                    Patch_Debug.AllSceneGroups = Resources.FindObjectsOfTypeAll<SceneGroup>().Where(sceneGroup => sceneGroup.sceneReferences.Any(reference => Extensions.TryGetResourceLocator(reference.RuntimeKey, out var value)) && excluded.Find(x => x.Contains(sceneGroup.name)) == null).ToArray();
-                    break;
+                    {"A test mod", "1.0.0"}
                 }
-                case "SystemCore":
+            };
+            
+            var selectMany = SRLEManager.Categories.SelectMany(x => x.Objects).ToArray();
+            foreach (var idClass in selectMany)
+            {
+                if (idClass.Id == selectMany.Length) break;
+                if (!worldV01.buildObjects.TryGetValue(idClass.Id, out var list))
                 {
-                    allSceneRelated = new GameObject("AllSceneRelated");
-                    allSceneRelated.SetActive(true);
-                    allSceneRelated.AddComponent<MeshRenderer>();
-                    SceneManager.MoveGameObjectToScene(allSceneRelated, SceneManager.GetSceneByName("SystemCore"));
-                    break;
+                    list = new List<SRLESaveSystem.BuildObject>();
+                    worldV01.buildObjects.Add(idClass.Id, list);
                 }
-                
+
+
+                for (int i = 0; i < 1; i++)
+                {
+                    list.Add(new SRLESaveSystem.BuildObject()
+                    {
+                        pos = new Vector3(1, 1, 1).ToVector3Save(),
+                        rot = new Vector3(1, 1, 1).ToVector3Save(),
+                        properties = new Dictionary<string, string>()
+                    });
+                }
             }
             
 
+            worldV01.SaveToJSON(@"D:\SteamLibrary\steamapps\common\Slime Rancher 2\SRLE\testing.srle");
+            */
+
+
+
+
+        }
+
+        
+        public static List<string> excluded = "GameCore|StandaloneStart|AllZones|XboxOneStart|MainMenu|MainMenuFromBoot|CompanyLogoWithLoadingScreen|UITesting".Split('|').ToList();
+
+        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
+        {
+            switch (sceneName)
+            {
+                case "MainMenuEnvironment":
+                    SRLEManager.ClearSRLEData();
+                    SRLEMod.IsLoaded = true;
+                    SRLEMod.CurrentMode = SRLEMod.Mode.NONE;
+                    
+
+                    break;
+                case "GameCore":
+                {
+                    var array = Resources.FindObjectsOfTypeAll<SceneGroup>().Where(sceneGroup => sceneGroup.sceneReferences.Any(reference => reference.RuntimeKey.TryGetResourceLocator(out var value)) && excluded.Find(x => x.Contains(sceneGroup.name)) == null).ToArray();
+                    break;
+                }
+                case "UICore":
+                {
+                    if (SRLEMod.CurrentMode != SRLEMod.Mode.BUILD) return;
+                    
+                    
+                    var srleCamera = new GameObject(nameof(SRLEManager.SRLEGameObject));
+                    srleCamera.hideFlags |= HideFlags.HideAndDontSave;
+                    srleCamera.AddComponent<Camera>();
+                    srleCamera.AddComponent<SRLECamera>();
+                    break;
+                }
+            }
+
+            if (!sceneName.EndsWith("Core"))
+            {
+                if (SRLECamera.Instance != null && SRLECamera.Instance.isActiveAndEnabled)
+                {
+                    foreach (var directedActorSpawner in Resources.FindObjectsOfTypeAll<DirectedActorSpawner>())
+                    {
+                        directedActorSpawner.enabled = !directedActorSpawner.enabled;
+                    }
+                }
+            }
         }
 
         public override void OnSceneWasUnloaded(int buildIndex, string sceneName)
         {
             if (sceneName.Equals("MainMenuEnvironment"))
             {
-                SRLEMod.IsLoaded = false;
-                
-
+                SRLEManager.ClearSRLEData();
             }
         }
     }

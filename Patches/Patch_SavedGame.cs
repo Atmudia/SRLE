@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Il2CppMonomiPark.SlimeRancher;
+using SRLE.Components;
 
 namespace SRLE.Patches;
 
@@ -8,5 +9,5 @@ public class Patch_SavedGame
 {
     [HarmonyPatch(nameof(SavedGame.CreateNew))]
     [HarmonyPrefix]
-    public static bool CreateNew() => !SRLEMod.Instance.IsBuildMode;
+    public static bool CreateNew() => SRLEMod.CurrentMode != SRLEMod.Mode.BUILD;
 }

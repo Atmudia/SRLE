@@ -218,7 +218,7 @@ namespace SRLE
             Transform previewObject;
             if (shouldCloneModel)
             {
-                previewObject = (Transform)Object.Instantiate(model, null, false);
+                previewObject = Object.Instantiate(model, null, false).Cast<Transform>();
                 previewObject.gameObject.hideFlags = HideFlags.HideAndDontSave;
             }
             else
