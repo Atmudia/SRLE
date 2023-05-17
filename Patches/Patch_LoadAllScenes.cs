@@ -22,7 +22,7 @@ namespace SRLE.Patches;
     {
         public static int index = 0;
         public static bool IsConverting = true;
-        public static bool isCreating = true;
+        public static bool isExecuted;
 
         [HarmonyPatch(nameof(Debug.LogWarning), typeof(Object)), HarmonyPrefix]
         public static bool DebugLogWarning(Il2CppSystem.Object message)
@@ -46,34 +46,32 @@ namespace SRLE.Patches;
             if (SRLEMod.CurrentMode == SRLEMod.Mode.BUILD)
             {
                 
-                if (message.ToString().Contains("AllZones") && isCreating)
+                if (message.ToString().Contains("AllZones") && !isExecuted)
                 {
-                    
-                    isCreating = false;
                     
                     if (!IsConverting)
                         SRLEConverterUtils.ConvertToBuildObjects();
-                    
-                    foreach (var scene in SRLEConverterUtils.GetAllScenes())
+
+                foreach (var scene in SRLEConverterUtils.GetAllScenes())
+                {
+                    if (!SRLEManager.SceneIdClassMapping.TryGetValue(scene.name, out var list)) continue;
+                    foreach (var idClass in list)
                     {
-                        if (!SRLEManager.SceneIdClassMapping.TryGetValue(scene.name, out var list)) continue;
-                        foreach (var idClass in list)
-                        {
-                            var gameObjectPath = GameObject.Find(idClass.Path);
-                            gameObjectPath.SetActive(false);
-                            var instantiate = Object.Instantiate(gameObjectPath, SRLEManager.AllZonesObj.transform);
-                            instantiate.name = $"{idClass.Id} {gameObjectPath.name}";
-                            instantiate.transform.position = Vector3.zero;
-                               
-                            gameObjectPath.SetActive(true);
+                        var gameObjectPath = GameObject.Find(idClass.Path);
+                        gameObjectPath.SetActive(false);
+                        var instantiate = Object.Instantiate(gameObjectPath, SRLEManager.CachedObjects.transform);
+                        instantiate.name = $"{idClass.Id} {gameObjectPath.name}";
+                        instantiate.transform.position = Vector3.zero;
 
-                            SRLEManager.GameObjectIdClassMapping.Add(idClass, instantiate);
+                        gameObjectPath.SetActive(true);
 
-                        }
+                        SRLEManager.GameObjectIdClassMapping.Add(idClass, instantiate);
 
                     }
-                    
-                    SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(SRLEMod.DefaultZone, new SceneLoadingParameters()
+
+                }
+
+                SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(SRLEMod.DefaultZone, new SceneLoadingParameters()
                     {
                         teleportPlayer = true,
                         onSceneGroupLoadedPhase2 = new Action<Il2CppSystem.Action<SceneLoadErrorData>>(data =>

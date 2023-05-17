@@ -15,6 +15,7 @@ using Il2CppSystem;
 using Il2CppSystem.IO;
 using MelonLoader;
 using SRLE.Components;
+using SRLE.Components.Gizmos;
 using SRLE.Patches;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -26,7 +27,6 @@ using UnityEngine.SceneManagement;
 using DirectoryInfo = System.IO.DirectoryInfo;
 using Object = Il2CppSystem.Object;
 
- 
 namespace SRLE
 {
 
@@ -49,17 +49,25 @@ namespace SRLE
     
     public class EntryPoint : MelonMod
     {
+        
+
         public const string Version = "1.0.0";
         
         public override void OnInitializeMelon()
         {
-            
+            var o = new object()
+            {
+                
+            };
             var directoryInfo = new DirectoryInfo(SRLEMod.SRLEDataPath);
             if (!directoryInfo.Exists)
                 directoryInfo.Create();
             ClassInjector.RegisterTypeInIl2Cpp<SRLEMod>();
             ClassInjector.RegisterTypeInIl2Cpp<BuildObjectId>();
+            ClassInjector.RegisterTypeInIl2Cpp<CenterPositionGetter>();
             ClassInjector.RegisterTypeInIl2Cpp<SRLECamera>();
+            ClassInjector.RegisterTypeInIl2Cpp<TransformController>();
+            ClassInjector.RegisterTypeInIl2Cpp<Selector>();
 
             var gSRLE = new GameObject("SRLE");
             gSRLE.AddComponent<SRLEMod>();
@@ -138,6 +146,9 @@ namespace SRLE
                     srleCamera.hideFlags |= HideFlags.HideAndDontSave;
                     srleCamera.AddComponent<Camera>();
                     srleCamera.AddComponent<SRLECamera>();
+                    srleCamera.AddComponent<CenterPositionGetter>();
+                    srleCamera.AddComponent<TransformController>();
+                    srleCamera.AddComponent<Selector>();
                     break;
                 }
             }

@@ -11,7 +11,7 @@ namespace SRLE;
 
 public static class SRLEManager
 {
-    public static GameObject AllZonesObj;
+    public static GameObject CachedObjects;
     public static GameObject World;
 
     public static List<BuildObjects.Category> Categories;
@@ -22,7 +22,7 @@ public static class SRLEManager
 
     public static void LoadBuildObjects()
     {
-        Categories = File.ReadAllText(@"D:\SteamLibrary\steamapps\common\Slime Rancher 2\SRLE\buildobjects.json").LoadFromJSON<List<BuildObjects.Category>>();
+        Categories = File.ReadAllText(@"C:\Program Files (x86)\Steam\steamapps\common\Slime Rancher 2\SRLE\buildobjects.json").LoadFromJSON<List<BuildObjects.Category>>();
         foreach (var idClass in Categories.SelectMany(category => category.Objects))
         {
             if (!SceneIdClassMapping.TryGetValue(idClass.Scene, out var list))
@@ -33,10 +33,10 @@ public static class SRLEManager
             list.Add(idClass); 
         }
 
-        AllZonesObj = new GameObject(nameof(AllZonesObj));
-        AllZonesObj.hideFlags |= HideFlags.HideAndDontSave;
-        AllZonesObj.SetActive(false);
-        Object.DontDestroyOnLoad(AllZonesObj);
+        CachedObjects = new GameObject(nameof(CachedObjects));
+        CachedObjects.hideFlags |= HideFlags.HideAndDontSave;
+        CachedObjects.SetActive(false);
+        Object.DontDestroyOnLoad(CachedObjects);
 
 
 
@@ -46,15 +46,15 @@ public static class SRLEManager
     {
         SRLEMod.IsLoaded = false;
         
-        Patch_Debug.isCreating = true;
+        Patch_Debug.isExecuted = false;
         
         GameObjectIdClassMapping.Clear();
-        Object.DestroyImmediate(AllZonesObj);
+        Object.DestroyImmediate(CachedObjects);
         
-        AllZonesObj = new GameObject(nameof(AllZonesObj));
-        AllZonesObj.hideFlags |= HideFlags.HideAndDontSave;
-        AllZonesObj.SetActive(true);
-        Object.DontDestroyOnLoad(AllZonesObj);
+        CachedObjects = new GameObject(nameof(CachedObjects));
+        CachedObjects.hideFlags |= HideFlags.HideAndDontSave;
+        CachedObjects.SetActive(true);
+        Object.DontDestroyOnLoad(CachedObjects);
         
         World = new GameObject("World");
         World.hideFlags |= HideFlags.HideAndDontSave;
@@ -83,7 +83,7 @@ public static class SRLEManager
         if (firstOrDefault != null)
         {
             var buildObjectId = Object.Instantiate(firstOrDefault.Value.Item1);
-            var transformPosition = SRSingleton<SceneContext>.Instance.Player.transform.position;
+            var transformPosition = CenterPositionGetter.Instance.pos;
             buildObjectId.transform.position = transformPosition;
             buildObjectId.SetActive(true);
             if (!SRLESaveSystem.CurrentLevel.buildObjects.TryGetValue(id, out var list))
@@ -104,10 +104,10 @@ public static class SRLEManager
     {
         foreach (var VARIABLE in GameObjectIdClassMapping)
         {
-            var generateModelPreview = RuntimePreviewGenerator.GenerateModelPreview(VARIABLE.Value.transform, 128, 128);
+            var generateModelPreview = RuntimePreviewGenerator.GenerateModelPreview(VARIABLE.Value.transform, 512, 512);
             var il2CppStructArray = ImageConversion.EncodeToPNG(generateModelPreview);
             if (il2CppStructArray is not null)
-                File.WriteAllBytes($@"D:\SteamLibrary\steamapps\common\Slime Rancher 2\SRLE\Textures\{VARIABLE.Value.name}.png",il2CppStructArray);
+                File.WriteAllBytes($@"C:\Program Files (x86)\Steam\steamapps\common\Slime Rancher 2\SRLE\Textures\{VARIABLE.Value.name}.png",il2CppStructArray);
         }
     }
     

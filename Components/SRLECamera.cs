@@ -21,12 +21,14 @@ public class SRLECamera : MonoBehaviour
     public Camera camera;
     public GameObject playerController;
     public GameObject playerCamera;
+    public CursorLockHandler cursorLockHandler;
     public void Awake()
     {
         Instance = this;
         camera = GetComponent<Camera>();
         playerController = SRSingleton<SceneContext>.Instance.Player;
         playerCamera = playerController.scene.GetRootGameObjects().FirstOrDefault(x => x.name.Equals("PlayerCameraKCC"));
+        cursorLockHandler = Resources.FindObjectsOfTypeAll<CursorLockHandler>().First();
     }
 
     public void OnEnable()
@@ -102,7 +104,7 @@ public class SRLECamera : MonoBehaviour
         }
     }
 
-    public void Update()
+    public void LateUpdate()
     {
 
         
@@ -141,27 +143,27 @@ public class SRLECamera : MonoBehaviour
         }
         if (!InputManager.GetMouseButton(1))
         {
-            
-            //_vpFpInput.MouseCursorForced = true;
-
+            cursorLockHandler.SetEnableCursor(true);
         }
         else
         {
-            float newRotationX = transform.localEulerAngles.y + Mouse.current.delta.x.ReadValue() * 0.5f;
-            float newRotationY = transform.localEulerAngles.x - Mouse.current.delta.y.ReadValue() * 0.5f;
-            transform.localEulerAngles = new Vector3(newRotationY, newRotationX, 0f);
-            /*
-            this.lastRotation += 0.5f * Mouse.current.delta.x.ReadValue();
-            this.rotation -= 2f * Mouse.current.delta.y.ReadValue();
-            this.rotation = Mathf.Clamp(this.rotation, -90f, 90f);
-            base.transform.eulerAngles = new Vector3(this.rotation, this.lastRotation, 0f);
-            */
+            cursorLockHandler.SetEnableCursor(false);
+            pitch = Mathf.Clamp(pitch - Mouse.current.delta.y.ReadValue()  * 30 * Time.deltaTime, -90f, 90f);
+            yaw += Mouse.current.delta.x.ReadValue() * 30f * Time.deltaTime;
+            transform.localRotation = Quaternion.Euler(pitch, yaw, 0f);
         }
 
     }
 
-    
+    public void FixedUpdate()
+    {
+      
+    }
+
+
     private float rotation = 0f;
+    private float pitch;
+    private float yaw;
 
     private float speed = 6;
     private float lastRotation = 0f;

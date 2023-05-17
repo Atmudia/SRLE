@@ -139,7 +139,7 @@ public static class SRLEConverterUtils
             FindCategory(category, categories).Objects.Add(idClass);
             aa++;
         }
-        File.WriteAllText(@"D:\SteamLibrary\steamapps\common\Slime Rancher 2\SRLE\buildobjects.json", JsonConvert.SerializeObject(categories, Formatting.Indented));
+        File.WriteAllText(@"C:\Program Files (x86)\Steam\steamapps\common\Slime Rancher 2\SRLE\buildobjects.json", JsonConvert.SerializeObject(categories, Formatting.Indented));
         }
 }
 

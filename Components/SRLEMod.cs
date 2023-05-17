@@ -133,6 +133,11 @@ namespace SRLE.Components
         }
         */
 
+        private void UpdateBuildObjects()
+        {
+
+        }
+
         private void CreateLevel(string levelName)
         {
             MelonLogger.Msg(levelName);
@@ -140,8 +145,10 @@ namespace SRLE.Components
             var srleLevel = Path.Combine(SRLEDataPath, levelName + ".srle");
             CurrentLevelPath = srleLevel;
             SRLESaveSystem.CreateLevel(CurrentLevel);
-            
-            
+
+            UpdateBuildObjects();
+
+
             var loadNewGameMetadata = new AutoSaveDirector.LoadNewGameMetadata
             {
                 saveSlotIndex = 999,
@@ -165,15 +172,16 @@ namespace SRLE.Components
         }
         private void LoadLevel(SRLESaveSystem.WorldV01 currentLevel)
         {
+            UpdateBuildObjects();
 
-            var melonMods = MelonMod.RegisteredMelons.ToArray();
+            /* var melonMods = MelonMod.RegisteredMelons.ToArray();
             var missingMods = (from modName in currentLevel.dependencies let firstOrDefault = melonMods.FirstOrDefault(x => x.Info.Name == modName.Key && x.Info.Version == modName.Value) where firstOrDefault == null select modName.Key + " : " + modName.Value).ToList();
 
             if (missingMods.Count != 0)
             {
                 error = "Missing dependencies (mods): \n" + missingMods.Aggregate(string.Empty, (current, mod) => current + (mod + Environment.NewLine));
                 return;
-            }
+            } */
             MelonLogger.Msg(currentLevel.worldName);
             CurrentMode = Mode.BUILD;
             SRLESaveSystem.CurrentLevel = currentLevel;
