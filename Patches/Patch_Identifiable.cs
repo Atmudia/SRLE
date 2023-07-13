@@ -19,7 +19,9 @@ public static class Identifiable_Awake
                     Destroyer.DestroyActor(__instance.gameObject, "CameraActivated");
                 }
                 catch
-                { }
+                {
+                    // ignored
+                }
             }
         }
     }

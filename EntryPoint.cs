@@ -1,31 +1,18 @@
 ﻿global using Il2Cpp;
-using System.Collections;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppMonomiPark.SlimeRancher.SceneManagement;
-using Il2CppMonomiPark.SlimeRancher.UI.Popup;
-using Il2CppSystem;
-using Il2CppSystem.IO;
 using MelonLoader;
 using SRLE.Components;
-using SRLE.Components.Gizmos;
-using SRLE.Patches;
+using SRLE.RuntimeGizmo;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.AddressableAssets.ResourceLocators;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceLocations;
-using UnityEngine.ResourceManagement.ResourceProviders;
-using UnityEngine.SceneManagement;
+using UnityEngine.Rendering.HighDefinition;
 using DirectoryInfo = System.IO.DirectoryInfo;
-using Object = Il2CppSystem.Object;
+using Object = UnityEngine.Object;
 
 namespace SRLE
 {
@@ -52,22 +39,28 @@ namespace SRLE
         
 
         public const string Version = "1.0.0";
+
+        public static Shader[] shaders;
         
         public override void OnInitializeMelon()
         {
-            var o = new object()
+            /*var manifestResourceStream = MelonAssembly.Assembly.GetManifestResourceStream("SRLE.srle"); 
+            byte[] data = new byte[manifestResourceStream.Length];
+            manifestResourceStream.Read(data, 0, data.Length);
+            */
+            var assetBundle = AssetBundle.LoadFromFile(@"C:\Users\komik\SRLEGizmo\Assets\AssetBundles\srle");//AssetBundle.LoadFromMemory(data);
+            shaders = assetBundle.LoadAllAssets(Il2CppType.Of<Shader>()).Select(delegate(Object o)
             {
-                
-            };
+                o.hideFlags |= HideFlags.HideAndDontSave;
+                return o.Cast<Shader>();
+            }).ToArray();
             var directoryInfo = new DirectoryInfo(SRLEMod.SRLEDataPath);
             if (!directoryInfo.Exists)
                 directoryInfo.Create();
             ClassInjector.RegisterTypeInIl2Cpp<SRLEMod>();
             ClassInjector.RegisterTypeInIl2Cpp<BuildObjectId>();
-            ClassInjector.RegisterTypeInIl2Cpp<CenterPositionGetter>();
             ClassInjector.RegisterTypeInIl2Cpp<SRLECamera>();
-            ClassInjector.RegisterTypeInIl2Cpp<TransformController>();
-            ClassInjector.RegisterTypeInIl2Cpp<Selector>();
+            ClassInjector.RegisterTypeInIl2Cpp<TransformGizmo>();
 
             var gSRLE = new GameObject("SRLE");
             gSRLE.AddComponent<SRLEMod>();
@@ -146,9 +139,7 @@ namespace SRLE
                     srleCamera.hideFlags |= HideFlags.HideAndDontSave;
                     srleCamera.AddComponent<Camera>();
                     srleCamera.AddComponent<SRLECamera>();
-                    srleCamera.AddComponent<CenterPositionGetter>();
-                    srleCamera.AddComponent<TransformController>();
-                    srleCamera.AddComponent<Selector>();
+                    srleCamera.AddComponent<TransformGizmo>();
                     break;
                 }
             }

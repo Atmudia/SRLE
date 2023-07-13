@@ -4,7 +4,7 @@ using MelonLoader;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SRLE
+namespace SRLE.Utils
 {
     public static class RuntimePreviewGenerator
     {

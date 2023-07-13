@@ -1,10 +1,10 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 
-namespace SRLE;
+namespace SRLE.Patches;
 
 [HarmonyPatch(typeof(UnityEngine.GUIStateObjects))]
-public static class Patch_GetStateObjects
+public static class Patch_GUIStateObjects
 {
     private static System.Collections.Generic.Dictionary<int, Il2CppSystem.Object> s_StateCache = new();
     [HarmonyPrefix]

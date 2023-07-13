@@ -2,9 +2,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using Il2CppSystem.Numerics;
 using MelonLoader;
 using SRLE.Components;
 using SRLE.Patches;
+using SRLE.Utils;
 using UnityEngine;
 
 namespace SRLE;
@@ -22,7 +24,7 @@ public static class SRLEManager
 
     public static void LoadBuildObjects()
     {
-        Categories = File.ReadAllText(@"C:\Program Files (x86)\Steam\steamapps\common\Slime Rancher 2\SRLE\buildobjects.json").LoadFromJSON<List<BuildObjects.Category>>();
+        Categories = File.ReadAllText(Path.Combine(SRLEMod.SRLEDataPath, "buildobjects.json")).LoadFromJSON<List<BuildObjects.Category>>();
         foreach (var idClass in Categories.SelectMany(category => category.Objects))
         {
             if (!SceneIdClassMapping.TryGetValue(idClass.Scene, out var list))
@@ -83,9 +85,9 @@ public static class SRLEManager
         if (firstOrDefault != null)
         {
             var buildObjectId = Object.Instantiate(firstOrDefault.Value.Item1);
-            var transformPosition = CenterPositionGetter.Instance.pos;
-            buildObjectId.transform.position = transformPosition;
+            buildObjectId.transform.position = SRLECamera.Instance.transform.position;
             buildObjectId.SetActive(true);
+            buildObjectId.AddComponent<BuildObjectId>().IdClass = firstOrDefault.Value.Item2;
             if (!SRLESaveSystem.CurrentLevel.buildObjects.TryGetValue(id, out var list))
             {
                 list = new List<SRLESaveSystem.BuildObject>();
@@ -105,7 +107,7 @@ public static class SRLEManager
         foreach (var VARIABLE in GameObjectIdClassMapping)
         {
             var generateModelPreview = RuntimePreviewGenerator.GenerateModelPreview(VARIABLE.Value.transform, 512, 512);
-            var il2CppStructArray = ImageConversion.EncodeToPNG(generateModelPreview);
+            var il2CppStructArray = generateModelPreview.EncodeToPNG();
             if (il2CppStructArray is not null)
                 File.WriteAllBytes($@"C:\Program Files (x86)\Steam\steamapps\common\Slime Rancher 2\SRLE\Textures\{VARIABLE.Value.name}.png",il2CppStructArray);
         }

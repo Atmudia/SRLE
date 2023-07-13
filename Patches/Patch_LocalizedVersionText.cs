@@ -1,8 +1,7 @@
 ﻿using HarmonyLib;
 using Il2CppMonomiPark.SlimeRancher.UI.MainMenu;
-using Il2CppTMPro;
 
-namespace SRLE
+namespace SRLE.Patches
 {
     [HarmonyPatch(typeof(LocalizedVersionText), nameof(LocalizedVersionText.Awake))]
     public static class Patch_LocalizedVersionText

@@ -1,14 +1,7 @@
-﻿using System.Linq;
-using HarmonyLib;
-using Il2CppMonomiPark.SlimeRancher.Script.Util;
-using Il2CppMonomiPark.SlimeRancher.UI.ButtonBehavior;
+﻿using HarmonyLib;
 using Il2CppMonomiPark.SlimeRancher.UI.MainMenu;
-using Il2CppTMPro;
-using MelonLoader;
-using UnityEngine;
-using UnityEngine.Localization;
 
-namespace SRLE
+namespace SRLE.Patches
 {
     [HarmonyPatch(typeof(MainMenuLandingRootUI), nameof(MainMenuLandingRootUI.CreateModels))]
     public static class Patch_MainMenuLandingRootUI

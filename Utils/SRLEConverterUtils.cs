@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace SRLE;
+namespace SRLE.Utils;
 
 public static class SRLEConverterUtils
 {
@@ -137,9 +137,11 @@ public static class SRLEConverterUtils
             var category = InBounds(3, strings) ? strings[3] : "None";
             var idClass = new BuildObjects.IdClass {Id = aa, Name = element.Key.name, Path = path, Scene = element.Key.scene.name, HashCode = element.Value};
             FindCategory(category, categories).Objects.Add(idClass);
-            aa++;
+            aa++; 
         }
-        File.WriteAllText(@"C:\Program Files (x86)\Steam\steamapps\common\Slime Rancher 2\SRLE\buildobjects.json", JsonConvert.SerializeObject(categories, Formatting.Indented));
-        }
+        
+        
+        File.WriteAllText(@"D:\SteamLibrary\steamapps\common\Slime Rancher 2\SRLE\buildobjects.json", JsonConvert.SerializeObject(categories, Formatting.Indented));
+    }
 }
 

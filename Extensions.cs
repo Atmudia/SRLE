@@ -119,7 +119,6 @@ public static class Extensions
     }
     public static Il2CppSystem.Collections.Generic.List<T> ToIL2CPPList<T>(this System.Collections.Generic.List<T> @this)
     {
-        //UnityEngine.GUI.BeginScrollView
         Il2CppSystem.Collections.Generic.List<T> list = new Il2CppSystem.Collections.Generic.List<T>();
         foreach (var t in @this)
         {

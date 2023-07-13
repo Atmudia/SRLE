@@ -7,6 +7,7 @@ using Il2CppMonomiPark.SlimeRancher.Damage;
 using Il2CppMonomiPark.SlimeRancher.Player.CharacterController;
 using Il2CppMonomiPark.SlimeRancher.UI;
 using MelonLoader;
+using SRLE.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UniverseLib.Config;
@@ -19,15 +20,15 @@ public class SRLECamera : MonoBehaviour
 {
     public static SRLECamera Instance;
     public Camera camera;
-    public GameObject playerController;
+    public SRCharacterController playerController;
     public GameObject playerCamera;
     public CursorLockHandler cursorLockHandler;
     public void Awake()
     {
         Instance = this;
         camera = GetComponent<Camera>();
-        playerController = SRSingleton<SceneContext>.Instance.Player;
-        playerCamera = playerController.scene.GetRootGameObjects().FirstOrDefault(x => x.name.Equals("PlayerCameraKCC"));
+        playerController = SRSingleton<SceneContext>.Instance.Player.GetComponent<SRCharacterController>();
+        playerCamera = playerController.gameObject.scene.GetRootGameObjects().FirstOrDefault(x => x.name.Equals("PlayerCameraKCC"));
         cursorLockHandler = Resources.FindObjectsOfTypeAll<CursorLockHandler>().First();
     }
 
@@ -60,10 +61,9 @@ public class SRLECamera : MonoBehaviour
     {
         SRSingleton<HudUI>.Instance.gameObject.SetActive(true); 
         SRSingleton<SceneContext>.Instance.PlayerState.InGadgetMode = false;
-        playerController.GetComponent<SRCharacterController>().Position = transform.position;
-        playerController.GetComponent<SRCharacterController>().Rotation = transform.localRotation;
-
-        //playerController.transform.localPosition = this.transform.localPosition;
+        playerController.Position = transform.position;
+        playerController.Rotation = transform.localRotation;
+        cursorLockHandler.SetEnableCursor(false);
         playerCamera.SetActive(true);
         foreach (var o in playerController.transform)
         {
@@ -104,10 +104,10 @@ public class SRLECamera : MonoBehaviour
         }
     }
 
-    public void LateUpdate()
+    public void Update()
     {
-
         
+
         if (InputManager.MouseScrollDelta.y > 0f) // forward
         {
             speed = Mathf.Clamp(this.speed + 1f, 0.1f, 50f);
@@ -139,7 +139,7 @@ public class SRLECamera : MonoBehaviour
 
         if (InputManager.GetMouseButtonDown(1))
         {
-            this.lastRotation = base.transform.eulerAngles.y;
+            //this.lastRotation = base.transform.eulerAngles.y;
         }
         if (!InputManager.GetMouseButton(1))
         {
@@ -147,17 +147,34 @@ public class SRLECamera : MonoBehaviour
         }
         else
         {
+         
+            
             cursorLockHandler.SetEnableCursor(false);
-            pitch = Mathf.Clamp(pitch - Mouse.current.delta.y.ReadValue()  * 30 * Time.deltaTime, -90f, 90f);
-            yaw += Mouse.current.delta.x.ReadValue() * 30f * Time.deltaTime;
+            /*pitch = Mathf.Clamp(pitch - Mouse.current.delta.y.ReadValue()  * 30, -90f, 90f);
+            yaw += Mouse.current.delta.x.ReadValue() * 30f;
             transform.localRotation = Quaternion.Euler(pitch, yaw, 0f);
+            */
+
+            Vector2 mouseInput = Mouse.current.delta.ReadValue();
+            pitch = Math.Clamp(pitch - mouseInput.y * 0.5f, -90f, 90f);
+            yaw += mouseInput.x * 0.5f;
+            transform.localRotation = Quaternion.Euler(pitch, yaw, 0f);
+
         }
+        lastRotation = InputManager.MousePosition;
+
 
     }
 
-    public void FixedUpdate()
+    public void OnGUI()
     {
-      
+        GUI.Label(new Rect(15f, 125f, 150f, 25f), "Spawn object with id: ");
+
+        spawnObject = GUI.TextField(new Rect(125f, 110f + 35f * 1, 200f, 25f), spawnObject);
+        if (GUI.Button(new Rect(170f, 125f, 150f, 25f), "Spawn object"))
+        {
+            SRLEManager.SpawnObjectFromId(Convert.ToUInt32(spawnObject));
+        }
     }
 
 
@@ -166,6 +183,8 @@ public class SRLECamera : MonoBehaviour
     private float yaw;
 
     private float speed = 6;
-    private float lastRotation = 0f;
+    private Vector3 lastRotation;
+
+    public static string spawnObject;
 
 }

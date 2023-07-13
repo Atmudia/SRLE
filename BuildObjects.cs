@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SRLE;
@@ -11,8 +12,17 @@ public static class BuildObjects
         public uint Id;
         public string Path;
         public string Scene;
-        public int HashCode;
+        public  int HashCode;
+        public override bool Equals(object? obj)
+        {
+            if (obj is not IdClass idClass) return false;
+            return idClass.Id == this.Id;
+        }
 
+        public override int GetHashCode()
+        {
+            return this.HashCode;
+        }
     }
 
     public class ModdedIdClass : IdClass
@@ -29,4 +39,5 @@ public static class BuildObjects
 public class BuildObjectId : MonoBehaviour
 {
     public BuildObjects.IdClass IdClass;
+    
 }

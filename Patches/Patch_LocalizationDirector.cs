@@ -4,7 +4,7 @@ using Il2CppMonomiPark.SlimeRancher.UI.Localization;
 using MelonLoader;
 using UnityEngine;
 
-namespace SRLE
+namespace SRLE.Patches
 {
     [HarmonyPatch(typeof(LocalizationDirector), nameof(LocalizationDirector.LoadTables))]
     public static class Patch_LocalizationDirector
