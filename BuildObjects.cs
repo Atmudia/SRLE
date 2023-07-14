@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace SRLE;
@@ -12,8 +13,10 @@ public static class BuildObjects
         public uint Id;
         public string Path;
         public string Scene;
-        public  int HashCode;
-        public override bool Equals(object? obj)
+        public int HashCode;
+
+        [JsonIgnore] public GameObject GameObject;
+        public override bool Equals(object obj)
         {
             if (obj is not IdClass idClass) return false;
             return idClass.Id == this.Id;
@@ -35,9 +38,4 @@ public static class BuildObjects
         public string CategoryName;
         public List<IdClass> Objects = new List<IdClass>();
     }
-}
-public class BuildObjectId : MonoBehaviour
-{
-    public BuildObjects.IdClass IdClass;
-    
 }

@@ -17,7 +17,6 @@ public static class Patch_TutorialDirector
         {
             SRLEMod.Mode.NONE => true,
             SRLEMod.Mode.BUILD => false,
-            SRLEMod.Mode.PLAY => true,
-            _ => true
+            _ => throw new ArgumentOutOfRangeException()
         };
 }

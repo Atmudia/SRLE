@@ -6,7 +6,7 @@
     <LangVersion>10</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<DebugType>Portable</DebugType>
-	<Nullable>annotations</Nullable>
+	<Nullable>disable</Nullable>
 	<UserSecretsId>34473185-8b32-4be7-959d-7d69c367dc79</UserSecretsId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -17,17 +17,11 @@
     <EmbeddedResource Include="C:\Users\komik\SRLEGizmo\Assets\AssetBundles\srle">
       <Link>srle</Link>
     </EmbeddedResource>
-    <Content Include="Persistance\BuildObjectV01.cs" />
     <Compile Remove="Persistance\BuildObjectV02.cs" />
-    <Content Include="Persistance\BuildObjectV02.cs" />
     <Compile Remove="Persistance\BuildObjectV03.cs" />
-    <Content Include="Persistance\BuildObjectV03.cs" />
     <Compile Remove="Persistance\BuildObjectV04.cs" />
-    <Content Include="Persistance\BuildObjectV04.cs" />
     <Compile Remove="Persistance\StringV01.cs" />
-    <Content Include="Persistance\StringV01.cs" />
     <Compile Remove="Persistance\WorldV01.cs" />
-    <Content Include="Persistance\WorldV01.cs" />
     <Compile Remove="s.css.cs" />
     <Content Include="s.css.cs" />
   </ItemGroup>
@@ -362,8 +356,8 @@
     <Reference Include="UnityExplorer.ML.IL2CPP.net6preview.interop">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\Slime Rancher 2\Mods\UnityExplorer.ML.IL2CPP.net6preview.interop.dll</HintPath>
     </Reference>
-    <Reference Include="UniverseLib.IL2CPP.Interop.ML">
-      <HintPath>D:\SteamLibrary\steamapps\common\Slime Rancher 2\UserLibs\UniverseLib.IL2CPP.Interop.ML.dll</HintPath>
-    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="RuntimeGizmo\" />
   </ItemGroup>
 </Project>

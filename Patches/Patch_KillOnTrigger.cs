@@ -5,16 +5,14 @@ using UnityEngine;
 namespace SRLE.Patches;
 
 [HarmonyPatch(typeof(KillOnTrigger), nameof(KillOnTrigger.OnTriggerEnter))]
-public static class KillOnTriggerOnTriggerEnter
+public static class Patch_KillOnTrigger
 {
     public static bool Prefix(Collider collider)
     {
-        if (PhysicsUtil.IsPlayerMainCollider(collider))
+        if (!PhysicsUtil.IsPlayerMainCollider(collider)) return false;
+        if (SRLECamera.Instance != null && SRLECamera.Instance.isActiveAndEnabled && SRLEMod.CurrentMode == SRLEMod.Mode.BUILD)
         {
-            if (SRLECamera.Instance != null && SRLECamera.Instance.isActiveAndEnabled && SRLEMod.CurrentMode == SRLEMod.Mode.BUILD)
-            {
-                return false;
-            }
+            return false;
         }
 
         return false;

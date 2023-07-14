@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using MelonLoader;
+using SRLE.Components;
 using SRLE.RuntimeGizmo.Helpers;
 using SRLE.RuntimeGizmo.Objects;
 using SRLE.RuntimeGizmo.Objects.Commands;
@@ -11,7 +12,6 @@ using SRLE.RuntimeGizmo.UndoRedo;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
-using InputManager = UniverseLib.Input.InputManager;
 
 namespace SRLE.RuntimeGizmo
 {
@@ -28,21 +28,21 @@ namespace SRLE.RuntimeGizmo
 		public ScaleType scaleType = ScaleType.FromPoint;
 
 		//These are the same as the unity editor hotkeys
-		public KeyCode SetMoveType = KeyCode.Keypad1;
-		public KeyCode SetRotateType = KeyCode.Keypad2;
-		public KeyCode SetScaleType = KeyCode.Keypad3;
+		public Key SetMoveType = Key.Digit1;
+		public Key SetRotateType = Key.Digit2;
+		public Key SetScaleType = Key.Digit3;
 		//public KeyCode SetRectToolType = KeyCode.T;
-		public KeyCode SetAllTransformType = KeyCode.Keypad4;
-		public KeyCode SetSpaceToggle = KeyCode.X;
-		public KeyCode SetPivotModeToggle = KeyCode.Z;
-		public KeyCode SetCenterTypeToggle = KeyCode.C;
-		public KeyCode SetScaleTypeToggle = KeyCode.S;
-		public KeyCode translationSnapping = KeyCode.LeftControl;
-		public KeyCode AddSelection = KeyCode.LeftShift;
-		public KeyCode RemoveSelection = KeyCode.LeftControl;
-		public KeyCode ActionKey = KeyCode.LeftShift; //Its set to shift instead of control so that while in the editor we dont accidentally undo editor changes =/
-		public KeyCode UndoAction = KeyCode.Z;
-		public KeyCode RedoAction = KeyCode.Y;
+		public Key SetAllTransformType = Key.Digit4;
+		public Key SetSpaceToggle = Key.X;
+		public Key SetPivotModeToggle = Key.Z;
+		public Key SetCenterTypeToggle = Key.C;
+		public Key SetScaleTypeToggle = Key.S;
+		public Key translationSnapping = Key.LeftCtrl;
+		public Key AddSelection = Key.LeftShift;
+		public Key RemoveSelection = Key.LeftCtrl;
+		public Key ActionKey = Key.LeftShift; //Its set to shift instead of control so that while in the editor we dont accidentally undo editor changes =/
+		public Key UndoAction = Key.Z;
+		public Key RedoAction = Key.Y;
 
 		public Color xColor = new Color(1, 0, 0, 0.8f);
 		public Color yColor = new Color(0, 1, 0, 0.8f);
@@ -266,7 +266,7 @@ namespace SRLE.RuntimeGizmo
 		{
 			if(maxUndoStored != UndoRedoManager.maxUndoStored) { UndoRedoManager.maxUndoStored = maxUndoStored; }
 
-			if(InputManager.GetKeyDown(ActionKey))
+			if(InputManager.GetKey(ActionKey))
 			{
 				if(InputManager.GetKeyDown(UndoAction))
 				{
@@ -1443,9 +1443,9 @@ namespace SRLE.RuntimeGizmo
 			if(lineMaterial == null)
 			{
 				
-				lineMaterial = new Material(EntryPoint.shaders.First(x => x.name.Equals("Custom/Lines")));
+				lineMaterial = new Material(SRLEObjectManager.Shaders.First(x => x.name.Equals("Custom/Lines")));
 				lineMaterial.hideFlags |= HideFlags.HideAndDontSave;
-				outlineMaterial = new Material(EntryPoint.shaders.First(x => x.name.Equals("SuperSystems/Wireframe-Transparent")));
+				outlineMaterial = new Material(SRLEObjectManager.Shaders.First(x => x.name.Equals("SuperSystems/Wireframe-Transparent")));
 				outlineMaterial.hideFlags |= HideFlags.HideAndDontSave;
 
 			}

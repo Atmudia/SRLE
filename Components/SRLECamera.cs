@@ -1,34 +1,30 @@
-using System;
+﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using Il2CppMonomiPark.SlimeRancher;
-using Il2CppMonomiPark.SlimeRancher.Damage;
 using Il2CppMonomiPark.SlimeRancher.Player.CharacterController;
 using Il2CppMonomiPark.SlimeRancher.UI;
 using MelonLoader;
-using SRLE.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UniverseLib.Config;
-using UniverseLib.Input;
-using InputManager = UniverseLib.Input.InputManager;
 
 namespace SRLE.Components;
 
 public class SRLECamera : MonoBehaviour
 {
+    public SRLECamera(IntPtr value) : base(value) { }
     public static SRLECamera Instance;
     public Camera camera;
     public SRCharacterController playerController;
     public GameObject playerCamera;
     public CursorLockHandler cursorLockHandler;
+
+    public object DestroyDelayedObject = null;
     public void Awake()
     {
         Instance = this;
         camera = GetComponent<Camera>();
         playerController = SRSingleton<SceneContext>.Instance.Player.GetComponent<SRCharacterController>();
-        playerCamera = playerController.gameObject.scene.GetRootGameObjects().FirstOrDefault(x => x.name.Equals("PlayerCameraKCC"));
+        playerCamera = GameObject.Find("PlayerCameraKCC");
         cursorLockHandler = Resources.FindObjectsOfTypeAll<CursorLockHandler>().First();
     }
 
@@ -46,37 +42,42 @@ public class SRLECamera : MonoBehaviour
 
         
         camera.tag = "MainCamera";
-        foreach (var rootGameObjects in SRLEConverterUtils.GetAllScenes().Where(x => !x.name.EndsWith("Core")).SelectMany(x => x.GetRootGameObjects()))
+        /*foreach (var rootGameObjects in EntryPoint.GetAllScenes().Where(x => !x.name.EndsWith("Core")).SelectMany(x => x.GetRootGameObjects()))
         {
             foreach (var directedActorSpawner in rootGameObjects.GetComponentsInChildren<DirectedActorSpawner>())
             {
                 directedActorSpawner.enabled = !directedActorSpawner.enabled;
             }
         }
-        MelonCoroutines.Start(DestroyDelayed());
+        */
+        
+        DestroyDelayedObject = MelonCoroutines.Start(DestroyDelayed());
 
     }
 
     public void OnDisable()
     {
+        if (SRSingleton<HudUI>.Instance == null) return;
         SRSingleton<HudUI>.Instance.gameObject.SetActive(true); 
         SRSingleton<SceneContext>.Instance.PlayerState.InGadgetMode = false;
         playerController.Position = transform.position;
-        playerController.Rotation = transform.localRotation;
+        playerController.Rotation = transform.rotation;
         cursorLockHandler.SetEnableCursor(false);
         playerCamera.SetActive(true);
         foreach (var o in playerController.transform)
         {
             o.Cast<Transform>().gameObject.SetActive(true);
         }
+        MelonCoroutines.Stop(DestroyDelayedObject);
 
-        foreach (var rootGameObjects in SRLEConverterUtils.GetAllScenes().Where(x => !x.name.EndsWith("Core")).SelectMany(x => x.GetRootGameObjects()))
+        /*foreach (var rootGameObjects in SRLEConverterUtils.GetAllScenes().Where(x => !x.name.EndsWith("Core")).SelectMany(x => x.GetRootGameObjects()))
         {
             foreach (var directedActorSpawner in rootGameObjects.GetComponentsInChildren<DirectedActorSpawner>())
             {
                 directedActorSpawner.enabled = !directedActorSpawner.enabled;
             }
         }
+        */
     }
 
     public void SetActive(bool setActive)
@@ -117,22 +118,22 @@ public class SRLECamera : MonoBehaviour
             speed = Mathf.Clamp(this.speed - 1f, 0.1f, 50f);
         }
 
-        if (InputManager.GetKey(KeyCode.A) || InputManager.GetKey(KeyCode.LeftArrow))
+        if (InputManager.GetKey(Key.A) || InputManager.GetKey(Key.LeftArrow))
         {
             transform.position += -transform.right * (speed * Time.deltaTime);
         }
 
-        if (InputManager.GetKey(KeyCode.D) || InputManager.GetKey(KeyCode.RightArrow))
+        if (InputManager.GetKey(Key.D) || InputManager.GetKey(Key.RightArrow))
         {
             transform.position += transform.right * (speed * Time.deltaTime);
         }
 
-        if (InputManager.GetKey(KeyCode.W) || InputManager.GetKey(KeyCode.UpArrow))
+        if (InputManager.GetKey(Key.W) || InputManager.GetKey(Key.UpArrow))
         {
             transform.position += transform.forward * (speed * Time.deltaTime);
         }
 
-        if (InputManager.GetKey(KeyCode.S) || InputManager.GetKey(KeyCode.DownArrow))
+        if (InputManager.GetKey(Key.S) || InputManager.GetKey(Key.DownArrow))
         {
             transform.position += -transform.forward * (speed * Time.deltaTime);
         }
@@ -173,12 +174,18 @@ public class SRLECamera : MonoBehaviour
         spawnObject = GUI.TextField(new Rect(125f, 110f + 35f * 1, 200f, 25f), spawnObject);
         if (GUI.Button(new Rect(170f, 125f, 150f, 25f), "Spawn object"))
         {
-            SRLEManager.SpawnObjectFromId(Convert.ToUInt32(spawnObject));
+            SRLEObjectManager.SpawnObject(Convert.ToUInt32(spawnObject));
+            //SRLEManager.SpawnObjectFromId();
+        }
+
+        if (GUI.Button(new Rect(170f, 90f, 150f, 25f), "Quit"))
+        {
+            SRSingleton<SceneContext>.Instance.PauseMenuDirector.Quit();
+            
         }
     }
 
 
-    private float rotation = 0f;
     private float pitch;
     private float yaw;
 

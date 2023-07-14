@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using MelonLoader;
 using SRLE.Components;
 using UnityEngine;
 
@@ -14,8 +15,7 @@ internal static class Patch_AutoSaveDirector
 
         if (SRLEMod.CurrentMode == SRLEMod.Mode.BUILD)
         {
-            
-            SRLESaveSystem.SaveLevel(SRLEMod.CurrentLevelPath);
+            SRLESaveManager.SaveLevel();
             //World.Save();
             return false;
         }

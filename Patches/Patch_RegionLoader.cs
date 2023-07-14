@@ -1,5 +1,6 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2CppMonomiPark.SlimeRancher.Regions;
+using MelonLoader;
 using SRLE.Components;
 
 namespace SRLE.Patches;
@@ -11,6 +12,7 @@ public static class Patch_RegionLoader
     {
         if (SRLEMod.CurrentMode == SRLEMod.Mode.BUILD && SRLECamera.Instance != null)
         {
+            
             var srleCamera = SRLECamera.Instance;
             if (srleCamera.isActiveAndEnabled)
             {
@@ -22,7 +24,6 @@ public static class Patch_RegionLoader
             }
             return true;
         }
-
         return true;
     }
 }
