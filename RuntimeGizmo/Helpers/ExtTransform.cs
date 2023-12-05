@@ -47,26 +47,15 @@ namespace SRLE.RuntimeGizmo.Helpers
 			target.position = newPosition;
 		}
 
-		public static Vector3 GetCenter(this Transform transform, CenterType centerType)
+		public static Vector3 GetCenter(this Transform transform)
 		{
-			if(centerType == CenterType.Solo)
+			Renderer renderer = transform.GetComponent<Renderer>();
+			if(renderer != null)
 			{
-				Renderer renderer = transform.GetComponent<Renderer>();
-				if(renderer != null)
-				{
-					return renderer.bounds.center;
-				}else{
-					return transform.position;
-				}
+				return renderer.bounds.center;
+			}else{
+				return transform.position;
 			}
-			else if(centerType == CenterType.All)
-			{
-				Bounds totalBounds = new Bounds(transform.position, Vector3.zero);
-				GetCenterAll(transform, ref totalBounds);
-				return totalBounds.center;
-			}
-
-			return transform.position;
 		}
 		static void GetCenterAll(this Transform transform, ref Bounds currentTotalBounds)
 		{

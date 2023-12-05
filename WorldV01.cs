@@ -24,6 +24,8 @@ public class BuildObject
     public Dictionary<string, string> Properties;
     public class Vector3Save
     {
-        public float x, y, z;
+        public float x;
+        public float y;
+        public float z;
     }
 }

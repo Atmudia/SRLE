@@ -42,26 +42,37 @@ namespace SRLE.Patches;
         [HarmonyPatch( nameof(Debug.Log), typeof(Object)), HarmonyPrefix]
         public static void DebugLogObject(Il2CppSystem.Object message)
         {
+            
+            
             if (SRLEMod.CurrentMode == SRLEMod.Mode.BUILD)
             {
                 if (SRLEObjectManager.CachedGameObjects != null) return;
                 if (message.ToString().Contains("AllZones"))
                 {
+                    if (SRLEConverter.IsConverting)
+                    {
+                        SRLEConverter.ConvertToBuildObjects();
+                        return;
+                    }
+                    
+                    
                     SRLEObjectManager.CachedGameObjects = new GameObject(nameof(SRLEObjectManager.CachedGameObjects))
                     { 
                         hideFlags = HideFlags.HideAndDontSave
                     };
                     Object.DontDestroyOnLoad(SRLEObjectManager.CachedGameObjects);
                   
+                    
                     foreach (var scene in GetAllScenes())
                     {
-                        var idClasses = SRLEObjectManager.OnlyIdClasses.Where(x => x.Scene.Equals(scene.name));
+                        var idClasses = SRLEObjectManager.BuildObjectsData.Where(x => x.Value.Scene.Equals(scene.name));
                         foreach (var idClass in idClasses)
                         {
-                            var gameObjectPath = GameObject.Find(idClass.Path);
+                            
+                            var gameObjectPath = GameObject.Find(idClass.Value.Path);
                             gameObjectPath.SetActive(false);
                             var instantiate = Object.Instantiate(gameObjectPath, SRLEObjectManager.CachedGameObjects.transform);
-                            instantiate.name = $"{idClass.Id} {gameObjectPath.name}";
+                            instantiate.name = $"{idClass.Value.Id} {gameObjectPath.name}";
                             instantiate.transform.position = Vector3.zero;
                             var meshFilters = instantiate.GetComponents<MeshFilter>().ToList();
                             meshFilters.AddRange(instantiate.GetComponentsInChildren<MeshFilter>());
@@ -72,15 +83,14 @@ namespace SRLE.Patches;
                             foreach (var skinnedMeshRenderer in skinnedMeshRenderers.Where(skinnedMeshRenderer => skinnedMeshRenderer.GetComponent<Collider>() == null))
                                 skinnedMeshRenderer.gameObject.AddComponent<MeshCollider>().sharedMesh = skinnedMeshRenderer.sharedMesh;
                             gameObjectPath.SetActive(true);
-                            idClass.GameObject = instantiate;
+                            idClass.Value.GameObject = instantiate;
                         }
                     }
-                    SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(SRSingleton<SystemContext>.Instance.SceneLoader.defaultGameplaySceneGroup, new SceneLoadingParameters()
+                    SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(SRSingleton<SystemContext>.Instance.SceneLoader.DefaultGameplaySceneGroup, new SceneLoadingParameters()
                     {
-                        teleportPlayer = true,
-                        onSceneGroupLoadedPhase2 = new Action<Il2CppSystem.Action<SceneLoadErrorData>>(data =>
+                        TeleportPlayer = true,
+                        OnSceneGroupLoadedPhase2 = new Action<Il2CppSystem.Action<SceneLoadErrorData>>(data =>
                         {
-                            SRLESaveManager.LoadObjectsFromLevel();
                         }),
                     });
                 }

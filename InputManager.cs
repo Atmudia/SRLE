@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace SRLE;
 
 public static class InputManager
 {
-    public static Vector3 MousePosition => Mouse.current.position.ReadValue();
+    public static Vector2 MousePosition => Mouse.current.position.ReadValue();
     public static Vector2 MouseScrollDelta => Mouse.current.scroll.ReadValue();
 
     public static bool GetMouseButtonDown(int btn)
@@ -41,7 +42,7 @@ public static class InputManager
     }
 
     public static bool GetKey(Key code)
-    {
+    { 
         return Keyboard.current[code].isPressed;
     }
     public static bool GetKeyDown(Key code)

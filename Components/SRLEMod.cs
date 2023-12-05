@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.IO;
 using System.Linq;
 using Il2CppMonomiPark.SlimeRancher;
@@ -8,6 +9,7 @@ using Il2CppMonomiPark.SlimeRancher.SceneManagement;
 using Il2CppSystem.Collections.Generic;
 using MelonLoader;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Object = UnityEngine.Object;
 
 namespace SRLE.Components;
@@ -52,7 +54,7 @@ public class SRLEMod : MonoBehaviour
             var levelName = Path.GetFileNameWithoutExtension(file);
             if (GUI.Button(new Rect(15f, 150f + 35f * i, 150f, 25f), "Load " + levelName))
             {
-                //LoadLevel(File.ReadAllText(file).LoadFromJSON<SRLESaveSystem.WorldV01>()); 
+               SRLESaveManager.LoadLevel(file);
             }
         }
         currentLevel = GUI.TextField(new Rect(125f, 170f + 35f * files.Length, 200f, 25f), currentLevel);

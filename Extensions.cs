@@ -12,5 +12,17 @@ public static class Extensions
         y = @this.y,
         z = @this.z
     };
+    public static string GetFullName(this GameObject obj)
+    {
+        string str = obj.name;
+        for (Transform parent = obj.transform.parent;
+             parent != null;
+             parent = parent.parent)
+        {
+            str = parent.gameObject.name + "/" + str;
+        }
+
+        return str;
+    }
 
 }

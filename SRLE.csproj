@@ -3,14 +3,11 @@
     <TargetFramework>net6.0</TargetFramework>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <LangVersion>10</LangVersion>
+    <LangVersion>preview</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<DebugType>Portable</DebugType>
+	<DebugType>embedded</DebugType>
 	<Nullable>disable</Nullable>
 	<UserSecretsId>34473185-8b32-4be7-959d-7d69c367dc79</UserSecretsId>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DefineConstants>TRACE;UNITY_2018_2_OR_NEWER</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Persistance\BuildObjectV01.cs" />
@@ -23,7 +20,8 @@
     <Compile Remove="Persistance\StringV01.cs" />
     <Compile Remove="Persistance\WorldV01.cs" />
     <Compile Remove="s.css.cs" />
-    <Content Include="s.css.cs" />
+    <Compile Remove="RuntimeGizmoTest\**" />
+    <EmbeddedResource Remove="RuntimeGizmoTest\**" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -358,6 +356,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="RuntimeGizmo\" />
+    <None Remove="RuntimeGizmoTest\**" />
   </ItemGroup>
 </Project>

@@ -19,7 +19,7 @@ public static class Patch_RegionLoader
                 var position = srleCamera.transform.position;
                 __instance.UpdateProxied(position);
                 __instance.UpdateHibernated(position);
-                __instance.lastRegionCheckPos = position;
+                __instance._lastRegionCheckPos = position;
                 return false;
             }
             return true;

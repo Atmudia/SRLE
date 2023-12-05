@@ -23,8 +23,6 @@ namespace SRLE.RuntimeGizmo
 	{
 		public TransformSpace space = TransformSpace.Global;
 		public TransformType transformType = TransformType.Move;
-		public TransformPivot pivot = TransformPivot.Pivot;
-		public CenterType centerType = CenterType.All;
 		public ScaleType scaleType = ScaleType.FromPoint;
 
 		//These are the same as the unity editor hotkeys
@@ -34,7 +32,6 @@ namespace SRLE.RuntimeGizmo
 		//public KeyCode SetRectToolType = KeyCode.T;
 		public Key SetAllTransformType = Key.Digit4;
 		public Key SetSpaceToggle = Key.X;
-		public Key SetPivotModeToggle = Key.Z;
 		public Key SetCenterTypeToggle = Key.C;
 		public Key SetScaleTypeToggle = Key.S;
 		public Key translationSnapping = Key.LeftCtrl;
@@ -43,7 +40,7 @@ namespace SRLE.RuntimeGizmo
 		public Key ActionKey = Key.LeftShift; //Its set to shift instead of control so that while in the editor we dont accidentally undo editor changes =/
 		public Key UndoAction = Key.Z;
 		public Key RedoAction = Key.Y;
-
+		public Key PasteAction = Key.V;
 		public Color xColor = new Color(1, 0, 0, 0.8f);
 		public Color yColor = new Color(0, 1, 0, 0.8f);
 		public Color zColor = new Color(0, 0, 1, 0.8f);
@@ -180,7 +177,8 @@ namespace SRLE.RuntimeGizmo
 			GetTarget();
 
 			if(mainTargetRoot == null) return;
-			
+			HandleCopyPaste();
+
 			TransformSelected();
 		}
 
@@ -279,6 +277,22 @@ namespace SRLE.RuntimeGizmo
 			}
 		}
 
+		public void HandleCopyPaste()
+		{
+			if(InputManager.GetKey(ActionKey))
+			{
+				if(InputManager.GetKeyDown(SetCenterTypeToggle))
+				{
+					CopyPasteManager.Copy();
+				}
+				else if(InputManager.GetKeyDown(PasteAction))
+				{
+					if (CopyPasteManager.copiedObject != null)
+						CopyPasteManager.Paste();
+				}
+			}
+		}
+
 		//We only support scaling in local space.
 		public TransformSpace GetProperTransformSpace()
 		{
@@ -296,7 +310,7 @@ namespace SRLE.RuntimeGizmo
 		}
 		public bool TransformTypeContains(TransformType mainType, TransformType type)
 		{
-			return ExtTransformType.TransformTypeContains(mainType, type, GetProperTransformSpace());
+			return mainType.TransformTypeContains(type, GetProperTransformSpace());
 		}
 		
 		public float GetHandleLength(TransformType type, Axis axis = Axis.None, bool multiplyDistanceMultiplier = true)
@@ -327,22 +341,8 @@ namespace SRLE.RuntimeGizmo
 			else if(InputManager.GetKeyDown(SetAllTransformType)) transformType = TransformType.All;
 
 			if(!isTransforming) translatingType = transformType;
+			SetPivotPoint();
 
-			if(InputManager.GetKeyDown(SetPivotModeToggle))
-			{
-				if(pivot == TransformPivot.Pivot) pivot = TransformPivot.Center;
-				else if(pivot == TransformPivot.Center) pivot = TransformPivot.Pivot;
-
-				SetPivotPoint();
-			}
-
-			if(InputManager.GetKeyDown(SetCenterTypeToggle))
-			{
-				if(centerType == CenterType.All) centerType = CenterType.Solo;
-				else if(centerType == CenterType.Solo) centerType = CenterType.All;
-
-				SetPivotPoint();
-			}
 
 			if(InputManager.GetKeyDown(SetSpaceToggle))
 			{
@@ -355,11 +355,7 @@ namespace SRLE.RuntimeGizmo
 				if(scaleType == ScaleType.FromPoint) scaleType = ScaleType.FromPointOffset;
 				else if(scaleType == ScaleType.FromPointOffset) scaleType = ScaleType.FromPoint;
 			}
-
-			if(transformType == TransformType.Scale)
-			{
-				if(pivot == TransformPivot.Pivot) scaleType = ScaleType.FromPoint; //FromPointOffset can be inaccurate and should only really be used in Center mode if desired.
-			}
+			
 		}
 
 		void TransformSelected()
@@ -427,8 +423,7 @@ namespace SRLE.RuntimeGizmo
 								float amountInAxis1 = ExtVector3.MagnitudeInDirection(currentSnapMovementAmount, otherAxis1);
 								float amountInAxis2 = ExtVector3.MagnitudeInDirection(currentSnapMovementAmount, otherAxis2);
 
-								float remainder1;
-								float snapAmount1 = CalculateSnapAmount(movementSnap, amountInAxis1, out remainder1);
+								float snapAmount1 = CalculateSnapAmount(movementSnap, amountInAxis1, out _);
 								float remainder2;
 								float snapAmount2 = CalculateSnapAmount(movementSnap, amountInAxis2, out remainder2);
 
@@ -491,7 +486,7 @@ namespace SRLE.RuntimeGizmo
 						Vector3 localAxis = (GetProperTransformSpace() == TransformSpace.Local && nearAxis != Axis.Any) ? mainTargetRoot.InverseTransformDirection(axis) : axis;
 						
 						Vector3 targetScaleAmount = Vector3.one;
-						if(nearAxis == Axis.Any) targetScaleAmount = (ExtVector3.Abs(mainTargetRoot.localScale.normalized) * scaleAmount);
+						if(nearAxis == Axis.Any) targetScaleAmount = (mainTargetRoot.localScale.normalized.Abs() * scaleAmount);
 						else targetScaleAmount = localAxis * scaleAmount;
 
 						for(int i = 0; i < targetRootsOrdered.Count; i++)
@@ -499,21 +494,14 @@ namespace SRLE.RuntimeGizmo
 							Transform target = targetRootsOrdered[i];
 
 							Vector3 targetScale = target.localScale + targetScaleAmount;
-
-							if(pivot == TransformPivot.Pivot)
+							
+							if(scaleType == ScaleType.FromPoint)
 							{
-								target.localScale = targetScale;
+								target.SetScaleFrom(originalPivot, targetScale);
 							}
-							else if(pivot == TransformPivot.Center)
+							else if(scaleType == ScaleType.FromPointOffset)
 							{
-								if(scaleType == ScaleType.FromPoint)
-								{
-									target.SetScaleFrom(originalPivot, targetScale);
-								}
-								else if(scaleType == ScaleType.FromPointOffset)
-								{
-									target.SetScaleFromOffset(originalPivot, targetScale);
-								}
+								target.SetScaleFromOffset(originalPivot, targetScale);
 							}
 						}
 
@@ -560,15 +548,7 @@ namespace SRLE.RuntimeGizmo
 						for(int i = 0; i < targetRootsOrdered.Count; i++)
 						{
 							Transform target = targetRootsOrdered[i];
-
-							if(pivot == TransformPivot.Pivot)
-							{
-								target.Rotate(rotationAxis, rotateAmount, Space.World);
-							}
-							else if(pivot == TransformPivot.Center)
-							{
-								target.RotateAround(originalPivot, rotationAxis, rotateAmount);
-							}
+							target.RotateAround(originalPivot, rotationAxis, rotateAmount);
 						}
 
 						totalRotationAmount *= Quaternion.Euler(rotationAxis * rotateAmount);
@@ -678,10 +658,11 @@ namespace SRLE.RuntimeGizmo
 						}
 					}
 				}
-				if (!isAdding && !isRemoving)
-				{
-					ClearTargets();
-				}
+				
+				//if (!isAdding && !isRemoving)
+				//{
+					//ClearTargets();
+				//}
 			}
 		}
 		
@@ -728,7 +709,7 @@ namespace SRLE.RuntimeGizmo
 			children.Clear();
 		}
 
-		void ClearAndAddTarget(Transform target)
+		public void ClearAndAddTarget(Transform target)
 		{
 			UndoRedoManager.Insert(new ClearAndAddTargetCommand(this, target, targetRootsOrdered));
 
@@ -771,6 +752,7 @@ namespace SRLE.RuntimeGizmo
 			if(target != null)
 			{
 				renderers.AddRange(target.GetComponentsInChildren<Renderer>(true));
+				renderers.RemoveAll(x => x.TryCast<ParticleSystemRenderer>());
 			}
 		}
 
@@ -867,35 +849,21 @@ namespace SRLE.RuntimeGizmo
 		{
 			if(mainTargetRoot != null)
 			{
-				if(pivot == TransformPivot.Pivot)
+				totalCenterPivotPoint = Vector3.zero;
+				
+				using Dictionary<Transform, TargetInfo>.Enumerator targetsEnumerator = targetRoots.GetEnumerator(); //We avoid foreach to avoid garbage.
+				while(targetsEnumerator.MoveNext())
 				{
-					pivotPoint = mainTargetRoot.position;
+					Transform target = targetsEnumerator.Current.Key;
+					TargetInfo info = targetsEnumerator.Current.Value;
+					info.centerPivotPoint = target.GetCenter();
+
+					totalCenterPivotPoint += info.centerPivotPoint;
 				}
-				else if(pivot == TransformPivot.Center)
-				{
-					totalCenterPivotPoint = Vector3.zero;
 
-					using Dictionary<Transform, TargetInfo>.Enumerator targetsEnumerator = targetRoots.GetEnumerator(); //We avoid foreach to avoid garbage.
-					while(targetsEnumerator.MoveNext())
-					{
-						Transform target = targetsEnumerator.Current.Key;
-						TargetInfo info = targetsEnumerator.Current.Value;
-						info.centerPivotPoint = target.GetCenter(centerType);
+				totalCenterPivotPoint /= targetRoots.Count;
+				pivotPoint = targetRoots[mainTargetRoot].centerPivotPoint;
 
-						totalCenterPivotPoint += info.centerPivotPoint;
-					}
-
-					totalCenterPivotPoint /= targetRoots.Count;
-
-					if(centerType == CenterType.Solo)
-					{
-						pivotPoint = targetRoots[mainTargetRoot].centerPivotPoint;
-					}
-					else if(centerType == CenterType.All)
-					{
-						pivotPoint = totalCenterPivotPoint;
-					}
-				}
 			}
 		}
 		void SetPivotPointOffset(Vector3 offset)
@@ -1074,8 +1042,7 @@ namespace SRLE.RuntimeGizmo
 				{
 					Plane plane = new Plane(planePoints[i], planePoints[i + 1], planePoints[i + 2]);
 
-					float distanceToPlane;
-					if(plane.Raycast(mouseRay, out distanceToPlane))
+					if(plane.Raycast(mouseRay, out var distanceToPlane))
 					{
 						Vector3 pointOnPlane = mouseRay.origin + (mouseRay.direction * distanceToPlane);
 						Vector3 planeCenter = (planePoints[0] + planePoints[1] + planePoints[2] + planePoints[3]) / 4f;

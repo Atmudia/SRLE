@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using Il2CppMonomiPark.SlimeRancher.DataModel;
 using Il2CppMonomiPark.SlimeRancher.Player.CharacterController;
 using Il2CppMonomiPark.SlimeRancher.UI;
+using Il2CppMonomiPark.SlimeRancher.World.Teleportation;
 using MelonLoader;
+using SRLE.RuntimeGizmo;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace SRLE.Components;
@@ -17,8 +21,8 @@ public class SRLECamera : MonoBehaviour
     public SRCharacterController playerController;
     public GameObject playerCamera;
     public CursorLockHandler cursorLockHandler;
-
-    public object DestroyDelayedObject = null;
+    public object DestroyDelayedObject;
+    public TransformGizmo transformGizmo;
     public void Awake()
     {
         Instance = this;
@@ -26,6 +30,7 @@ public class SRLECamera : MonoBehaviour
         playerController = SRSingleton<SceneContext>.Instance.Player.GetComponent<SRCharacterController>();
         playerCamera = GameObject.Find("PlayerCameraKCC");
         cursorLockHandler = Resources.FindObjectsOfTypeAll<CursorLockHandler>().First();
+        transformGizmo = GetComponent<TransformGizmo>();
     }
 
     public void OnEnable()
@@ -108,6 +113,7 @@ public class SRLECamera : MonoBehaviour
     public void Update()
     {
         
+        
 
         if (InputManager.MouseScrollDelta.y > 0f) // forward
         {
@@ -169,8 +175,12 @@ public class SRLECamera : MonoBehaviour
 
     public void OnGUI()
     {
-        GUI.Label(new Rect(15f, 125f, 150f, 25f), "Spawn object with id: ");
+        if (GUI.Button(new Rect(170f, 90f, 150f, 25f), "Quit"))
+        {
+            SRSingleton<SceneContext>.Instance.PauseMenuDirector.Quit();
+        }
 
+        GUI.Label(new Rect(15f, 125f, 150f, 25f), "Spawn object with id: ");
         spawnObject = GUI.TextField(new Rect(125f, 110f + 35f * 1, 200f, 25f), spawnObject);
         if (GUI.Button(new Rect(170f, 125f, 150f, 25f), "Spawn object"))
         {
@@ -178,11 +188,27 @@ public class SRLECamera : MonoBehaviour
             //SRLEManager.SpawnObjectFromId();
         }
 
-        if (GUI.Button(new Rect(170f, 90f, 150f, 25f), "Quit"))
+        if (transformGizmo == null || transformGizmo.mainTargetRoot == null) return;
+        var buildObject = transformGizmo.mainTargetRoot.GetComponent<BuildObjectId>().buildObject;
+        var staticTeleporterNode = transformGizmo.mainTargetRoot.GetComponentInChildren<TeleporterNode>();
+        if (staticTeleporterNode != null)
         {
-            SRSingleton<SceneContext>.Instance.PauseMenuDirector.Quit();
-            
+            GUI.Label(new Rect(15f, 215f, 100f, 25f), "Teleport:");
+            teleportNode = GUI.TextField(new Rect(125f, 215f, 200f, 25f), teleportNode);
+
+            if (GUI.Button(new Rect(170f, 275f, 150f, 25f), "Teleport"))
+            {
+                staticTeleporterNode._hasDestination = false;
+                //staticTeleporterNode.DeregisterSelf();
+                buildObject.Properties["TeleporterNode"] = teleportNode;
+                var nodeId = staticTeleporterNode.NodeId;
+                staticTeleporterNode.Awake();
+                staticTeleporterNode.RegisterSelf();
+                //staticTeleporterNode.nodeDefinition
+            }
         }
+        
+       
     }
 
 
@@ -193,5 +219,7 @@ public class SRLECamera : MonoBehaviour
     private Vector3 lastRotation;
 
     public static string spawnObject;
+    public static string teleportNode;
+
 
 }

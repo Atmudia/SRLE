@@ -5,16 +5,9 @@ using MelonLoader;
 
 namespace SRLE.Patches
 {
-    [HarmonyPatch]
+    [HarmonyPatch("Il2CppInterop.HarmonySupport.Il2CppDetourMethodPatcher", "ReportException")]
     public static class Patch_Il2CppDetourMethodPatcher
     {
-        public static MethodInfo TargetMethod()
-        {
-
-            Assembly assembly = AccessTools.AllAssemblies().FirstOrDefault(x => x.GetName().Name.Equals("Il2CppInterop.HarmonySupport"));
-            var Il2CppDetourMethodPatcher = assembly.GetTypes().FirstOrDefault(x => x.Name == "Il2CppDetourMethodPatcher");
-            return AccessTools.Method(Il2CppDetourMethodPatcher, "ReportException");
-        }
         public static bool Prefix(System.Exception ex)
         {
             MelonLogger.Error("During invoking native->managed trampoline", ex);

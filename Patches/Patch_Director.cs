@@ -1,10 +1,11 @@
 ﻿using System;
 using HarmonyLib;
+using Il2CppMonomiPark.SlimeRancher.UI.Popup;
 using SRLE.Components;
 
 namespace SRLE.Patches;
 
-[HarmonyPatch(typeof(PopupDirector), nameof(PopupDirector.MaybePopupNext))]
+[HarmonyPatch(typeof(PopupDirector), nameof(PopupDirector.EnqueuePopup))]
 public static class Patch_PopupDirector
 {
     public static bool Prefix() => SRLEMod.CurrentMode != SRLEMod.Mode.BUILD;

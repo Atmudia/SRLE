@@ -34,4 +34,7 @@
   &lt;Assembly Path="E:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll" /&gt;&#xD;
   &lt;Assembly Path="D:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.Timeline.dll" /&gt;&#xD;
   &lt;Assembly Path="D:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Managed\Newtonsoft.Json.dll" /&gt;&#xD;
-&lt;/AssemblyExplorer&gt;</s:String></wpf:ResourceDictionary>
+  &lt;Assembly Path="D:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppSystem.dll" /&gt;&#xD;
+  &lt;Assembly Path="D:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.ScreenCaptureModule.dll" /&gt;&#xD;
+&lt;/AssemblyExplorer&gt;</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=SRLE/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
