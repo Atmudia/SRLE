@@ -2,258 +2,214 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Il2CppMonomiPark.SlimeRancher.SceneManagement;
 using Il2CppMonomiPark.SlimeRancher.UI;
 using Il2CppSystem;
 using Il2CppTMPro;
 using MelonLoader;
 using Newtonsoft.Json;
+using SRLE.Models;
+using SRLE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 using Action = System.Action;
 using IntPtr = System.IntPtr;
 
-namespace SRLE.Components;
-
-public class HierarchyUI : BaseUI
+namespace SRLE.Components
 {
-    public static HierarchyUI Instance;
-    private GameObject Hierarchy;
-    private ScrollRect CategoryScroll;
-    private ScrollRect ObjectsScroll;
-    private TMP_InputField SearchInput;
-    private Dictionary<uint,Texture2D> BuildObjectsPreview;
-
-
-    public HierarchyUI(IntPtr value) : base(value)
+    [RegisterTypeInIl2Cpp]
+    public class HierarchyUI : MonoBehaviour
     {
-    }
+        public static HierarchyUI Instance;
 
-    public override void Awake()
-    {
-        Instance = this;
-        if (!Directory.Exists(Path.Combine(SRLESaveManager.DataPath, "Textures")))
-            Directory.CreateDirectory(Path.Combine(SRLESaveManager.DataPath, "Textures"));
-        Hierarchy = transform.Find("Hierarchy").gameObject;
-        CategoryScroll = transform.Find("Hierarchy/CategoryScroll").GetComponent<ScrollRect>();
-        ObjectsScroll = transform.Find("Hierarchy/ObjectsScroll").GetComponent<ScrollRect>();
-        SearchInput = transform.Find("Hierarchy/SearchInput").GetComponent<TMP_InputField>();
+        private GameObject Hierarchy;
+        private ScrollRect CategoryScroll;
+        private ScrollRect ObjectsScroll;
+        private InputField SearchInput;
+        private Dictionary<uint, Texture2D> BuildObjectsPreview;
 
-        BuildObjectsPreview = new Dictionary<uint, Texture2D>();
-        for (int i = 0; i < CategoryScroll.content.childCount; i++)
+        public HierarchyUI(IntPtr value) : base(value) { }
+
+        public void Awake()
         {
-            Transform child = CategoryScroll.content.GetChild(i);
-            Destroy(child.gameObject);
+            Instance = this;
+            InitializeUIElements();
+            PopulateCategoryButtons();
         }
-        for (int i = 0; i < ObjectsScroll.content.childCount; i++)
+
+        private void InitializeUIElements()
         {
-            Transform child = ObjectsScroll.content.GetChild(i);
-            Destroy(child.gameObject);
+            if (!Directory.Exists(Path.Combine(SaveManager.DataPath, "Textures")))
+                Directory.CreateDirectory(Path.Combine(SaveManager.DataPath, "Textures"));
+
+            Hierarchy = transform.Find("Hierarchy").gameObject;
+            CategoryScroll = transform.Find("Hierarchy/CategoryScroll").GetComponent<ScrollRect>();
+            ObjectsScroll = transform.Find("Hierarchy/ObjectsScroll").GetComponent<ScrollRect>();
+            SearchInput = transform.Find("Hierarchy/SearchInput").GetComponent<InputField>();
+
+            BuildObjectsPreview = new Dictionary<uint, Texture2D>();
+
+            ClearChildObjects(CategoryScroll.content);
+            ClearChildObjects(ObjectsScroll.content);
+
+            SearchInput.onValueChanged.AddListener(new System.Action<string>(Search));
         }
-        SearchInput.onValueChanged.AddListener(new System.Action<string>(Search));
-        
-        GameObject favoritesButton = Instantiate(SRLEAssetManager.CategoryButtonPrefab, CategoryScroll.content, false);
 
-        favoritesButton.GetComponentInChildren<Button>().onClick.AddListener(new System.Action(() =>
+        private void ClearChildObjects(Transform parent)
         {
-            SelectCategory("Favorites");
-        }));
-        favoritesButton.GetComponentInChildren<Text>().text = "Favorites";
-        foreach (string categoryName in SRLEObjectManager.BuildCategories.Keys)
-        {
-            GameObject categoryObj = Instantiate(SRLEAssetManager.CategoryButtonPrefab, CategoryScroll.content, false);
-
-            categoryObj.GetComponentInChildren<Button>().onClick.AddListener(new System.Action(() => SelectCategory(categoryName)));
-            categoryObj.GetComponentInChildren<Text>().text = categoryName;
-        }
-    }
-    public static Bounds CalculateObjectBounds(GameObject go)
-    {
-        Bounds combinedBounds = new Bounds(Vector3.zero, Vector3.zero);
-
-        Renderer[] renderers = go.GetComponentsInChildren<Renderer>();
-        foreach (var rend in renderers)
-        {
-            if (rend.enabled)
+            for (int i = 0; i < parent.childCount; i++)
             {
-                // Transformuj granice renderera do przestrzeni światowej
-                Bounds rendererBounds = rend.bounds;
-                rendererBounds.center = rend.transform.TransformPoint(rendererBounds.center);
-
-                // Rozszerz łączne granice, aby zawierały granice renderera
-                combinedBounds.Encapsulate(rendererBounds);
-            }
-        }
-
-        return combinedBounds;
-    }
-    
-    private void Search(string term)
-    {
-        for (int i = 0; i < ObjectsScroll.content.childCount; i++)
-        {
-            Transform child = ObjectsScroll.content.GetChild(i);
-            Destroy(child.gameObject);
-        }
-
-        if (term.Length < 2) return;
-
-        foreach (var buildObject in SRLEObjectManager.BuildObjectsData.Values.ToList())
-        {
-            if(buildObject.Name.ToLower().Contains(term.ToLower()))
-            {
-                var objectID = buildObject.Id;
-                var objectName = buildObject.Name;
-
-                GameObject buildObj = Instantiate(SRLEAssetManager.ObjectButtonPrefab, ObjectsScroll.content, false);
-                buildObj.GetComponentInChildren<Button>().onClick.AddListener(new Action(() => SpawnObject(objectID)));
-                buildObj.GetComponentInChildren<Text>().text = objectName;
-                var favorite = buildObj.transform.Find("Favorite");
-                favorite.GetComponent<Image>().color = SRLEObjectManager.BuildCategories["Favorites"].Contains(objectID) ? Color.yellow : Color.gray;
-                favorite.GetComponent<Button>().onClick.AddListener(new Action(() =>
-                {
-                    if (!SRLEObjectManager.BuildCategories["Favorites"].Contains(objectID))
-                    {
-                        SRLEObjectManager.BuildCategories["Favorites"].Add(objectID);
-                        favorite.GetComponent<Image>().color = Color.yellow;
-                    }
-                    else
-                    {
-                        SRLEObjectManager.BuildCategories["Favorites"].Remove(objectID);
-                        favorite.GetComponent<Image>().color = Color.gray;
-                    }
-                    File.WriteAllText(Path.Combine(SRLESaveManager.DataPath, "favorites.txt"), JsonConvert.SerializeObject(SRLEObjectManager.BuildCategories["Favorites"]));
-  
-                }));
-
-                if (!BuildObjectsPreview.ContainsKey(objectID))
-                {
-                    if (File.Exists(Path.Combine(SRLESaveManager.DataPath, "Textures", objectID + ".jpg")))
-                    {
-                        byte[] bytes = File.ReadAllBytes(Path.Combine(SRLESaveManager.DataPath, "Textures", objectID + ".jpg"));
-
-                        var result = new Texture2D(64, 64, TextureFormat.RGB24, false);
-                        result.LoadImage(bytes, false);
-                        result.Apply(false, false);
-
-                        buildObj.GetComponentInChildren<RawImage>().texture = result;
-
-                        BuildObjectsPreview.Add(objectID, result);
-                    }
-                    else
-                    {
-                        SRLEObjectManager.RequestObject(objectID, (previewObj) =>
-                        {
-                            if (previewObj == null) return;
-                            if (buildObj == null) return;
-
-                            var bounds = CalculateObjectBounds(previewObj);
-                            Texture2D texture = previewObj.RenderImage(new RuntimePreviewGeneratorAidanNotworking.RenderConfig(64, 64, Camera.main.transform.rotation)
-                            {
-                                centerOverride = bounds.center,
-                                renderHeightOverride = bounds.max.y - bounds.min.y
-                            }, out var ex);
-                            MelonLogger.Error(ex);
-                            byte[] bytes = texture.EncodeToPNG();
-                            File.WriteAllBytes(Path.Combine(SRLESaveManager.DataPath, "Textures", objectID + ".jpg"), bytes);
-
-                            buildObj.GetComponentInChildren<RawImage>().texture = texture;
-
-                            BuildObjectsPreview.Add(objectID, texture);
-                        });
-                    }
-                }
-                else
-                {
-                    buildObj.GetComponentInChildren<RawImage>().texture = BuildObjectsPreview[objectID];
-                }
-            }
-        }
-    }
-
-    private void SpawnObject(uint id)
-    {
-        SRLEObjectManager.SpawnObject(id);
-    }
-    private void SelectCategory(string categoryName)
-    {
-        if (SRLEObjectManager.BuildCategories.TryGetValue(categoryName, out List<uint> categoryObjects))
-        {
-            for (int i = 0; i < ObjectsScroll.content.childCount; i++)
-            {
-                Transform child = ObjectsScroll.content.GetChild(i);
+                Transform child = parent.GetChild(i);
                 Destroy(child.gameObject);
             }
+        }
 
-            foreach (var objectID in categoryObjects)
+        private void PopulateCategoryButtons()
+        {
+            CreateCategoryButton("Favorites", () => SelectCategory("Favorites"));
+
+            foreach (string categoryName in ObjectManager.BuildCategories.Keys)
             {
-                if (!SRLEObjectManager.BuildObjectsData.ContainsKey(objectID)) continue;
+                CreateCategoryButton(categoryName, () => SelectCategory(categoryName));
+            }
+        }
 
-                var objectName = SRLEObjectManager.BuildObjectsData[objectID].Name;
+        private void CreateCategoryButton(string categoryName, Action onClickAction)
+        {
+            GameObject categoryButton = Instantiate(AssetManager.CategoryButtonPrefab, CategoryScroll.content, false);
+            categoryButton.GetComponentInChildren<Button>().onClick.AddListener(onClickAction);
+            categoryButton.GetComponentInChildren<Text>().text = categoryName;
+        }
 
-                GameObject buildObj = Instantiate(SRLEAssetManager.ObjectButtonPrefab, ObjectsScroll.content, false);
-                buildObj.GetComponentInChildren<Button>().onClick.AddListener( new Action(() => SpawnObject(objectID)));
-                buildObj.GetComponentInChildren<Text>().text = objectName;
-                var favorite = buildObj.transform.Find("Favorite");
-                favorite.GetComponent<Image>().color = SRLEObjectManager.BuildCategories["Favorites"].Contains(objectID) ? Color.yellow : Color.gray;
-                favorite.GetComponent<Button>().onClick.AddListener(new Action(() =>
+        private void Search(string term)
+        {
+            ClearChildObjects(ObjectsScroll.content);
+
+            if (term.Length < 2) return;
+
+            foreach (var buildObject in ObjectManager.BuildObjectsData.Values.Where(buildObject => buildObject.Name.ToLower().Contains(term.ToLower())))
+            {
+                CreateObjectButton(buildObject);
+            }
+        }
+
+        private void CreateObjectButton(IdClass buildObject)
+        {
+            uint objectID = buildObject.Id;
+            string objectName = buildObject.Name;
+
+            GameObject buildObj = Instantiate(AssetManager.ObjectButtonPrefab, ObjectsScroll.content, false);
+            buildObj.GetComponentInChildren<Button>().onClick.AddListener(new Action(() => SpawnObject(objectID)));
+            buildObj.GetComponentInChildren<Text>().text = objectName;
+
+            CreateFavoriteButton(buildObj, objectID);
+
+            LoadOrUpdateObjectPreview(objectID, buildObj);
+        }
+
+        private void CreateFavoriteButton(GameObject buildObj, uint objectID)
+        {
+            var favorite = buildObj.transform.Find("Favorite");
+            favorite.GetComponent<Image>().color = ObjectManager.BuildCategories["Favorites"].Contains(objectID) ? Color.yellow : Color.gray;
+            favorite.GetComponent<Button>().onClick.AddListener(new Action(() => ToggleFavorite(objectID, favorite)));
+
+            void ToggleFavorite(uint id, Transform favoriteTransform)
+            {
+                var favorites = ObjectManager.BuildCategories["Favorites"];
+
+                if (!favorites.Contains(id))
                 {
-                    if (!SRLEObjectManager.BuildCategories["Favorites"].Contains(objectID))
-                    {
-                        SRLEObjectManager.BuildCategories["Favorites"].Add(objectID);
-                        favorite.GetComponent<Image>().color = Color.yellow;
-                    }
-                    else
-                    {
-                        SRLEObjectManager.BuildCategories["Favorites"].Remove(objectID);
-                        favorite.GetComponent<Image>().color = Color.gray;
-                    }
-                    File.WriteAllText(Path.Combine(SRLESaveManager.DataPath, "favorites.txt"), JsonConvert.SerializeObject(SRLEObjectManager.BuildCategories["Favorites"]));
-                    if (categoryName.Equals("Favorites"))
-                    {
-                        Destroy(buildObj);
-                    }
-                }));
-
-
-                if (!BuildObjectsPreview.ContainsKey(objectID))
-                {
-                    if (File.Exists(Path.Combine(SRLESaveManager.DataPath, "Textures", objectID + ".jpg")))
-                    {
-                        byte[] bytes = File.ReadAllBytes(Path.Combine(SRLESaveManager.DataPath, "Textures", objectID + ".jpg"));
-
-                        var result = new Texture2D(64, 64, TextureFormat.RGB24, false);
-                        result.LoadImage(bytes, false);
-                        result.Apply(false, false);
-
-                        buildObj.GetComponentInChildren<RawImage>().texture = result;
-
-                        BuildObjectsPreview.Add(objectID, result);
-                    }
-                    else
-                    {
-                        SRLEObjectManager.RequestObject(objectID, (previewObj) =>
-                        {
-                            if (previewObj == null) return;
-                            if (buildObj == null) return;
-
-                            var bounds = CalculateObjectBounds(previewObj);
-                            Texture2D texture = RuntimePreviewGenerator.GenerateModelPreview(previewObj.transform);
-
-                            byte[] bytes = texture.EncodeToPNG();
-                            File.WriteAllBytes(Path.Combine(SRLESaveManager.DataPath, "Textures", objectID + ".jpg"), bytes);
-
-                            buildObj.GetComponentInChildren<RawImage>().texture = texture;
-
-                            BuildObjectsPreview.Add(objectID, texture);
-                        });
-                    }
+                    favorites.Add(id);
+                    favoriteTransform.GetComponent<Image>().color = Color.yellow;
                 }
                 else
                 {
-                    buildObj.GetComponentInChildren<RawImage>().texture = BuildObjectsPreview[objectID];
+                    favorites.Remove(id);
+                    favoriteTransform.GetComponent<Image>().color = Color.gray;
+                }
+
+                File.WriteAllText(Path.Combine(SaveManager.DataPath, "favorites.txt"), JsonConvert.SerializeObject(favorites));
+            }
+        }
+
+        private void LoadOrUpdateObjectPreview(uint objectID, GameObject buildObj)
+        {
+            if (!BuildObjectsPreview.ContainsKey(objectID))
+            {
+                LoadObjectPreviewFromDisk(objectID, buildObj);
+            }
+            else
+            {
+                buildObj.GetComponentInChildren<RawImage>().texture = BuildObjectsPreview[objectID];
+            }
+        }
+        
+
+        private void LoadObjectPreviewFromDisk(uint objectID, GameObject buildObj)
+        {
+            string filePath = Path.Combine(SaveManager.DataPath, "Textures", objectID + ".jpg");
+
+            if (File.Exists(filePath))
+            {
+                byte[] bytes = File.ReadAllBytes(filePath);
+                Texture2D result = new Texture2D(64, 64, TextureFormat.RGB24, false);
+                result.LoadImage(bytes, false);
+                result.Apply(false, false);
+
+                buildObj.GetComponentInChildren<RawImage>().texture = result;
+                BuildObjectsPreview.Add(objectID, result);
+            }
+            else
+            {
+                RequestAndSaveObjectPreview(objectID, buildObj);
+            }
+        }
+
+        private void RequestAndSaveObjectPreview(uint objectID, GameObject buildObj)
+        {
+            ObjectManager.RequestObject(objectID, (previewObj) =>
+            {
+                if (previewObj == null) return;
+                if (buildObj == null) return;
+
+                Texture2D texture = RuntimePreviewGenerator.GenerateModelPreview(previewObj.transform);
+                byte[] bytes = texture.EncodeToPNG();
+                File.WriteAllBytes(Path.Combine(SaveManager.DataPath, "Textures", objectID + ".jpg"), bytes);
+
+                buildObj.GetComponentInChildren<RawImage>().texture = texture;
+                BuildObjectsPreview.Add(objectID, texture);
+            });
+        }
+
+        private void SpawnObject(uint id)
+        {
+            ObjectManager.RequestObject(id, (buildObject) =>
+            {
+                if (buildObject == null) return;
+
+                GameObject obj = Instantiate(buildObject, SRLECamera.Instance.transform.position + (SRLECamera.Instance.transform.forward * 10), Quaternion.identity, ObjectManager.World.transform); 
+                obj.SetActive(true);
+                var addComponent = obj.AddComponent<BuildObject>();
+                addComponent.ID = ObjectManager.BuildObjectsData[id];
+                ObjectManager.AddObject(id, obj);
+
+                // UndoManager.RegisterStates(new IUndo[] { new UndoSelection(), new UndoInstantiate(objectID, obj) }, "Create new Object");
+                // ObjectSelection.Instance.SetSelection(obj);
+            });
+            //ObjectManager.SpawnObject(id);
+        }
+
+        private void SelectCategory(string categoryName)
+        {
+            if (ObjectManager.BuildCategories.TryGetValue(categoryName, out List<uint> categoryObjects))
+            {
+                ClearChildObjects(ObjectsScroll.content);
+
+                foreach (var objectID in categoryObjects.Where(ObjectManager.BuildObjectsData.ContainsKey))
+                {
+                    CreateObjectButton(ObjectManager.BuildObjectsData[objectID]);
                 }
             }
         }
     }
-
 }

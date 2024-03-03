@@ -1,61 +1,69 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
-using Il2CppMonomiPark.SlimeRancher.DataModel;
+using Il2Cpp;
+using Il2CppKinematicCharacterController;
+using Il2CppMonomiPark.SlimeRancher.Input;
 using Il2CppMonomiPark.SlimeRancher.Player.CharacterController;
 using Il2CppMonomiPark.SlimeRancher.UI;
 using Il2CppMonomiPark.SlimeRancher.World.Teleportation;
+using JetBrains.Annotations;
 using MelonLoader;
-using SRLE.RuntimeGizmo;
+using SRLE.Patches;
+// using RuntimeHandle;
+// using SRLE.RuntimeGizmo;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
+using InputManager = SRLE.Utils.InputManager;
 
 namespace SRLE.Components;
 
+[RegisterTypeInIl2Cpp]
 public class SRLECamera : MonoBehaviour
 {
     public SRLECamera(IntPtr value) : base(value) { }
     public static SRLECamera Instance;
     public Camera camera;
+    public SRCameraController cameraController;
     public SRCharacterController playerController;
+
     public GameObject playerCamera;
-    public CursorLockHandler cursorLockHandler;
+    public CursorLockHandler cursorLockHandler; 
     public object DestroyDelayedObject;
-    public TransformGizmo transformGizmo;
+    public RuntimeGizmo.TransformGizmo transformGizmo;
+    public InputDirector inputDirector;
+    
     public void Awake()
     {
+        
         Instance = this;
         camera = GetComponent<Camera>();
+        cameraController = SRSingleton<SceneContext>.Instance.Camera.GetComponent<SRCameraController>();
         playerController = SRSingleton<SceneContext>.Instance.Player.GetComponent<SRCharacterController>();
+        
         playerCamera = GameObject.Find("PlayerCameraKCC");
         cursorLockHandler = Resources.FindObjectsOfTypeAll<CursorLockHandler>().First();
-        transformGizmo = GetComponent<TransformGizmo>();
+        transformGizmo = GetComponent<RuntimeGizmo.TransformGizmo>();
+        inputDirector = SRSingleton<GameContext>.Instance.InputDirector;
     }
 
     public void OnEnable()
     {
-        SRSingleton<HudUI>.Instance.gameObject.SetActive(false); 
-        SRSingleton<SceneContext>.Instance.PlayerState.InGadgetMode = true;
-        base.transform.position = playerCamera.transform.position;
-        this.transform.localPosition = playerCamera.transform.localPosition;
+        SRSingleton<HudUI>.Instance.gameObject.SetActive(false);
+
+        transform.position = cameraController.Position;
+        transform.rotation =  cameraController.Rotation;
+        playerController.BypassGravity = true;
+        // SRSingleton<SceneContext>.Instance.PlayerState.InGadgetMode = true;
+        // base.transform.position = playerCamera.transform.position;
+        // this.transform.localPosition = playerCamera.transform.localPosition;
         playerCamera.SetActive(false);
         foreach (var o in playerController.transform)
         {
             o.Cast<Transform>().gameObject.SetActive(false);
         }
-
-        
         camera.tag = "MainCamera";
-        /*foreach (var rootGameObjects in EntryPoint.GetAllScenes().Where(x => !x.name.EndsWith("Core")).SelectMany(x => x.GetRootGameObjects()))
-        {
-            foreach (var directedActorSpawner in rootGameObjects.GetComponentsInChildren<DirectedActorSpawner>())
-            {
-                directedActorSpawner.enabled = !directedActorSpawner.enabled;
-            }
-        }
-        */
-        
         DestroyDelayedObject = MelonCoroutines.Start(DestroyDelayed());
 
     }
@@ -64,7 +72,6 @@ public class SRLECamera : MonoBehaviour
     {
         if (SRSingleton<HudUI>.Instance == null) return;
         SRSingleton<HudUI>.Instance.gameObject.SetActive(true); 
-        SRSingleton<SceneContext>.Instance.PlayerState.InGadgetMode = false;
         playerController.Position = transform.position;
         playerController.Rotation = transform.rotation;
         cursorLockHandler.SetEnableCursor(false);
@@ -74,6 +81,9 @@ public class SRLECamera : MonoBehaviour
             o.Cast<Transform>().gameObject.SetActive(true);
         }
         MelonCoroutines.Stop(DestroyDelayedObject);
+        inputDirector._mainGame.Enable();
+        inputDirector._paused.Disable();
+        playerController.BypassGravity = false;
 
         /*foreach (var rootGameObjects in SRLEConverterUtils.GetAllScenes().Where(x => !x.name.EndsWith("Core")).SelectMany(x => x.GetRootGameObjects()))
         {
@@ -103,18 +113,26 @@ public class SRLECamera : MonoBehaviour
                 }
                 catch
                 {
+                    
                     // 
                 }
             }
+
+            foreach (var directedActorSpawner in Resources.FindObjectsOfTypeAll<DirectedSlimeSpawner>() )
+            {
+                var component = directedActorSpawner.GetComponent<Renderer>();
+                if (component != null)
+                    component.enabled = true;
+            }
+            
             yield return new WaitForSeconds(1);
         }
+        
+        
     }
 
     public void Update()
     {
-        
-        
-
         if (InputManager.MouseScrollDelta.y > 0f) // forward
         {
             speed = Mathf.Clamp(this.speed + 1f, 0.1f, 50f);
@@ -169,7 +187,7 @@ public class SRLECamera : MonoBehaviour
 
         }
         lastRotation = InputManager.MousePosition;
-
+        
 
     }
 
@@ -184,29 +202,10 @@ public class SRLECamera : MonoBehaviour
         spawnObject = GUI.TextField(new Rect(125f, 110f + 35f * 1, 200f, 25f), spawnObject);
         if (GUI.Button(new Rect(170f, 125f, 150f, 25f), "Spawn object"))
         {
-            SRLEObjectManager.SpawnObject(Convert.ToUInt32(spawnObject));
+            //SRLEObjectManager.SpawnObject(Convert.ToUInt32(spawnObject));
             //SRLEManager.SpawnObjectFromId();
         }
-
-        if (transformGizmo == null || transformGizmo.mainTargetRoot == null) return;
-        var buildObject = transformGizmo.mainTargetRoot.GetComponent<BuildObjectId>().buildObject;
-        var staticTeleporterNode = transformGizmo.mainTargetRoot.GetComponentInChildren<TeleporterNode>();
-        if (staticTeleporterNode != null)
-        {
-            GUI.Label(new Rect(15f, 215f, 100f, 25f), "Teleport:");
-            teleportNode = GUI.TextField(new Rect(125f, 215f, 200f, 25f), teleportNode);
-
-            if (GUI.Button(new Rect(170f, 275f, 150f, 25f), "Teleport"))
-            {
-                staticTeleporterNode._hasDestination = false;
-                //staticTeleporterNode.DeregisterSelf();
-                buildObject.Properties["TeleporterNode"] = teleportNode;
-                var nodeId = staticTeleporterNode.NodeId;
-                staticTeleporterNode.Awake();
-                staticTeleporterNode.RegisterSelf();
-                //staticTeleporterNode.nodeDefinition
-            }
-        }
+        
         
        
     }

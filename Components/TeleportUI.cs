@@ -1,127 +1,135 @@
 ﻿using System;
-using UnityEngine;
-using UnityEngine.UI;
-using System.IO;
-using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Il2CppMonomiPark.SlimeRancher.SceneManagement;
-using Il2CppMonomiPark.SlimeRancher.UI;
-using Il2CppSystem.Linq;
 using Il2CppTMPro;
-using SRLE;
-using SRLE.Components;
+using MelonLoader;
+using Newtonsoft.Json;
+using SRLE.Models;
+using UnityEngine;
+using UnityEngine.UI;
 
-public class TeleportUI : BaseUI
+namespace SRLE.Components
 {
-    private GameObject m_GameObject;
-    private List<TeleportModel> m_TeleportModels;
-
-    private ScrollRect m_CategoryScroll;
-    private TMP_InputField m_NameInput;
-
-    public bool IsOpen { get { return m_GameObject.activeSelf; } }
-
-    public static TeleportUI Instance;
-
-    private void Start()
+    [RegisterTypeInIl2Cpp]
+    public class TeleportUI : MonoBehaviour
     {
-        Instance = this;
-        m_GameObject = transform.Find("Teleports").gameObject;
+        private GameObject m_GameObject;
+        private List<TeleportModel> m_TeleportModels;
+        private ScrollRect m_CategoryScroll;
+        private TMP_InputField m_NameInput;
 
-        m_CategoryScroll = transform.Find("Teleports/CategoryScroll").GetComponent<ScrollRect>();
-        m_NameInput = transform.Find("Teleports/NameInput").GetComponent<TMP_InputField>();
-        var addButton = transform.Find("Teleports/AddButton").GetComponent<Button>();
+        public bool IsOpen => m_GameObject.activeSelf;
 
-        if (File.Exists(Path.Combine(SRLESaveManager.DataPath, "tp.txt")))
+        public static TeleportUI Instance;
+
+        private void Start()
         {
-            m_TeleportModels = JsonConvert.DeserializeObject<TeleportModel[]>(File.ReadAllText(Path.Combine(SRLESaveManager.DataPath, "tp.txt"))).ToList();
+            Instance = this;
+            m_GameObject = transform.Find("Teleports").gameObject;
+            m_CategoryScroll = transform.Find("Teleports/CategoryScroll").GetComponent<ScrollRect>();
+            m_NameInput = transform.Find("Teleports/NameInput").GetComponent<TMP_InputField>();
+            var addButton = transform.Find("Teleports/AddButton").GetComponent<Button>();
+
+            LoadTeleportModels();
+            InitializeCategoryButtons();
+
+            addButton.onClick.AddListener(new Action(OnAddTeleport));
+            Close();
         }
-        else
-        {
-            string data = "[{\"Name\":\"Ranch Home\",\"PositionX\":52.8,\"PositionY\":16.3,\"PositionZ\":-132.7,\"RotationX\":0.0,\"RotationY\":102.6,\"RotationZ\":0.0,\"Region\":0},{\"Name\":\"Desert Temple\",\"PositionX\":119.9,\"PositionY\":1077.4,\"PositionZ\":917.5,\"RotationX\":0.0,\"RotationY\":0.0,\"RotationZ\":0.0,\"Region\":1},{\"Name\":\"Slimulations\",\"PositionX\":1052.1,\"PositionY\":14.4,\"PositionZ\":824.0,\"RotationX\":0.0,\"RotationY\":315.0,\"RotationZ\":0.0,\"Region\":4},{\"Name\":\"Nimble 1\",\"PositionX\":-768.5,\"PositionY\":7.5,\"PositionZ\":-841.3,\"RotationX\":0.0,\"RotationY\":44.9,\"RotationZ\":0.0,\"Region\":2},{\"Name\":\"Nimble 2\",\"PositionX\":-189.8,\"PositionY\":11.1,\"PositionZ\":-1008.4,\"RotationX\":0.0,\"RotationY\":273.6,\"RotationZ\":0.0,\"Region\":2}]";
-            m_TeleportModels = JsonConvert.DeserializeObject<TeleportModel[]>(data).ToList();
 
-            File.WriteAllText(Path.Combine(SRLESaveManager.DataPath, "tp.txt"), JsonConvert.SerializeObject(m_TeleportModels.ToArray(), Formatting.Indented));
+        private void LoadTeleportModels()
+        {
+            string filePath = Path.Combine(SaveManager.DataPath, "tp.txt");
+
+            if (File.Exists(filePath))
+            {
+                m_TeleportModels = Enumerable.ToList(JsonConvert.DeserializeObject<TeleportModel[]>(File.ReadAllText(filePath)));
+            }
+            else
+            {
+                InitializeDefaultTeleportModels();
+            }
         }
 
-        foreach (var model in m_TeleportModels)
+        private void InitializeDefaultTeleportModels()
         {
-            GameObject categoryObj = Instantiate(SRLEAssetManager.CategoryButtonPrefab, m_CategoryScroll.content, false);
+            string jsonData = """
+                              [
+                                              {"Name":"Ranch","PositionX":541.9353,"PositionY":20.62804,"PositionZ":349.61053,"RotationX":2.5,"RotationY":231.5,"RotationZ":0.0,"Region":"SceneGroup.ConservatoryFields"},
+                                              {"Name":"Starlight Strand","PositionX":-4.2704897,"PositionY":15.532708,"PositionZ":-122.46755,"RotationX":1.0000001,"RotationY":155.00003,"RotationZ":-2.6684488E-08,"Region":"SceneGroup.LuminousStrand"},
+                                              {"Name":"Ember Valley","PositionX":-212.91,"PositionY":19.0,"PositionZ":468.7,"RotationX":0.0,"RotationY":-135.0,"RotationZ":0.0,"Region":"SceneGroup.RumblingGorge"},
+                                              {"Name":"Powderfall Bluffs","PositionX":-710.1747,"PositionY":6.5834,"PositionZ":1357.909,"RotationX":342.048,"RotationY":30.624,"RotationZ":0.0,"Region":"SceneGroup.PowderfallBluffs"}
+                                          ]
+                              """;
 
+            m_TeleportModels = JsonConvert.DeserializeObject<TeleportModel[]>(jsonData).ToList();
+            File.WriteAllText(Path.Combine(SaveManager.DataPath, "tp.txt"), JsonConvert.SerializeObject(m_TeleportModels.ToArray(), Formatting.Indented));
+        }
+
+        private void InitializeCategoryButtons()
+        {
+            foreach (var model in m_TeleportModels)
+            {
+                CreateCategoryButton(model);
+            }
+        }
+
+        private void CreateCategoryButton(TeleportModel model)
+        {
+            GameObject categoryObj = Instantiate(AssetManager.CategoryButtonPrefab, m_CategoryScroll.content, false);
             string categoryName = model.Name;
-            var sceneGroup = SRSingleton<SystemContext>.Instance.SceneLoader.SceneGroupList.GameplaySceneGroups.FirstOrDefault(new System.Func<SceneGroup, bool>(
-                group =>
-                {
-                    if (group.ReferenceId == model.Region)
-                        return true;
-                    return false;
-                }));
-            categoryObj.GetComponentInChildren<Button>().onClick.AddListener( new Action(() => TeleportTo(sceneGroup, new Vector3(model.PositionX, model.PositionY, model.PositionZ), new Vector3(model.RotationX, model.RotationY, model.RotationZ))));
-            categoryObj.GetComponentInChildren<Text>().text = categoryName;
-        }
 
-        addButton.onClick.AddListener(new Action(OnAddTeleport));
 
-        Close();
-    }
+            var sceneGroups = Il2CppSystem.Linq.Enumerable.ToList(SRSingleton<SystemContext>.Instance.SceneLoader.SceneGroupList.GameplaySceneGroups);
 
-    private void OnAddTeleport()
-    {
-        var name = m_NameInput.text;
-        if(string.IsNullOrEmpty(name))
-        {
-            name = SRSingleton<SceneContext>.Instance.RegionRegistry.CurrentSceneGroup.name + " Teleport";
-        }
-
-        var model = new TeleportModel()
-        {
-            Name = name,
-            PositionX = SRLECamera.Instance.transform.position.x,
-            PositionY = SRLECamera.Instance.transform.position.y,
-            PositionZ = SRLECamera.Instance.transform.position.z,
-            RotationX = SRLECamera.Instance.transform.eulerAngles.x,
-            RotationY = SRLECamera.Instance.transform.eulerAngles.y,
-            RotationZ = SRLECamera.Instance.transform.eulerAngles.z,
-            Region = SRSingleton<SceneContext>.Instance.RegionRegistry.CurrentSceneGroup.ReferenceId
-        };
-        GameObject categoryObj = Instantiate(SRLEAssetManager.CategoryButtonPrefab, m_CategoryScroll.content, false);
-
-        string categoryName = model.Name;
-        var sceneGroup = SRSingleton<SystemContext>.Instance.SceneLoader.SceneGroupList.GameplaySceneGroups.FirstOrDefault(new System.Func<SceneGroup, bool>(
-            group =>
+            foreach (var group in sceneGroups)
             {
                 if (group.ReferenceId == model.Region)
-                    return true;
-                return false;
-            }));
-        categoryObj.GetComponentInChildren<Button>().onClick.AddListener( new Action(() => TeleportTo(sceneGroup, new Vector3(model.PositionX, model.PositionY, model.PositionZ), new Vector3(model.RotationX, model.RotationY, model.RotationZ))));
-        categoryObj.GetComponentInChildren<Text>().text = categoryName;
+                {
+                    categoryObj.GetComponentInChildren<Button>().onClick.AddListener(new Action(() =>  TeleportTo(group, new Vector3(model.PositionX, model.PositionY, model.PositionZ), new Vector3(model.RotationX, model.RotationY, model.RotationZ))));
+                    categoryObj.GetComponentInChildren<Text>().text = categoryName;
+                    return;
+                }
+            }
 
-        m_NameInput.text = "";
+            Debug.LogError($"Scene group not found for teleport model {model.Name}");
+            Destroy(categoryObj);
+        }
 
-        m_TeleportModels.Add(model);
-        File.WriteAllText(Path.Combine(SRLESaveManager.DataPath, "tp.txt"), JsonConvert.SerializeObject(m_TeleportModels.ToArray(), Formatting.Indented));
-    }
-
-    private void TeleportTo(SceneGroup sceneGroup, Vector3 position, Vector3 rotation)
-    {
-        SRLECamera.Instance.transform.position = position;
-        SRLECamera.Instance.transform.eulerAngles = new Vector3(SRLECamera.Instance.transform.eulerAngles.x, rotation.y, SRLECamera.Instance.transform.eulerAngles.z);
-        SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(sceneGroup, new SceneLoadingParameters()
+        private void OnAddTeleport()
         {
-            TeleportPlayer = true,
-            
-        });
-    }
+            string name = string.IsNullOrEmpty(m_NameInput.text) ? SRSingleton<SceneContext>.Instance.RegionRegistry.CurrentSceneGroup.name + " Teleport" : m_NameInput.text;
 
-    public void Open()
-    {
-        m_GameObject.SetActive(true);
-    }
+            var model = new TeleportModel
+            {
+                Name = name,
+                PositionX = SRLECamera.Instance.transform.position.x,
+                PositionY = SRLECamera.Instance.transform.position.y,
+                PositionZ = SRLECamera.Instance.transform.position.z,
+                RotationX = SRLECamera.Instance.transform.eulerAngles.x,
+                RotationY = SRLECamera.Instance.transform.eulerAngles.y,
+                RotationZ = SRLECamera.Instance.transform.eulerAngles.z,
+                Region = SRSingleton<SceneContext>.Instance.RegionRegistry.CurrentSceneGroup.ReferenceId
+            };
 
-    public void Close()
-    {
-        m_GameObject.SetActive(false);
+            CreateCategoryButton(model);
+
+            m_NameInput.text = "";
+
+            m_TeleportModels.Add(model);
+            File.WriteAllText(Path.Combine(SaveManager.DataPath, "tp.txt"), JsonConvert.SerializeObject(m_TeleportModels.ToArray(), Formatting.Indented));
+        }
+
+        private void TeleportTo(SceneGroup sceneGroup, Vector3 position, Vector3 rotation)
+        {
+            SRLECamera.Instance.transform.position = position;
+            SRLECamera.Instance.transform.eulerAngles = new Vector3(SRLECamera.Instance.transform.eulerAngles.x, rotation.y, SRLECamera.Instance.transform.eulerAngles.z);
+            SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(sceneGroup, new SceneLoadingParameters { TeleportPlayer = true });
+        }
+
+        public void Open() => m_GameObject.SetActive(true);
+        public void Close() => m_GameObject.SetActive(false);
     }
 }

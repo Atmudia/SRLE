@@ -11,17 +11,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Persistance\BuildObjectV01.cs" />
-    <EmbeddedResource Include="C:\Users\komik\SRLEGizmo\Assets\AssetBundles\srle">
-      <Link>srle</Link>
-    </EmbeddedResource>
     <Compile Remove="Persistance\BuildObjectV02.cs" />
     <Compile Remove="Persistance\BuildObjectV03.cs" />
     <Compile Remove="Persistance\BuildObjectV04.cs" />
     <Compile Remove="Persistance\StringV01.cs" />
     <Compile Remove="Persistance\WorldV01.cs" />
-    <Compile Remove="s.css.cs" />
-    <Compile Remove="RuntimeGizmoTest\**" />
-    <EmbeddedResource Remove="RuntimeGizmoTest\**" />
+    <Compile Remove="RuntimeGizmoOld\**" />
+    <Compile Remove="RuntimeGizmoOlder\**" />
+    <Compile Remove="Unity\**" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -204,6 +201,9 @@
     <Reference Include="UnityEngine.HotReloadModule">
       <HintPath>D:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.HotReloadModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.Il2CppAssetBundleManager">
+      <HintPath>..\..\..\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Managed\UnityEngine.Il2CppAssetBundleManager.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
       <HintPath>D:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
@@ -286,7 +286,7 @@
       <HintPath>D:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.TLSModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>D:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\..\..\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIElementsModule">
       <HintPath>D:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UIElementsModule.dll</HintPath>
@@ -351,11 +351,26 @@
     <Reference Include="UnityEngine.XRModule">
       <HintPath>D:\SteamLibrary\steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.XRModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityExplorer.ML.IL2CPP.net6preview.interop">
-      <HintPath>..\..\..\SteamLibrary\steamapps\common\Slime Rancher 2\Mods\UnityExplorer.ML.IL2CPP.net6preview.interop.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Remove="RuntimeGizmoTest\**" />
+    <None Remove="RuntimeGizmoOld\**" />
+    <None Remove="RuntimeGizmoOlder\**" />
+    <None Remove="Unity\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="RuntimeGizmoOld\**" />
+    <EmbeddedResource Remove="RuntimeGizmoOlder\**" />
+    <EmbeddedResource Remove="Unity\**" />
+    <None Remove="BuildObjects.json" />
+    <EmbeddedResource Include="BuildObjects.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="RuntimeGizmo\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\SRLEInUnity\Assets\AssetBundles\srle">
+      <Link>srle</Link>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

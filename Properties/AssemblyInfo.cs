@@ -35,4 +35,3 @@ using SRLE;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: MelonInfo(typeof(EntryPoint), "SRLE", EntryPoint.Version, "SRLE Contributors")]

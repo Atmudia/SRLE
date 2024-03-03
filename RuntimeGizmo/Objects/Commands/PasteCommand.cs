@@ -14,14 +14,18 @@ public class PasteCommand : ICommand
         
         var transformGizmo = SRLECamera.Instance.transformGizmo;
         copyObj = CopyPasteManager.copiedObject;
-        pastedObj = Object.Instantiate(copyObj, SRLEManager.World.transform, true);
-        pastedObj.GetComponent<BuildObjectId>().IdClass = copyObj.GetComponent<BuildObjectId>().IdClass;
+        pastedObj = Object.Instantiate(copyObj, ObjectManager.World.transform);
+        var buildObject = copyObj.GetComponent<BuildObject>();
+        pastedObj.GetComponent<BuildObject>().ID = buildObject.ID;
         transformGizmo.ClearAndAddTarget(pastedObj.transform);
+        ObjectManager.AddObject(buildObject.ID.Id, pastedObj);
 
     }
 
     public void UnExecute()
     {
+        ObjectManager.RemoveObject(pastedObj);
         Object.Destroy(pastedObj);
+
     }
 }

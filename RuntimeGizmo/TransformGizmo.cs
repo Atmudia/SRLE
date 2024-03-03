@@ -3,15 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using Il2CppMonomiPark.SlimeRancher.DataModel;
 using MelonLoader;
 using SRLE.Components;
 using SRLE.RuntimeGizmo.Helpers;
 using SRLE.RuntimeGizmo.Objects;
 using SRLE.RuntimeGizmo.Objects.Commands;
 using SRLE.RuntimeGizmo.UndoRedo;
+using SRLE.Utils;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using InputManager = SRLE.Utils.InputManager;
+using Object = UnityEngine.Object;
 
 namespace SRLE.RuntimeGizmo
 {
@@ -19,6 +24,7 @@ namespace SRLE.RuntimeGizmo
 	//you should call ClearTargets before doing so just to be sure nothing unexpected happens... as well as call UndoRedoManager.Clear()
 	//For example, if you select an object that has children, move the children elsewhere, deselect the original object, then try to add those old children to the selection, I think it wont work.
 
+	[RegisterTypeInIl2Cpp]
 	public class TransformGizmo : MonoBehaviour
 	{
 		public TransformSpace space = TransformSpace.Global;
@@ -96,18 +102,18 @@ namespace SRLE.RuntimeGizmo
 		public bool isTransforming {get; private set;}
 		public float totalScaleAmount {get; private set;}
 		public Quaternion totalRotationAmount {get; private set;}
-		public Axis translatingAxis {get {return nearAxis;}}
-		public Axis translatingAxisPlane {get {return planeAxis;}}
-		public bool hasTranslatingAxisPlane {get {return translatingAxisPlane != Axis.None && translatingAxisPlane != Axis.Any;}}
-		public TransformType transformingType {get {return translatingType;}}
+		public Axis translatingAxis => nearAxis;
+		public Axis translatingAxisPlane => planeAxis;
+		public bool hasTranslatingAxisPlane => translatingAxisPlane != Axis.None && translatingAxisPlane != Axis.Any;
+		public TransformType transformingType => translatingType;
 
-		public Vector3 pivotPoint {get; private set;}
-		Vector3 totalCenterPivotPoint;
+		private Vector3 pivotPoint {get; set;}
+		private Vector3 totalCenterPivotPoint;
 
-		public Transform mainTargetRoot {get {return (targetRootsOrdered.Count > 0) ? (useFirstSelectedAsMain) ? targetRootsOrdered[0] : targetRootsOrdered[targetRootsOrdered.Count - 1] : null;}}
+		public Transform mainTargetRoot => (targetRootsOrdered.Count > 0) ? (useFirstSelectedAsMain) ? targetRootsOrdered[0] : targetRootsOrdered[^1] : null;
 
-		AxisInfo axisInfo;
-		Axis nearAxis = Axis.None;
+		private AxisInfo axisInfo;
+		public Axis nearAxis = Axis.None;
 		Axis planeAxis = Axis.None;
 		TransformType translatingType;
 
@@ -118,25 +124,30 @@ namespace SRLE.RuntimeGizmo
 		AxisVectors circlesLines = new AxisVectors();
 
 		//We use a HashSet and a List for targetRoots so that we get fast lookup with the hashset while also keeping track of the order with the list.
-		List<Transform> targetRootsOrdered = new List<Transform>();
-		Dictionary<Transform, TargetInfo> targetRoots = new Dictionary<Transform, TargetInfo>();
-		HashSet<Renderer> highlightedRenderers = new HashSet<Renderer>();
+		
+		
+		
+		
+		
+		public List<Transform> targetRootsOrdered = new List<Transform>();
+
+		
+		
+		System.Collections.Generic.Dictionary<Transform, TargetInfo> targetRoots = new Dictionary<Transform, TargetInfo>();
+		
 		HashSet<Transform> children = new HashSet<Transform>();
 
 		List<Transform> childrenBuffer = new List<Transform>();
-		List<Renderer> renderersBuffer = new List<Renderer>();
-		List<Material> materialsBuffer = new List<Material>();
 
 		WaitForEndOfFrame waitForEndOFFrame = new WaitForEndOfFrame();
 		object forceUpdatePivotCoroutine;
 
 		static Material lineMaterial;
-		static Material outlineMaterial;
 
 		void Awake()
 		{
 			myCamera = GetComponent<Camera>();
-			SetMaterial();
+			lineMaterial = AssetManager.Lines;
 		}
 		private void RenderPipelineManager_endFrameRendering(ScriptableRenderContext context, Il2CppReferenceArray<Camera> il2CppReferenceArray)
 		{
@@ -169,16 +180,21 @@ namespace SRLE.RuntimeGizmo
 
 			if(manuallyHandleGizmo)
 			{
-				if(onCheckForSelectedAxis != null) onCheckForSelectedAxis();
-			}else{
+				onCheckForSelectedAxis?.Invoke();
+			}
+			else
+			{
 				SetNearAxis();
 			}
 			
 			GetTarget();
 
-			if(mainTargetRoot == null) return;
+			if (mainTargetRoot == null)
+			{
+				return;
+			}
 			HandleCopyPaste();
-
+			HandleDelete();
 			TransformSelected();
 		}
 
@@ -281,15 +297,17 @@ namespace SRLE.RuntimeGizmo
 		{
 			if(InputManager.GetKey(ActionKey))
 			{
-				if(InputManager.GetKeyDown(SetCenterTypeToggle))
-				{
-					CopyPasteManager.Copy();
+				if(InputManager.GetKeyDown(PasteAction))
+				{ 
+					CopyPasteManager.Paste();
 				}
-				else if(InputManager.GetKeyDown(PasteAction))
-				{
-					if (CopyPasteManager.copiedObject != null)
-						CopyPasteManager.Paste();
-				}
+			}
+		}
+		public void HandleDelete()
+		{
+			if(InputManager.GetKeyDown(Key.Delete))
+			{ 
+				ObjectManager.RemoveObject(mainTargetRoot.gameObject);
 			}
 		}
 
@@ -403,7 +421,7 @@ namespace SRLE.RuntimeGizmo
 				{
 					if(transType == TransformType.Move)
 					{
-						Vector3 movement = Vector3.zero;
+						Vector3 movement;
 
 						if(hasTranslatingAxisPlane)
 						{
@@ -424,8 +442,7 @@ namespace SRLE.RuntimeGizmo
 								float amountInAxis2 = ExtVector3.MagnitudeInDirection(currentSnapMovementAmount, otherAxis2);
 
 								float snapAmount1 = CalculateSnapAmount(movementSnap, amountInAxis1, out _);
-								float remainder2;
-								float snapAmount2 = CalculateSnapAmount(movementSnap, amountInAxis2, out remainder2);
+								float snapAmount2 = CalculateSnapAmount(movementSnap, amountInAxis2, out _);
 
 								if(snapAmount1 != 0)
 								{
@@ -464,7 +481,7 @@ namespace SRLE.RuntimeGizmo
 					}
 					else if(transType == TransformType.Scale)
 					{
-						Vector3 projected = (nearAxis == Axis.Any) ? transform.right : projectedAxis;
+						Vector3 projected = nearAxis == Axis.Any ? transform.right : projectedAxis;
 						float scaleAmount = ExtVector3.MagnitudeInDirection(mousePosition - previousMousePosition, projected) * scaleSpeedMultiplier;
 						
 						if(isSnapping && scaleSnap > 0)
@@ -482,7 +499,6 @@ namespace SRLE.RuntimeGizmo
 							}
 						}
 
-						//WARNING - There is a bug in unity 5.4 and 5.5 that causes InverseTransformDirection to be affected by scale which will break negative scaling. Not tested, but updating to 5.4.2 should fix it - https://issuetracker.unity3d.com/issues/transformdirection-and-inversetransformdirection-operations-are-affected-by-scale
 						Vector3 localAxis = (GetProperTransformSpace() == TransformSpace.Local && nearAxis != Axis.Any) ? mainTargetRoot.InverseTransformDirection(axis) : axis;
 						
 						Vector3 targetScaleAmount = Vector3.one;
@@ -511,7 +527,7 @@ namespace SRLE.RuntimeGizmo
 					else if(transType == TransformType.Rotate)
 					{
 						var vector2 = Mouse.current.delta.ReadValue();
-						float rotateAmount = 0;
+						float rotateAmount;
 						Vector3 rotationAxis = axis;
 
 						if(nearAxis == Axis.Any)
@@ -623,64 +639,58 @@ namespace SRLE.RuntimeGizmo
 
 			return Vector3.zero;
 		}
-	
+		
+		
+
 		void GetTarget()
 		{
 			if (nearAxis == Axis.None && InputManager.GetMouseButtonDown(0))
 			{
 				bool isAdding = InputManager.GetKey(AddSelection);
 				bool isRemoving = InputManager.GetKey(RemoveSelection);
-
-				RaycastHit[] hits = Physics.RaycastAll(myCamera.ScreenPointToRay(InputManager.MousePosition), Mathf.Infinity, selectionMask);
-				if (hits.Length > 0)
+				if (EventSystem.current.IsPointerOverGameObject())
+					return;
+				if (Physics.Raycast(myCamera.ScreenPointToRay(InputManager.MousePosition), out var hitInfo, Mathf.Infinity, selectionMask) && ObjectManager.GetBuildObject(hitInfo.transform.gameObject, out var buildObject))
 				{
-					foreach (RaycastHit hit in hits)
+					Transform target = buildObject.transform;
+					if (isAdding)
 					{
-						Transform target = hit.transform;
-						var buildObjectId = target.GetComponent<BuildObjectId>();
-						if (buildObjectId == null)
-							buildObjectId = target.GetComponentInParent<BuildObjectId>();
-						if (buildObjectId == null)
-							buildObjectId = target.GetComponentInChildren<BuildObjectId>();
-						if (buildObjectId == null) continue;
-						target = buildObjectId.transform;
-						if (isAdding)
-						{
-							AddTarget(target);
-						}
-						else if (isRemoving)
-						{
-							RemoveTarget(target);
-						}
-						else if (!isAdding && !isRemoving)
-						{
-							ClearAndAddTarget(target);
-						}
+						AddTarget(target);
+					}
+					else if (isRemoving)
+					{	
+						RemoveTarget(target);
+					}
+					else
+					{
+						ClearAndAddTarget(target);
 					}
 				}
-				
-				//if (!isAdding && !isRemoving)
-				//{
-					//ClearTargets();
-				//}
+				else
+				{
+					if (!isAdding && !isRemoving)
+					{
+						ClearTargets();
+					}
+				}
 			}
 		}
-		
+
 
 		public void AddTarget(Transform target, bool addCommand = true)
 		{
 			if(target != null)
 			{
-				if(targetRoots.ContainsKey(target)) return;
+				if(targetRoots.ContainsKeyInIL2CPP(target)) return;
 				if(children.Contains(target)) return;
 
-				if(addCommand) UndoRedoManager.Insert(new AddTargetCommand(this, target, targetRootsOrdered));
-
+				if(addCommand) UndoRedoManager.Insert(new AddTargetCommand(this, target, targetRootsOrdered)); 
+				
 				AddTargetRoot(target);
 				AddTargetHighlightedRenderers(target);
 
 				SetPivotPoint();
-				
+				InspectorUI.Instance.SetActive(true);
 			}
 		}
 
@@ -688,7 +698,11 @@ namespace SRLE.RuntimeGizmo
 		{
 			if(target != null)
 			{
-				if(!targetRoots.ContainsKey(target)) return;
+
+				if (!targetRoots.ContainsKey(target))
+				{
+					return;
+				}
 
 				if(addCommand) UndoRedoManager.Insert(new RemoveTargetCommand(this, target));
 
@@ -696,7 +710,9 @@ namespace SRLE.RuntimeGizmo
 				RemoveTargetRoot(target);
 
 				SetPivotPoint();
+				
 			}
+			InspectorUI.Instance.SetActive(false);
 		}
 
 		public void ClearTargets(bool addCommand = true)
@@ -707,6 +723,7 @@ namespace SRLE.RuntimeGizmo
 			targetRoots.Clear();
 			targetRootsOrdered.Clear();
 			children.Clear();
+			InspectorUI.Instance.SetActive(false);
 		}
 
 		public void ClearAndAddTarget(Transform target)
@@ -721,83 +738,31 @@ namespace SRLE.RuntimeGizmo
 		{
 			if(target != null)
 			{
-				GetTargetRenderers(target, renderersBuffer);
-
-				for(int i = 0; i < renderersBuffer.Count; i++)
+				foreach (MeshFilter meshFilter in target.GetComponentsInChildren<MeshFilter>(true))
 				{
-					Renderer render = renderersBuffer[i];
-
-					if(!highlightedRenderers.Contains(render))
-					{
-						materialsBuffer.Clear();
-						materialsBuffer.AddRange(render.sharedMaterials);
-
-						if(!materialsBuffer.Contains(outlineMaterial))
-						{
-							materialsBuffer.Add(outlineMaterial);
-							render.materials = materialsBuffer.ToArray();
-						}
-
-						highlightedRenderers.Add(render);
-					}
+					meshFilter.gameObject.AddComponent<ObjectHighlight>();
 				}
-
-				materialsBuffer.Clear();
 			}
 		}
-
-		void GetTargetRenderers(Transform target, List<Renderer> renderers)
-		{
-			renderers.Clear();
-			if(target != null)
-			{
-				renderers.AddRange(target.GetComponentsInChildren<Renderer>(true));
-				renderers.RemoveAll(x => x.TryCast<ParticleSystemRenderer>());
-			}
-		}
+		
 
 		void ClearAllHighlightedRenderers()
 		{
-			foreach(var target in targetRoots)
+			foreach (var componentsInChild in targetRoots.Keys.SelectMany(targetInfo => targetInfo.GetComponentsInChildren<ObjectHighlight>(true)))
 			{
-				RemoveTargetHighlightedRenderers(target.Key);
+				Object.Destroy(componentsInChild);
 			}
-
-			//In case any are still left, such as if they changed parents or what not when they were highlighted.
-			renderersBuffer.Clear();
-			renderersBuffer.AddRange(highlightedRenderers);
-			RemoveHighlightedRenderers(renderersBuffer);
 		}
 
 		void RemoveTargetHighlightedRenderers(Transform target)
 		{
-			GetTargetRenderers(target, renderersBuffer);
-
-			RemoveHighlightedRenderers(renderersBuffer);
-		}
-
-		void RemoveHighlightedRenderers(List<Renderer> renderers)
-		{
-			for(int i = 0; i < renderersBuffer.Count; i++)
+			foreach (ObjectHighlight objectHighlight in target.GetComponentsInChildren<ObjectHighlight>(true))
 			{
-				Renderer render = renderersBuffer[i];
-				if(render != null)
-				{
-					materialsBuffer.Clear();
-					materialsBuffer.AddRange(render.sharedMaterials);
-					var material = materialsBuffer.Find(x => x.GetInstanceID().Equals(outlineMaterial.GetInstanceID()));
-					if(material != null)
-					{ 
-						materialsBuffer.Remove(material);
-						render.materials = materialsBuffer.ToArray();
-					}
-				}
+				Object.Destroy(objectHighlight);
 
-				highlightedRenderers.Remove(render);
 			}
-
-			renderersBuffer.Clear();
 		}
+		
 
 		void AddTargetRoot(Transform targetRoot)
 		{
@@ -807,11 +772,11 @@ namespace SRLE.RuntimeGizmo
 			AddAllChildren(targetRoot);
 		}
 		void RemoveTargetRoot(Transform targetRoot)
-		{
-			if(targetRoots.Remove(targetRoot))
+		{ 
+			if (targetRoots.Remove(targetRoot))
 			{
+				MelonLogger.Msg("Succeed:" + targetRoot.name);
 				targetRootsOrdered.Remove(targetRoot);
-
 				RemoveAllChildren(targetRoot);
 			}
 		}
@@ -850,19 +815,19 @@ namespace SRLE.RuntimeGizmo
 			if(mainTargetRoot != null)
 			{
 				totalCenterPivotPoint = Vector3.zero;
-				
-				using Dictionary<Transform, TargetInfo>.Enumerator targetsEnumerator = targetRoots.GetEnumerator(); //We avoid foreach to avoid garbage.
-				while(targetsEnumerator.MoveNext())
+
+				foreach (var targetsEnumerator in targetRoots)
 				{
-					Transform target = targetsEnumerator.Current.Key;
-					TargetInfo info = targetsEnumerator.Current.Value;
+					Transform target = targetsEnumerator.Key;
+					TargetInfo info = targetsEnumerator.Value;
 					info.centerPivotPoint = target.GetCenter();
 
 					totalCenterPivotPoint += info.centerPivotPoint;
 				}
-
 				totalCenterPivotPoint /= targetRoots.Count;
 				pivotPoint = targetRoots[mainTargetRoot].centerPivotPoint;
+
+
 
 			}
 		}
@@ -889,19 +854,18 @@ namespace SRLE.RuntimeGizmo
 				if(mainTargetRoot != null && !isTransforming)
 				{
 					bool hasSet = false;
-					using Dictionary<Transform, TargetInfo>.Enumerator targets = targetRoots.GetEnumerator();
-					while(targets.MoveNext())
+
+					foreach (var targets in targetRoots)
 					{
 						if(!hasSet)
 						{
-							if(targets.Current.Value.previousPosition != Vector3.zero && targets.Current.Key.position != targets.Current.Value.previousPosition)
+							if(targets.Value.previousPosition != Vector3.zero && targets.Key.position != targets.Value.previousPosition)
 							{
 								SetPivotPoint();
 								hasSet = true;
 							}
 						}
-
-						targets.Current.Value.previousPosition = targets.Current.Key.position;
+						targets.Value.previousPosition = targets.Key.position;
 					}
 				}
 			}
@@ -1092,8 +1056,8 @@ namespace SRLE.RuntimeGizmo
 		{
 			if(mainTargetRoot == null) return 0f;
 
-			if(myCamera.orthographic) return Mathf.Max(.01f, myCamera.orthographicSize * 2f);
-			return Mathf.Max(.01f, Mathf.Abs(ExtVector3.MagnitudeInDirection(pivotPoint - transform.position, myCamera.transform.forward)));
+			if(myCamera.orthographic) return Math.Max(.01f, myCamera.orthographicSize * 2f);
+			return Math.Max(.01f, Math.Abs(ExtVector3.MagnitudeInDirection(pivotPoint - transform.position, myCamera.transform.forward)));
 		}
 
 		void SetLines()
@@ -1132,10 +1096,6 @@ namespace SRLE.RuntimeGizmo
 				AddQuads(pivotPoint, axisInfo.zDirection, axisInfo.xDirection, axisInfo.yDirection, zLineLength, lineWidth, handleLines.z);
 			}
 		}
-		int AxisDirectionMultiplier(Vector3 direction, Vector3 otherDirection)
-		{
-			return ExtVector3.IsInDirection(direction, otherDirection) ? 1 : -1;
-		}
 
 		void SetHandlePlanes()
 		{
@@ -1152,9 +1112,9 @@ namespace SRLE.RuntimeGizmo
 				if(transformType == TransformType.All) { planeSize *= allMoveHandleLengthMultiplier; }
 				planeSize *= GetDistanceMultiplier();
 
-				Vector3 xDirection = (axisInfo.xDirection * planeSize) * cameraXSign;
-				Vector3 yDirection = (axisInfo.yDirection * planeSize) * cameraYSign;
-				Vector3 zDirection = (axisInfo.zDirection * planeSize) * cameraZSign;
+				Vector3 xDirection = axisInfo.xDirection * (planeSize * cameraXSign);
+				Vector3 yDirection = axisInfo.yDirection * (planeSize * cameraYSign);
+				Vector3 zDirection = axisInfo.zDirection * (planeSize * cameraZSign);
 
 				Vector3 xPlaneCenter = pivotPoint + (yDirection + zDirection);
 				Vector3 yPlaneCenter = pivotPoint + (xDirection + zDirection);
@@ -1289,20 +1249,19 @@ namespace SRLE.RuntimeGizmo
 			Vector3 forward = Vector3.Slerp(up, -up, .5f);
 			Vector3 right = Vector3.Cross(up, forward).normalized * size;
 		
-			Matrix4x4 matrix = new Matrix4x4();
-		
-			matrix[0] = right.x;
-			matrix[1] = right.y;
-			matrix[2] = right.z;
-		
-			matrix[4] = up.x;
-			matrix[5] = up.y;
-			matrix[6] = up.z;
-		
-			matrix[8] = forward.x;
-			matrix[9] = forward.y;
-			matrix[10] = forward.z;
-		
+			Matrix4x4 matrix = new Matrix4x4
+			{
+				[0] = right.x,
+				[1] = right.y,
+				[2] = right.z,
+				[4] = up.x,
+				[5] = up.y,
+				[6] = up.z,
+				[8] = forward.x,
+				[9] = forward.y,
+				[10] = forward.z
+			};
+
 			Vector3 lastPoint = origin + matrix.MultiplyPoint3x4(new Vector3(Mathf.Cos(0), 0, Mathf.Sin(0)));
 			Vector3 nextPoint = Vector3.zero;
 			float multiplier = 360f / circleDetail;
@@ -1403,20 +1362,6 @@ namespace SRLE.RuntimeGizmo
 			}
 
 			GL.End();
-		}
-
-		void SetMaterial()
-		{
-			if(lineMaterial == null)
-			{
-				
-				lineMaterial = new Material(SRLEObjectManager.Shaders.First(x => x.name.Equals("Custom/Lines")));
-				lineMaterial.hideFlags |= HideFlags.HideAndDontSave;
-				outlineMaterial = new Material(SRLEObjectManager.Shaders.First(x => x.name.Equals("SuperSystems/Wireframe-Transparent")));
-				outlineMaterial.hideFlags |= HideFlags.HideAndDontSave;
-
-			}
-			
 		}
 	}
 }

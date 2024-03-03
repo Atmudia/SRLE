@@ -1,7 +1,4 @@
-﻿using Il2CppMonomiPark.SlimeRancher.Regions;
-using Il2CppMonomiPark.SlimeRancher.SceneManagement;
-
-namespace SRLE;
+﻿namespace SRLE.Models;
 
 public class TeleportModel
 {

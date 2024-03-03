@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using MelonLoader;
 using SRLE.Components;
 using UnityEngine;
@@ -12,14 +13,16 @@ internal static class Patch_AutoSaveDirector
     [HarmonyPrefix]
     public static bool SaveGame()
     {
+        return LevelManager.CurrentMode != LevelManager.Mode.BUILD;
+    }
 
-        if (SRLEMod.CurrentMode == SRLEMod.Mode.BUILD)
-        {
-            SRLESaveManager.SaveLevel();
-            //World.Save();
-            return false;
-        }
-        return true;
+    [HarmonyPatch(nameof(AutoSaveDirector.SaveGame))]
+    [HarmonyFinalizer]
+    public static Exception FinalizerSaveGame(Exception __exception)
+    {
+        if (LevelManager.CurrentMode != LevelManager.Mode.BUILD) return __exception;
+        SaveManager.SaveLevel();
+        return null;
     }
 
     [HarmonyPatch(nameof(AutoSaveDirector.OnGameLoaded))]
@@ -28,7 +31,7 @@ internal static class Patch_AutoSaveDirector
     {
         
         
-        if (SRLEMod.CurrentMode == SRLEMod.Mode.BUILD)
+        if (LevelManager.CurrentMode == LevelManager.Mode.BUILD)
         {
 
 

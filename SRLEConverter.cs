@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using SRLE.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,12 +11,27 @@ namespace SRLE;
 public static class SRLEConverter
 {
     public static bool IsConverting = false;
-    private static List<string> included = new[] {
-        "Main Nav", "Cliffs", "Mountains", "Solid Filler", "Rocks", "Flora", "Grass", 
-        "Deco", "Constructs", "Resources", "Slimes", "FX", "Lights", "Water", 
-        "Colliders", "Loot", "Audio", "Build Sites", "Roots", "Upgrades", 
+
+    private static List<string> included = new()
+    {
+        "Main Nav", "Cliffs", "Mountains", "Solid Filler", "Rocks", "Flora", "Grass",
+        "Deco", "Constructs", "Resources", "Slimes", "FX", "Lights", "Water",
+        "Colliders", "Loot", "Audio", "Build Sites", "Roots", "Upgrades",
         "Ranch Features", "Drone Network"
-    }.ToList();
+    };
+    public static string GetFullName(this GameObject obj)
+    {
+        string str = obj.name;
+        for (Transform parent = obj.transform.parent;
+             parent != null;
+             parent = parent.parent)
+        {
+            str = parent.gameObject.name + "/" + str;
+        }
+
+        return str;
+    }
+
 
     internal static IEnumerable<Scene> GetAllScenes()
     {
@@ -33,7 +49,7 @@ public static class SRLEConverter
             {
                 foreach (var cellDirector in rootGameObject.GetComponentsInChildren<CellDirector>())
                 {
-                    if (cellDirector.transform.parent is not null)
+                    if (cellDirector.transform.parent != null)
                     {
                         if (cellDirector.transform.parent.name == "PrefabParent")
                         {
@@ -115,20 +131,20 @@ public static class SRLEConverter
                 return (index >= 0) && (index < array.Length);
             }
 
-            List<BuildObjects.Category> categories = new List<BuildObjects.Category>();
-            static BuildObjects.Category FindCategory(string CategoryName, List<BuildObjects.Category> categories)
+            List<IdCategoryData> categories = new List<IdCategoryData>();
+            static IdCategoryData FindCategory(string CategoryName, List<IdCategoryData> categories)
             {
 
-                BuildObjects.Category category = null;
-                foreach (var VARIABLE in categories)
-                {
-                    if (VARIABLE.CategoryName == CategoryName)
-                        category = VARIABLE;
-                }
+                IdCategoryData category = categories.FirstOrDefault(x => x.CategoryName.Equals(CategoryName));
+                // foreach (var VARIABLE in categories)
+                // {
+                //     if (VARIABLE.CategoryName == CategoryName)
+                //         category = VARIABLE;
+                // }
 
-                if (category is null)
+                if (category != null)
                 {
-                    var item = new BuildObjects.Category {Objects = new List<BuildObjects.IdClass>(), CategoryName = CategoryName};
+                    var item = new IdCategoryData {Objects = new List<IdClass>(), CategoryName = CategoryName};
                     categories.Add(item);
                     category = item;
                 }
@@ -145,7 +161,7 @@ public static class SRLEConverter
                 var path = element.Key.GetFullName();
                 var strings = path.Split('/', '/');
                 var category = InBounds(3, strings) ? strings[3] : "None";
-                var idClass = new BuildObjects.IdClass {Id = aa, Name = element.Key.name, Path = path, Scene = element.Key.scene.name, HashCode = element.Value};
+                var idClass = new IdClass {Id = aa, Name = element.Key.name, Path = path, Scene = element.Key.scene.name, HashCode = element.Value};
                 FindCategory(category, categories).Objects.Add(idClass);
                 aa++;
             }

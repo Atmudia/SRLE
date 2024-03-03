@@ -4,7 +4,7 @@ namespace SRLE.RuntimeGizmo.UndoRedo
 	{
 		static UndoRedo undoRedo = new UndoRedo();
 
-		public static int maxUndoStored {get {return undoRedo.maxUndoStored;} set {undoRedo.maxUndoStored = value;}}
+		public static int maxUndoStored {get => undoRedo.maxUndoStored; set {undoRedo.maxUndoStored = value;}}
 
 		public static void Clear()
 		{

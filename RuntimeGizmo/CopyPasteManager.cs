@@ -9,13 +9,9 @@ namespace SRLE.RuntimeGizmo;
 public static class CopyPasteManager
 {
     public static GameObject copiedObject;
-    public static void Copy()
-    {
-        copiedObject = SRLECamera.Instance.transformGizmo.mainTargetRoot.gameObject;
-        MelonLogger.Msg($"Copied object with: {copiedObject.ToString()}");
-    }
     public static void Paste()
     {
+        copiedObject = SRLECamera.Instance.transformGizmo.mainTargetRoot.gameObject;
         var pasteCommand = new PasteCommand();
         pasteCommand.Execute();
         UndoRedoManager.Insert(pasteCommand);

@@ -2,7 +2,8 @@ namespace SRLE.RuntimeGizmo.UndoRedo
 {
 	public class UndoRedo
 	{
-		public int maxUndoStored {get {return undoCommands.maxLength;} set {SetMaxLength(value);}}
+		public int maxUndoStored {get {return undoCommands.maxLength;} set => SetMaxLength(value);
+		}
 
 		DropoutStack<ICommand> undoCommands = new DropoutStack<ICommand>();
 		DropoutStack<ICommand> redoCommands = new DropoutStack<ICommand>();

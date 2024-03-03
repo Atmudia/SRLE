@@ -1,8 +1,7 @@
 ﻿using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
-
-namespace SRLE;
+namespace SRLE.Utils;
 
 public static class InputManager
 {
