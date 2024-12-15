@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Il2CppMonomiPark.SlimeRancher.SceneManagement;
 using Il2CppMonomiPark.SlimeRancher.UI;
 using Il2CppSystem;
@@ -27,6 +28,10 @@ namespace SRLE.Components
         private ScrollRect ObjectsScroll;
         internal InputField SearchInput;
         private Dictionary<uint, Texture2D> BuildObjectsPreview;
+
+        private bool currentlyProcessingPreviews = false;
+        private object currPreviewEnumerator = null;
+        private Queue<(uint, GameObject)> previewQueue = new Queue<(uint, GameObject)>();
 
         public HierarchyUI(IntPtr value) : base(value) { }
 
@@ -84,6 +89,7 @@ namespace SRLE.Components
         private void Search(string term)
         {
             ClearChildObjects(ObjectsScroll.content);
+            KillCurrentPreviewQueue();
 
             if (term.Length < 2) return;
 
@@ -136,7 +142,9 @@ namespace SRLE.Components
         {
             if (!BuildObjectsPreview.ContainsKey(objectID))
             {
-                LoadObjectPreviewFromDisk(objectID, buildObj);
+                previewQueue.Enqueue((objectID, buildObj));
+                if (!currentlyProcessingPreviews)
+                    currPreviewEnumerator = MelonCoroutines.Start(LoadPreviewAsync());
             }
             else
             {
@@ -207,12 +215,78 @@ namespace SRLE.Components
             if (ObjectManager.BuildCategories.TryGetValue(categoryName, out List<uint> categoryObjects))
             {
                 ClearChildObjects(ObjectsScroll.content);
+                KillCurrentPreviewQueue();
 
                 foreach (var objectID in categoryObjects.Where(ObjectManager.BuildObjectsData.ContainsKey))
                 {
                     CreateObjectButton(ObjectManager.BuildObjectsData[objectID]);
                 }
             }
+        }
+
+        private System.Collections.IEnumerator LoadPreviewAsync()
+        {
+            currentlyProcessingPreviews = true;
+
+            (uint, GameObject) previewToLoad = previewQueue.Dequeue();
+            uint objectID = previewToLoad.Item1;
+            GameObject buildObj = previewToLoad.Item2;
+
+            string filePath = Path.Combine(SaveManager.DataPath, "Textures", objectID + ".jpg");
+
+            if (File.Exists(filePath))
+            {
+                Task<byte[]> asyncBytes = File.ReadAllBytesAsync(filePath);
+                while (!asyncBytes.IsCompleted)
+                    yield return null;
+
+                Texture2D result = new Texture2D(64, 64, TextureFormat.RGB24, false);
+                result.LoadImage(asyncBytes.Result, false);
+                result.Apply(false, false);
+
+                BuildObjectsPreview.Add(objectID, result);
+
+                if (buildObj != null)
+                    buildObj.GetComponentInChildren<RawImage>().texture = result;
+            }
+            else
+            {
+                GameObject previewObj = null;
+                ObjectManager.RequestObject(objectID, x => previewObj = x);
+
+                if (previewObj != null)
+                {
+                    Texture2D texture = RuntimePreviewGenerator.GenerateModelPreview(previewObj.transform);
+                    byte[] bytes = texture.EncodeToPNG();
+
+                    Task asyncBytes = File.WriteAllBytesAsync(filePath, bytes);
+                    while (!asyncBytes.IsCompleted)
+                        yield return null;
+
+                    BuildObjectsPreview.Add(objectID, texture);
+
+                    if (buildObj != null)
+                        buildObj.GetComponentInChildren<RawImage>().texture = texture;
+                }
+                else MelonLogger.Warning("Attempting model generation of non-existent object! Skipping ...");
+            }
+
+            if (previewQueue.Count == 0)
+            {
+                currentlyProcessingPreviews = false;
+                currPreviewEnumerator = null;
+                yield break;
+            }
+            currPreviewEnumerator = MelonCoroutines.Start(LoadPreviewAsync());
+            yield return null;
+        }
+
+        public void KillCurrentPreviewQueue()
+        {
+            if (currPreviewEnumerator != null)
+                MelonCoroutines.Stop(currPreviewEnumerator);
+            previewQueue.Clear();
+            currentlyProcessingPreviews = false;
         }
     }
 }
