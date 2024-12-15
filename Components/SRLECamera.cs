@@ -13,7 +13,9 @@ using SRLE.Patches;
 // using RuntimeHandle;
 // using SRLE.RuntimeGizmo;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.Serialization;
 using InputManager = SRLE.Utils.InputManager;
 
@@ -33,6 +35,7 @@ public class SRLECamera : MonoBehaviour
     public object DestroyDelayedObject;
     public RuntimeGizmo.TransformGizmo transformGizmo;
     public InputDirector inputDirector;
+
     
     public void Awake()
     {
@@ -46,15 +49,21 @@ public class SRLECamera : MonoBehaviour
         cursorLockHandler = Resources.FindObjectsOfTypeAll<CursorLockHandler>().First();
         transformGizmo = GetComponent<RuntimeGizmo.TransformGizmo>();
         inputDirector = SRSingleton<GameContext>.Instance.InputDirector;
+        
+        SRSingleton<SceneContext>.Instance.Player.transform.Find("GadgetModeOverlay").GetComponent<CustomPassVolume>().enabled = false;
+        
     }
 
     public void OnEnable()
     {
+        // return;
         SRSingleton<HudUI>.Instance.gameObject.SetActive(false);
 
         transform.position = cameraController.Position;
         transform.rotation =  cameraController.Rotation;
         playerController.BypassGravity = true;
+        playerController.ResetVelocity(false);;
+        playerController.enabled = false;
         // SRSingleton<SceneContext>.Instance.PlayerState.InGadgetMode = true;
         // base.transform.position = playerCamera.transform.position;
         // this.transform.localPosition = playerCamera.transform.localPosition;
@@ -71,7 +80,7 @@ public class SRLECamera : MonoBehaviour
     public void OnDisable()
     {
         if (SRSingleton<HudUI>.Instance == null) return;
-        SRSingleton<HudUI>.Instance.gameObject.SetActive(true); 
+        SRSingleton<HudUI>.Instance.gameObject.SetActive(true);
         playerController.Position = transform.position;
         playerController.Rotation = transform.rotation;
         cursorLockHandler.SetEnableCursor(false);
@@ -81,9 +90,10 @@ public class SRLECamera : MonoBehaviour
             o.Cast<Transform>().gameObject.SetActive(true);
         }
         MelonCoroutines.Stop(DestroyDelayedObject);
-        inputDirector._mainGame.Enable();
-        inputDirector._paused.Disable();
+        // inputDirector._mainGame._asset.Enable();
+        // inputDirector._paused._asset.Disable();
         playerController.BypassGravity = false;
+        playerController.enabled = true;
 
         /*foreach (var rootGameObjects in SRLEConverterUtils.GetAllScenes().Where(x => !x.name.EndsWith("Core")).SelectMany(x => x.GetRootGameObjects()))
         {
@@ -162,9 +172,12 @@ public class SRLECamera : MonoBehaviour
             transform.position += -transform.forward * (speed * Time.deltaTime);
         }
 
-        if (InputManager.GetMouseButtonDown(1))
+        if (InputManager.GetMouseButtonDown(0))
         {
-            //this.lastRotation = base.transform.eulerAngles.y;
+            // if (HierarchyUI.Instance.SearchInput.isFocused && EventSystem.current.currentSelectedGameObject != HierarchyUI.Instance.SearchInput.gameObject)
+            // {
+            //     HierarchyUI.Instance.SearchInput.DeactivateInputField();
+            // }
         }
         if (!InputManager.GetMouseButton(1))
         {
@@ -190,26 +203,7 @@ public class SRLECamera : MonoBehaviour
         
 
     }
-
-    public void OnGUI()
-    {
-        if (GUI.Button(new Rect(170f, 90f, 150f, 25f), "Quit"))
-        {
-            SRSingleton<SceneContext>.Instance.PauseMenuDirector.Quit();
-        }
-
-        GUI.Label(new Rect(15f, 125f, 150f, 25f), "Spawn object with id: ");
-        spawnObject = GUI.TextField(new Rect(125f, 110f + 35f * 1, 200f, 25f), spawnObject);
-        if (GUI.Button(new Rect(170f, 125f, 150f, 25f), "Spawn object"))
-        {
-            //SRLEObjectManager.SpawnObject(Convert.ToUInt32(spawnObject));
-            //SRLEManager.SpawnObjectFromId();
-        }
-        
-        
-       
-    }
-
+    
 
     private float pitch;
     private float yaw;

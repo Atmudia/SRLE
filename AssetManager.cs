@@ -1,5 +1,8 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.InteropTypes;
 using MelonLoader;
 using UnityEngine;
 
@@ -33,22 +36,29 @@ public static class AssetManager
     public static Shader HandleShader;
     public static Shader AdvancedHandleShader;
 
+    public static Material SuperRaycastMaterial;
+
+    public static Dictionary<string, Mesh> SeperatedMeshes = new Dictionary<string, Mesh>();
+
 
     static AssetManager()
     {
         MelonCoroutines.Start(LoadAssetBundleData());
     }
 
+    public static T LoadAsset<T>(this AssetBundle @this, string name) where T : Il2CppObjectBase => @this.LoadAsset(name).Cast<T>();
+
     private static IEnumerator LoadAssetBundleData()
     {
         Melon<EntryPoint>.Logger.Msg("Initializing Asset Manager");
-        Il2CppAssetBundle assetBundle;
+        AssetBundle assetBundle;
         using (Stream bundleStream = Melon<EntryPoint>.Instance.MelonAssembly.Assembly.GetManifestResourceStream("SRLE.srle"))
         {
             byte[] bundleBytes = new byte[bundleStream.Length];
             _ = bundleStream.Read(bundleBytes, 0, bundleBytes.Length);
-            assetBundle = Il2CppAssetBundleManager.LoadFromMemory(bundleBytes);
+            assetBundle = AssetBundle.LoadFromMemory(bundleBytes);
         }
+        // assetBundle = Il2CppAssetBundleManager.LoadFromFile(@"D:\SlimeRancherModding\SR2\SRLEInUnity\Assets\AssetBundles\srle");
         ToolbarUI = assetBundle.LoadAsset<GameObject>("BetterBuildToolbar");
         ToolbarUI.hideFlags |= HideFlags.HideAndDontSave;
         HierarchyUI = assetBundle.LoadAsset<GameObject>("BetterBuildHierarchy");
@@ -93,6 +103,23 @@ public static class AssetManager
         AdvancedHandleShader = assetBundle.LoadAsset<Shader>("assets/betterbuild/anothergizmo/handleshader.shader");
         AdvancedHandleShader.hideFlags |= HideFlags.HideAndDontSave;
 
+        // SuperRaycastMaterial = assetBundle.LoadAsset<Material>("Super Raycast");
+        // SuperRaycastMaterial.hideFlags |= HideFlags.HideAndDontSave;
+        
+        using (Stream bundleStream = Melon<EntryPoint>.Instance.MelonAssembly.Assembly.GetManifestResourceStream("SRLE.srlemeshes"))
+        {
+            byte[] bundleBytes = new byte[bundleStream.Length];
+            _ = bundleStream.Read(bundleBytes, 0, bundleBytes.Length);
+            var srlemeshes = AssetBundle.LoadFromMemory(bundleBytes);
+            foreach (var loadAllAsset in srlemeshes.LoadAllAssets(Il2CppType.Of<Mesh>()))
+            {
+                loadAllAsset.hideFlags |= HideFlags.HideAndDontSave;
+                SeperatedMeshes.Add(loadAllAsset.name, loadAllAsset.Cast<Mesh>());
+            }
+        }
+       
+        
+        
         
         yield return new WaitForEndOfFrame();
         yield return new WaitForEndOfFrame();

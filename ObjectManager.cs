@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using MelonLoader;
-using Newtonsoft.Json;
 using SRLE.Components;
 using SRLE.Models;
+using Unity.Collections;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -36,15 +37,16 @@ public static class ObjectManager
     public static void LoadBuildObjects()
     {
         string json;
+        // json = File.ReadAllText("BuildObjects.json");
         
         using (StreamReader streamReader = new StreamReader(Melon<EntryPoint>.Instance.MelonAssembly.Assembly.GetManifestResourceStream("SRLE.BuildObjects.json") ?? throw new NullReferenceException("Build Objects are null. Please report this bug")))
         {
             json = streamReader.ReadToEnd();
         }
-        List<SRLE.Models.IdCategoryData> buildCategories = JsonConvert.DeserializeObject<List<IdCategoryData>>(json);
+        List<SRLE.Models.IdCategoryData> buildCategories = JsonSerializer.Deserialize<List<IdCategoryData>>(json);
         foreach (var category in buildCategories)
         {
-            List<uint> objectIDs = new List<uint>();
+            List<uint> objectIDs = [];
             foreach (var buildObject in category.Objects)
             {
                 objectIDs.Add(buildObject.Id);
@@ -53,7 +55,7 @@ public static class ObjectManager
             BuildCategories.Add(category.CategoryName, objectIDs);
         }
 
-        BuildCategories["Favorites"] = JsonConvert.DeserializeObject<List<uint>>(File.ReadAllText(Path.Combine(SaveManager.DataPath, "favorites.txt")));
+        BuildCategories["Favorites"] = JsonSerializer.Deserialize<List<uint>>(File.ReadAllText(Path.Combine(SaveManager.DataPath, "favorites.txt")));
     }
     public static void RequestObject(uint id, Action<GameObject> callback)
     {
@@ -84,7 +86,7 @@ public static class ObjectManager
             GameObject worldObject = data.GameObject;
             if (worldObject != null)
             {
-                //var buildObject = LoadWorldObject(data, worldObject);
+                // var buildObject = LoadWorldObject(data, worldObject);
 
                 foreach (var callback in request.Value)
                 {
@@ -167,9 +169,9 @@ public static class ObjectManager
     {
         Transform target = obj.transform;
         buildObject = target.GetComponent<BuildObject>();
-        if (buildObject == null)
+        if (!buildObject)
             buildObject = target.GetComponentInParent<BuildObject>();
-        if (buildObject == null)
+        if (!buildObject)
             buildObject = target.GetComponentInChildren<BuildObject>();
 
         return buildObject != null;

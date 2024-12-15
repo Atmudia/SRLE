@@ -4,7 +4,7 @@ using Il2CppMonomiPark.SlimeRancher;
 namespace SRLE.Patches;
 
 [HarmonyPatch(typeof(SavedGame))]
-public static class Patch_SavedGame
+internal static class Patch_SavedGame
 {
     [HarmonyPatch(nameof(SavedGame.CreateNew))]
     [HarmonyPrefix]

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using Il2Cpp;
 using Il2CppMonomiPark.SlimeRancher;
 using Il2CppMonomiPark.SlimeRancher.DataModel;
@@ -16,7 +17,7 @@ namespace SRLE;
 public static class SaveManager
 {
     public static string DataPath => Path.Combine(Application.dataPath, "..", "SRLE");
-    public static string LevelsPath => Path.Combine(DataPath, "Levels");
+        public static string LevelsPath => Path.Combine(DataPath, "Levels");
     public static string TexturesDataPath => Path.Combine(DataPath, "Textures");
     public static LevelData CurrentLevel;
     public static SettingsUI.Settings Settings;
@@ -44,18 +45,20 @@ public static class SaveManager
             Directory.CreateDirectory(TexturesDataPath);
         } 
         if (!File.Exists(Path.Combine(DataPath, "favorites.txt")))
-            File.WriteAllText(Path.Combine(DataPath, "favorites.txt"), Newtonsoft.Json.JsonConvert.SerializeObject(new List<uint>()));
-    }
+            File.WriteAllText(
+                Path.Combine(DataPath, "favorites.txt"),
+                JsonSerializer.Serialize(new List<uint>())
+            );    }
     public static void LoadLevel(string levelPath)
     {
         LevelManager.SetMode(LevelManager.Mode.BUILD);
-        CurrentLevel = Newtonsoft.Json.JsonConvert.DeserializeObject<LevelData>(File.ReadAllText(levelPath));
+        CurrentLevel = JsonSerializer.Deserialize<LevelData>(File.ReadAllText(levelPath));
         CurrentLevel.Path = levelPath;
         var loadNewGameMetadata = new AutoSaveDirector.LoadNewGameMetadata
         {
             saveSlotIndex = 999,
             gameSettingsModel = new GameSettingsModel(new Il2CppSystem.Collections.Generic.List<OptionsItemDefinition>().Cast<Il2CppSystem.Collections.Generic.IEnumerable<OptionsItemDefinition>>()),
-                    
+            
         };
         SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame(loadNewGameMetadata, new System.Action(
             () =>
@@ -114,5 +117,5 @@ public static class SaveManager
             }
            
         }
-        File.WriteAllText(CurrentLevel.Path, Newtonsoft.Json.JsonConvert.SerializeObject(CurrentLevel)); }
+        File.WriteAllText(CurrentLevel.Path, JsonSerializer.Serialize(CurrentLevel)); }
 }

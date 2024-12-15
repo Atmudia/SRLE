@@ -9,19 +9,28 @@ using SRLE.Components;
 using SRLE.Models;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using Random = System.Random;
 
 namespace SRLE.Patches;
 
 [HarmonyPatch(typeof(Debug))]
-public class Patch_Debug
+internal static class Patch_Debug
 {
     [HarmonyPatch(nameof(Debug.Log), typeof(Object)), HarmonyPrefix]
     public static void DebugLog(Il2CppSystem.Object message)
     {
+        // return;
         if (LevelManager.CurrentMode == LevelManager.Mode.BUILD)
         {
             if (message.ToString().Contains("AllZones") && LevelManager.IsLoading)
             {
+                // LevelManager.IsLoading = false;
+                // SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(
+                //     Resources.FindObjectsOfTypeAll<SceneGroup>().FirstOrDefault(x => x.name.Equals("ConservatoryFields")), new SceneLoadingParameters()
+                //     {
+                //
+                //     });
+                // return;
                 SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(SRSingleton<SystemContext>.Instance.SceneLoader.DefaultGameplaySceneGroup, new SceneLoadingParameters()
                 {
                     TeleportPlayer = false,
@@ -31,7 +40,7 @@ public class Patch_Debug
                         UIInitializer.Initialize();
                         ObjectManager.World = new GameObject("SRLEWorld");
                         ObjectManager.World.hideFlags |= HideFlags.HideAndDontSave;
-                        GameObject.DontDestroyOnLoad(ObjectManager.World);
+                        Object.DontDestroyOnLoad(ObjectManager.World);
                         
                         var findObjectsOfTypeAll = Resources.FindObjectsOfTypeAll<SceneGroup>();
                         foreach (var id in SaveManager.CurrentLevel.BuildObjects.Keys)
@@ -47,13 +56,14 @@ public class Patch_Debug
                                     buildObject.ID = bObj;
                                     obj.transform.localScale = BuildObjectData.Vector3Save.RevertToVector3(data.Scale);
                                     obj.SetActive(true);
+                                   
                                     ObjectManager.AddObject(id, obj);
                                 }
                                 else
                                 {
                                     MelonLogger.Msg($"[SRLE] Can't find the gameobject with id: {id}");
                                 }
-
+                        
                                 ToolbarUI.Instance.UpdateStatus();
                             }
                         }
@@ -64,4 +74,5 @@ public class Patch_Debug
             }
         }
     }
+    
 }

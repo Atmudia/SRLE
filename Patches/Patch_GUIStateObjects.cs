@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SRLE.Patches;
 
 [HarmonyPatch(typeof(UnityEngine.GUIStateObjects))]
-public static class Patch_GUIStateObjects
+internal static class Patch_GUIStateObjects
 {
     private static System.Collections.Generic.Dictionary<int, Il2CppSystem.Object> s_StateCache = new();
     [HarmonyPrefix]

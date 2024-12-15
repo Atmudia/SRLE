@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Text.Json;
 using MelonLoader;
-using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -46,7 +46,7 @@ public class SettingsUI : MonoBehaviour
 
         if(File.Exists(Path.Combine(SaveManager.DataPath, "settings.txt")))
         {
-            SaveManager.Settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Path.Combine(SaveManager.DataPath, "settings.txt")));
+            SaveManager.Settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText(Path.Combine(SaveManager.DataPath, "settings.txt")));
         }
         else
         {
@@ -125,6 +125,6 @@ public class SettingsUI : MonoBehaviour
 
     private void SaveSettings()
     {
-        File.WriteAllText(Path.Combine(SaveManager.DataPath, "settings.txt"), JsonConvert.SerializeObject(SaveManager.Settings));
+        File.WriteAllText(Path.Combine(SaveManager.DataPath, "settings.txt"), JsonSerializer.Serialize(SaveManager.Settings));
     }
 }

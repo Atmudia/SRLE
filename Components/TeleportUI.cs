@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using Il2CppMonomiPark.SlimeRancher.SceneManagement;
 using Il2CppTMPro;
 using MelonLoader;
-using Newtonsoft.Json;
 using SRLE.Models;
 using UnityEngine;
 using UnityEngine.UI;
@@ -45,7 +45,7 @@ namespace SRLE.Components
 
             if (File.Exists(filePath))
             {
-                m_TeleportModels = Enumerable.ToList(JsonConvert.DeserializeObject<TeleportModel[]>(File.ReadAllText(filePath)));
+                m_TeleportModels = JsonSerializer.Deserialize<List<TeleportModel>>(File.ReadAllText(filePath));
             }
             else
             {
@@ -60,12 +60,16 @@ namespace SRLE.Components
                                               {"Name":"Ranch","PositionX":541.9353,"PositionY":20.62804,"PositionZ":349.61053,"RotationX":2.5,"RotationY":231.5,"RotationZ":0.0,"Region":"SceneGroup.ConservatoryFields"},
                                               {"Name":"Starlight Strand","PositionX":-4.2704897,"PositionY":15.532708,"PositionZ":-122.46755,"RotationX":1.0000001,"RotationY":155.00003,"RotationZ":-2.6684488E-08,"Region":"SceneGroup.LuminousStrand"},
                                               {"Name":"Ember Valley","PositionX":-212.91,"PositionY":19.0,"PositionZ":468.7,"RotationX":0.0,"RotationY":-135.0,"RotationZ":0.0,"Region":"SceneGroup.RumblingGorge"},
-                                              {"Name":"Powderfall Bluffs","PositionX":-710.1747,"PositionY":6.5834,"PositionZ":1357.909,"RotationX":342.048,"RotationY":30.624,"RotationZ":0.0,"Region":"SceneGroup.PowderfallBluffs"}
+                                              {"Name":"Powderfall Bluffs","PositionX":-710.1747,"PositionY":6.5834,"PositionZ":1357.909,"RotationX":342.048,"RotationY":30.624,"RotationZ":0.0,"Region":"SceneGroup.PowderfallBluffs"},
+                                              {"Name":"Labyrinth","PositionX":1432.718,"PositionY":79.9886,"PositionZ":-1185.905,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"Region":"SceneGroup.Labyrinth"}
                                           ]
                               """;
 
-            m_TeleportModels = JsonConvert.DeserializeObject<TeleportModel[]>(jsonData).ToList();
-            File.WriteAllText(Path.Combine(SaveManager.DataPath, "tp.txt"), JsonConvert.SerializeObject(m_TeleportModels.ToArray(), Formatting.Indented));
+            m_TeleportModels = JsonSerializer.Deserialize<List<TeleportModel>>(jsonData);
+            File.WriteAllText(Path.Combine(SaveManager.DataPath, "tp.txt"), JsonSerializer.Serialize(m_TeleportModels.ToArray(), new JsonSerializerOptions()
+            {
+                WriteIndented = true
+            }));
         }
 
         private void InitializeCategoryButtons()
@@ -82,7 +86,7 @@ namespace SRLE.Components
             string categoryName = model.Name;
 
 
-            var sceneGroups = Il2CppSystem.Linq.Enumerable.ToList(SRSingleton<SystemContext>.Instance.SceneLoader.SceneGroupList.GameplaySceneGroups);
+            var sceneGroups = SRSingleton<SystemContext>.Instance.SceneLoader.SceneGroupList.GameplaySceneGroups.Cast<Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<SceneGroup>>();
 
             foreach (var group in sceneGroups)
             {
@@ -119,7 +123,10 @@ namespace SRLE.Components
             m_NameInput.text = "";
 
             m_TeleportModels.Add(model);
-            File.WriteAllText(Path.Combine(SaveManager.DataPath, "tp.txt"), JsonConvert.SerializeObject(m_TeleportModels.ToArray(), Formatting.Indented));
+            File.WriteAllText(Path.Combine(SaveManager.DataPath, "tp.txt"), JsonSerializer.Serialize(m_TeleportModels, new JsonSerializerOptions()
+            {
+                WriteIndented = true
+            }));
         }
 
         private void TeleportTo(SceneGroup sceneGroup, Vector3 position, Vector3 rotation)

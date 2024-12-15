@@ -16,26 +16,27 @@ public class InspectorBase : MonoBehaviour
 
     public void BindTo(object parent, MemberInfo member, string variableName = null)
     {
-        if (member is FieldInfo field)
+        switch (member)
         {
-            variableName ??= field.Name;
+            case FieldInfo field:
+                variableName ??= field.Name;
 
-            BindTo(() => field.GetValue(parent), (value) =>
-            {
-                field.SetValue(parent, value);
-            });
-        }
-        else if (member is PropertyInfo property)
-        {
-            variableName ??= property.Name;
+                BindTo(() => field.GetValue(parent), (value) =>
+                {
+                    field.SetValue(parent, value);
+                });
+                break;
+            case PropertyInfo property:
+                variableName ??= property.Name;
 
-            BindTo(() => property.GetValue(parent, null), (value) =>
-            {
-                property.SetValue(parent, value, null);
-            });
+                BindTo(() => property.GetValue(parent, null), (value) =>
+                {
+                    property.SetValue(parent, value, null);
+                });
+                break;
+            default:
+                throw new ArgumentException("Member can either be a field or a property");
         }
-        else
-            throw new ArgumentException("Member can either be a field or a property");
     }
 
     public void BindTo(Getter getter, Setter setter)

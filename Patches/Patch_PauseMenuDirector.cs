@@ -6,7 +6,7 @@ using SRLE.Components;
 namespace SRLE.Patches;
 
 [HarmonyPatch(typeof(PauseMenuDirector))]
-public static class Patch_PauseMenuDirector
+internal static class Patch_PauseMenuDirector
 {
     [HarmonyPatch(nameof(PauseMenuDirector.PauseGame)), HarmonyPrefix]
     
@@ -15,6 +15,7 @@ public static class Patch_PauseMenuDirector
         
         if (LevelManager.CurrentMode != LevelManager.Mode.BUILD) return true;
         SRLECamera.Instance.SetActive(!SRLECamera.Instance.isActiveAndEnabled);
+        MelonLogger.Msg(!SRLECamera.Instance.isActiveAndEnabled);
         return false;
     }
     [HarmonyPatch(nameof(PauseMenuDirector.Quit)), HarmonyPrefix]

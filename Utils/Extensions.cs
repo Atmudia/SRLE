@@ -20,11 +20,12 @@ public static class Extensions
     {
         return Il2CppSystem.Object.Equals(a, b);
     }
-    public static bool ContainsKeyInIL2CPP<Key, Value>(this Dictionary<Key, Value> a, Il2CppSystem.Object b) where Key : Il2CppSystem.Object
+    public static bool ContainsKeyInIL2CPP<TKey, TValue>(this Dictionary<TKey, TValue> a, Il2CppSystem.Object b) where TKey : Il2CppSystem.Object
     {
         foreach (var value in a)
         {
-            return EqualsInIL2CPP(value.Key, b);
+            if (EqualsInIL2CPP(value.Key, b))
+                return true;
         }
         return false;
     }

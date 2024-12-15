@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
+using MelonLoader;
 using SRLE.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,6 +11,8 @@ namespace SRLE;
 
 public static class SRLEConverter
 {
+    public static List<IdCategoryData> CategoryDatas;
+    
     public static bool IsConverting = false;
 
     private static List<string> included = new()
@@ -44,7 +47,6 @@ public static class SRLEConverter
         Dictionary<GameObject, int> listOfCategory = new Dictionary<GameObject, int>();
         foreach (var scene in GetAllScenes().Where(x => !x.name.EndsWith("Core")))
         {
-
             foreach (var rootGameObject in scene.GetRootGameObjects())
             {
                 foreach (var cellDirector in rootGameObject.GetComponentsInChildren<CellDirector>())
@@ -77,11 +79,16 @@ public static class SRLEConverter
                                 Renderer renderer = elementTransform.GetComponent<Renderer>();
                                 if (renderer != null && meshFilter != null)
                                 {
-                                    num2 = (meshFilter.sharedMesh.name + renderer.material.name).GetHashCode();
+                                    string meshName = meshFilter.sharedMesh?.name ?? string.Empty;
+                                    string materialName = renderer.material?.name ?? string.Empty;
+
+                                    num2 = (meshName + materialName).GetHashCode();
+
                                     if (hashcodes.Contains(num2))
                                     {
                                         continue;
                                     }
+
                                     hashcodes.Add(num2);
                                 }
                             }
@@ -132,29 +139,31 @@ public static class SRLEConverter
             }
 
             List<IdCategoryData> categories = new List<IdCategoryData>();
-            static IdCategoryData FindCategory(string CategoryName, List<IdCategoryData> categories)
+            // static IdCategoryData FindCategory(string CategoryName, List<IdCategoryData> categories)
+            // {
+            //     IdCategoryData category = categories.FirstOrDefault(x => x.CategoryName.Equals(CategoryName));
+            //     if (category != null)
+            //     {
+            //         var item = new IdCategoryData {Objects = new List<IdClass>(), CategoryName = CategoryName};
+            //         categories.Add(item);
+            //         category = item;
+            //     }
+            //     // MelonLogger.Msg(category.Objects == null);
+            //     return category;
+            // }
+            static IdCategoryData FindCategory(string categoryName, List<IdCategoryData> categories)
             {
-
-                IdCategoryData category = categories.FirstOrDefault(x => x.CategoryName.Equals(CategoryName));
-                // foreach (var VARIABLE in categories)
-                // {
-                //     if (VARIABLE.CategoryName == CategoryName)
-                //         category = VARIABLE;
-                // }
-
-                if (category != null)
+                IdCategoryData category = categories.FirstOrDefault(x => x.CategoryName.Equals(categoryName));
+                if (category != null) return category;
+                var newCategory = new IdCategoryData
                 {
-                    var item = new IdCategoryData {Objects = new List<IdClass>(), CategoryName = CategoryName};
-                    categories.Add(item);
-                    category = item;
-                }
-
-                return category;
-
-
-
-
+                    Objects = [],
+                    CategoryName = categoryName
+                };
+                categories.Add(newCategory);
+                return newCategory;
             }
+
 
             foreach (var element in listOfCategory)
             {
@@ -163,9 +172,15 @@ public static class SRLEConverter
                 var category = InBounds(3, strings) ? strings[3] : "None";
                 var idClass = new IdClass {Id = aa, Name = element.Key.name, Path = path, Scene = element.Key.scene.name, HashCode = element.Value};
                 FindCategory(category, categories).Objects.Add(idClass);
+                // MelonLogger.Msg(category == null);
+
                 aa++;
             }
-            File.WriteAllText(@"D:\SteamLibrary\steamapps\common\Slime Rancher 2\SRLE\buildobjects.json", JsonConvert.SerializeObject(categories, Formatting.Indented));
+            File.WriteAllText(@"BuildObjects.json", JsonSerializer.Serialize(categories, new JsonSerializerOptions()
+            {
+                WriteIndented = true
+            }));
+            CategoryDatas = categories;
         };
 
     }

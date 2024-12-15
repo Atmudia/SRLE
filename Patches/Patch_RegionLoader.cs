@@ -6,20 +6,17 @@ using SRLE.Components;
 namespace SRLE.Patches;
 
 [HarmonyPatch(typeof(RegionLoader), nameof(RegionLoader.Update))]
-public static class Patch_RegionLoader
+internal static class Patch_RegionLoader
 {
     public static bool Prefix(RegionLoader __instance)
     {
         var srleCamera = SRLECamera.Instance;
-        if (LevelManager.CurrentMode == LevelManager.Mode.BUILD && srleCamera != null)
-        {
-            if (!srleCamera.isActiveAndEnabled)
-                return true;
-            var position = srleCamera.transform.position;
-            __instance.UpdateProxied(position);
-            __instance.UpdateHibernated(position);
-            return false;
-        }
+        if (LevelManager.CurrentMode != LevelManager.Mode.BUILD || srleCamera == null) return true;
+        if (!srleCamera.isActiveAndEnabled)
+            return true;
+        var position = srleCamera.transform.position;
+        __instance.UpdateProxied(position);
+        __instance.UpdateHibernated(position);
         return false;
     }
 }

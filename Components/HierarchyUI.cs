@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using Il2CppMonomiPark.SlimeRancher.SceneManagement;
 using Il2CppMonomiPark.SlimeRancher.UI;
 using Il2CppSystem;
 using Il2CppTMPro;
 using MelonLoader;
-using Newtonsoft.Json;
 using SRLE.Models;
 using SRLE.Utils;
 using UnityEngine;
@@ -25,7 +25,7 @@ namespace SRLE.Components
         private GameObject Hierarchy;
         private ScrollRect CategoryScroll;
         private ScrollRect ObjectsScroll;
-        private InputField SearchInput;
+        internal InputField SearchInput;
         private Dictionary<uint, Texture2D> BuildObjectsPreview;
 
         public HierarchyUI(IntPtr value) : base(value) { }
@@ -46,7 +46,7 @@ namespace SRLE.Components
             CategoryScroll = transform.Find("Hierarchy/CategoryScroll").GetComponent<ScrollRect>();
             ObjectsScroll = transform.Find("Hierarchy/ObjectsScroll").GetComponent<ScrollRect>();
             SearchInput = transform.Find("Hierarchy/SearchInput").GetComponent<InputField>();
-
+            
             BuildObjectsPreview = new Dictionary<uint, Texture2D>();
 
             ClearChildObjects(CategoryScroll.content);
@@ -67,11 +67,11 @@ namespace SRLE.Components
         private void PopulateCategoryButtons()
         {
             CreateCategoryButton("Favorites", () => SelectCategory("Favorites"));
-
-            foreach (string categoryName in ObjectManager.BuildCategories.Keys)
+            foreach (var categoryName in ObjectManager.BuildCategories.Keys.Where(categoryName => !categoryName.Equals("Favorites")))
             {
                 CreateCategoryButton(categoryName, () => SelectCategory(categoryName));
             }
+            SelectCategory("Favorites");
         }
 
         private void CreateCategoryButton(string categoryName, Action onClickAction)
@@ -128,7 +128,7 @@ namespace SRLE.Components
                     favoriteTransform.GetComponent<Image>().color = Color.gray;
                 }
 
-                File.WriteAllText(Path.Combine(SaveManager.DataPath, "favorites.txt"), JsonConvert.SerializeObject(favorites));
+                File.WriteAllText(Path.Combine(SaveManager.DataPath, "favorites.txt"), JsonSerializer.Serialize(favorites));
             }
         }
 
@@ -187,12 +187,15 @@ namespace SRLE.Components
             {
                 if (buildObject == null) return;
 
-                GameObject obj = Instantiate(buildObject, SRLECamera.Instance.transform.position + (SRLECamera.Instance.transform.forward * 10), Quaternion.identity, ObjectManager.World.transform); 
+                GameObject obj = Instantiate(buildObject, SRLECamera.Instance.transform.position + (SRLECamera.Instance.transform.forward * 10), Quaternion.identity, ObjectManager.World.transform);
                 obj.SetActive(true);
                 var addComponent = obj.AddComponent<BuildObject>();
                 addComponent.ID = ObjectManager.BuildObjectsData[id];
                 ObjectManager.AddObject(id, obj);
+                
+                SRLECamera.Instance.transformGizmo.ClearAndAddTarget(obj.transform);
 
+                
                 // UndoManager.RegisterStates(new IUndo[] { new UndoSelection(), new UndoInstantiate(objectID, obj) }, "Create new Object");
                 // ObjectSelection.Instance.SetSelection(obj);
             });

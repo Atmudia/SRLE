@@ -650,7 +650,7 @@ namespace SRLE.RuntimeGizmo
 				bool isRemoving = InputManager.GetKey(RemoveSelection);
 				if (EventSystem.current.IsPointerOverGameObject())
 					return;
-				if (Physics.Raycast(myCamera.ScreenPointToRay(InputManager.MousePosition), out var hitInfo, Mathf.Infinity, selectionMask) && ObjectManager.GetBuildObject(hitInfo.transform.gameObject, out var buildObject))
+				if (Physics.Raycast(myCamera.ScreenPointToRay(InputManager.MousePosition), out var hitInfo, Mathf.Infinity, selectionMask) && ObjectManager.GetBuildObject(hitInfo.collider.gameObject, out var buildObject))
 				{
 					Transform target = buildObject.transform;
 					if (isAdding)

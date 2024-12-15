@@ -59,7 +59,6 @@ namespace SRLE.Components
 
         void OnDestroy()
         {
-            MelonLogger.Msg("Got destroyed?");
             if (type == HighlightType.Wireframe || type == HighlightType.Bounds)
                 UnityEngine.Object.Destroy(mesh);
         }
