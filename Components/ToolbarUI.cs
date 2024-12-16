@@ -89,6 +89,7 @@ public class ToolbarUI : MonoBehaviour
         {
             //SRLESaveManager.SaveLevel();
             SRSingleton<SceneContext>.Instance.PauseMenuDirector.Quit();
+            LevelManager.SetMode(LevelManager.Mode.NONE);
         }));
 
         var teleportButton = GetToolbarButton("Teleport");

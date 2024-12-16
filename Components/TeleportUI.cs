@@ -55,17 +55,79 @@ namespace SRLE.Components
 
         private void InitializeDefaultTeleportModels()
         {
-            string jsonData = """
-                              [
-                                              {"Name":"Ranch","PositionX":541.9353,"PositionY":20.62804,"PositionZ":349.61053,"RotationX":2.5,"RotationY":231.5,"RotationZ":0.0,"Region":"SceneGroup.ConservatoryFields"},
-                                              {"Name":"Starlight Strand","PositionX":-4.2704897,"PositionY":15.532708,"PositionZ":-122.46755,"RotationX":1.0000001,"RotationY":155.00003,"RotationZ":-2.6684488E-08,"Region":"SceneGroup.LuminousStrand"},
-                                              {"Name":"Ember Valley","PositionX":-212.91,"PositionY":19.0,"PositionZ":468.7,"RotationX":0.0,"RotationY":-135.0,"RotationZ":0.0,"Region":"SceneGroup.RumblingGorge"},
-                                              {"Name":"Powderfall Bluffs","PositionX":-710.1747,"PositionY":6.5834,"PositionZ":1357.909,"RotationX":342.048,"RotationY":30.624,"RotationZ":0.0,"Region":"SceneGroup.PowderfallBluffs"},
-                                              {"Name":"Labyrinth","PositionX":1432.718,"PositionY":79.9886,"PositionZ":-1185.905,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"Region":"SceneGroup.Labyrinth"}
-                                          ]
-                              """;
+            // string jsonData = """
+            //                   [
+            //                                   {"Name":"Ranch","PositionX":541.9353,"PositionY":20.62804,"PositionZ":349.61053,"RotationX":2.5,"RotationY":231.5,"RotationZ":0.0,"Region":"SceneGroup.ConservatoryFields"},
+            //                                   {"Name":"Starlight Strand","PositionX":-4.2704897,"PositionY":15.532708,"PositionZ":-122.46755,"RotationX":1.0000001,"RotationY":155.00003,"RotationZ":-2.6684488E-08,"Region":"SceneGroup.LuminousStrand"},
+            //                                   {"Name":"Ember Valley","PositionX":-212.91,"PositionY":19.0,"PositionZ":468.7,"RotationX":0.0,"RotationY":-135.0,"RotationZ":0.0,"Region":"SceneGroup.RumblingGorge"},
+            //                                   {"Name":"Powderfall Bluffs","PositionX":-710.1747,"PositionY":6.5834,"PositionZ":1357.909,"RotationX":342.048,"RotationY":30.624,"RotationZ":0.0,"Region":"SceneGroup.PowderfallBluffs"},
+            //                                   {"Name":"Labyrinth","PositionX":1432.718,"PositionY":79.9886,"PositionZ":-1185.905,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"Region":"SceneGroup.Labyrinth"}
+            //                               ]
+            //                   """;
+            m_TeleportModels =
+            [
+                new TeleportModel
+                {
+                    Name = "Ranch",
+                    PositionX = 541.9353f,
+                    PositionY = 20.62804f,
+                    PositionZ = 349.61053f,
+                    RotationX = 2.5f,
+                    RotationY = 231.5f,
+                    RotationZ = 0.0f,
+                    Region = "SceneGroup.ConservatoryFields"
+                },
 
-            m_TeleportModels = JsonSerializer.Deserialize<List<TeleportModel>>(jsonData);
+                new TeleportModel
+                {
+                    Name = "Starlight Strand",
+                    PositionX = -4.2704897f,
+                    PositionY = 15.532708f,
+                    PositionZ = -122.46755f,
+                    RotationX = 1.0000001f,
+                    RotationY = 155.00003f,
+                    RotationZ = -2.6684488E-08f,
+                    Region = "SceneGroup.LuminousStrand"
+                },
+
+                new TeleportModel
+                {
+                    Name = "Ember Valley",
+                    PositionX = -212.91f,
+                    PositionY = 19.0f,
+                    PositionZ = 468.7f,
+                    RotationX = 0.0f,
+                    RotationY = -135.0f,
+                    RotationZ = 0.0f,
+                    Region = "SceneGroup.RumblingGorge"
+                },
+
+                new TeleportModel
+                {
+                    Name = "Powderfall Bluffs",
+                    PositionX = -710.1747f,
+                    PositionY = 6.5834f,
+                    PositionZ = 1357.909f,
+                    RotationX = 342.048f,
+                    RotationY = 30.624f,
+                    RotationZ = 0.0f,
+                    Region = "SceneGroup.PowderfallBluffs"
+                },
+
+                new TeleportModel
+                {
+                    Name = "Labyrinth",
+                    PositionX = 1432.718f,
+                    PositionY = 79.9886f,
+                    PositionZ = -1185.905f,
+                    RotationX = 0.0f,
+                    RotationY = 0.0f,
+                    RotationZ = 0.0f,
+                    Region = "SceneGroup.Labyrinth"
+                }
+
+            ];
+
             File.WriteAllText(Path.Combine(SaveManager.DataPath, "tp.txt"), JsonSerializer.Serialize(m_TeleportModels.ToArray(), new JsonSerializerOptions()
             {
                 WriteIndented = true
@@ -133,7 +195,7 @@ namespace SRLE.Components
         {
             SRLECamera.Instance.transform.position = position;
             SRLECamera.Instance.transform.eulerAngles = new Vector3(SRLECamera.Instance.transform.eulerAngles.x, rotation.y, SRLECamera.Instance.transform.eulerAngles.z);
-            SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(sceneGroup, new SceneLoadingParameters { TeleportPlayer = true });
+            SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(sceneGroup, new SceneLoadingParameters { TeleportPlayer = false });
         }
 
         public void Open() => m_GameObject.SetActive(true);

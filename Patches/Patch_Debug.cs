@@ -17,20 +17,12 @@ namespace SRLE.Patches;
 internal static class Patch_Debug
 {
     [HarmonyPatch(nameof(Debug.Log), typeof(Object)), HarmonyPrefix]
-    public static void DebugLog(Il2CppSystem.Object message)
+    public static void Log(Il2CppSystem.Object message)
     {
-        // return;
         if (LevelManager.CurrentMode == LevelManager.Mode.BUILD)
         {
             if (message.ToString().Contains("AllZones") && LevelManager.IsLoading)
             {
-                // LevelManager.IsLoading = false;
-                // SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(
-                //     Resources.FindObjectsOfTypeAll<SceneGroup>().FirstOrDefault(x => x.name.Equals("ConservatoryFields")), new SceneLoadingParameters()
-                //     {
-                //
-                //     });
-                // return;
                 SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(SRSingleton<SystemContext>.Instance.SceneLoader.DefaultGameplaySceneGroup, new SceneLoadingParameters()
                 {
                     TeleportPlayer = false,

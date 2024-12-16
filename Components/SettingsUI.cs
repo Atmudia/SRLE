@@ -64,8 +64,6 @@ public class SettingsUI : MonoBehaviour
         OnRenderDistanceChanged(SaveManager.Settings.RenderDistance);
         fogToggle.isOn = SaveManager.Settings.EnableFog;
         OnFogChanged(SaveManager.Settings.EnableFog);
-        //hightlightDropdown.value = (int)SRLESaveManager.Settings.HighlightMethod;
-        //OnHighlightMethodChanged((int)SRLESaveManager.Settings.HighlightMethod);
         hightlightSlider.value = SaveManager.Settings.HighlightStrength;
         OnHightlightStrengthChanged(SaveManager.Settings.HighlightStrength);
 
@@ -76,9 +74,7 @@ public class SettingsUI : MonoBehaviour
     {
         m_HighlightText.text = $"Highlight Strength: {arg0}";
         SaveManager.Settings.HighlightStrength = (byte)arg0;
-
-        // Globals.HighlightMaterial.color = new Color(SRLESaveManager.Settings.HighlightMaterial.color.r, Globals.HighlightMaterial.color.g, Globals.HighlightMaterial.color.b, arg0 / 255f);
-        // Globals.WireframeMaterial.color = new Color(SRLESaveManager.Settings.WireframeMaterial.color.r, Globals.WireframeMaterial.color.g, Globals.WireframeMaterial.color.b, arg0 / 255f);
+        
         SaveSettings();
     }
 
@@ -118,12 +114,12 @@ public class SettingsUI : MonoBehaviour
         m_GameObject.SetActive(true);
     }
 
-    private Button GetSettingsButton(string name)
+    private Button GetSettingsButton(string btnName)
     {
-        return transform.Find($"Settings/Panel/{name}Button")?.GetComponent<Button>();
+        return transform.Find($"Settings/Panel/{btnName}Button")?.GetComponent<Button>();
     }
 
-    private void SaveSettings()
+    private static void SaveSettings()
     {
         File.WriteAllText(Path.Combine(SaveManager.DataPath, "settings.txt"), JsonSerializer.Serialize(SaveManager.Settings));
     }

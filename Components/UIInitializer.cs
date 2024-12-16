@@ -11,10 +11,6 @@ namespace SRLE.Components;
 public static class UIInitializer
 {
     internal static bool IsInitialized;
-    
-
-    
-
     public static void Initialize()
     {
         IsInitialized = true;
@@ -43,9 +39,5 @@ public static class UIInitializer
         var toolbarUI = Object.Instantiate(AssetManager.ToolbarUI, srleCamera.transform);
         toolbarUI.AddComponent<ToolbarUI>();
         
-        
-        
-        
-        // toolbarUI.hideFlags |= HideFlags.HideAndDontSave;
     }
 }

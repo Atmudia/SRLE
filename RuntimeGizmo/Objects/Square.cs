@@ -13,21 +13,16 @@ namespace SRLE.RuntimeGizmo.Objects
 		{
 			get
 			{
-				switch (index)
+				return index switch
 				{
-					case 0:
-						return this.bottomLeft;
-					case 1:
-						return this.topLeft;
-					case 2:
-						return this.topRight;
-					case 3:
-						return this.bottomRight;
-					case 4:
-						return this.bottomLeft; //so we wrap around back to start
-					default:
-						return Vector3.zero;
-				}
+					0 => this.bottomLeft,
+					1 => this.topLeft,
+					2 => this.topRight,
+					3 => this.bottomRight,
+					4 => this.bottomLeft //so we wrap around back to start
+					,
+					_ => Vector3.zero
+				};
 			}
 		}
 	}

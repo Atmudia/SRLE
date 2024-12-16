@@ -167,14 +167,11 @@ public static class ObjectManager
     }
     public static bool GetBuildObject(GameObject obj, out BuildObject buildObject)
     {
-        Transform target = obj.transform;
-        buildObject = target.GetComponent<BuildObject>();
-        if (!buildObject)
-            buildObject = target.GetComponentInParent<BuildObject>();
-        if (!buildObject)
-            buildObject = target.GetComponentInChildren<BuildObject>();
-
-        return buildObject != null;
+        buildObject = obj.GetComponent<BuildObject>() 
+                      ?? obj.GetComponentInParent<BuildObject>() 
+                      ?? obj.GetComponentInChildren<BuildObject>();
+        return buildObject;
     }
+
 
 }

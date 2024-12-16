@@ -58,7 +58,6 @@ public static class AssetManager
             _ = bundleStream.Read(bundleBytes, 0, bundleBytes.Length);
             assetBundle = AssetBundle.LoadFromMemory(bundleBytes);
         }
-        // assetBundle = Il2CppAssetBundleManager.LoadFromFile(@"D:\SlimeRancherModding\SR2\SRLEInUnity\Assets\AssetBundles\srle");
         ToolbarUI = assetBundle.LoadAsset<GameObject>("BetterBuildToolbar");
         ToolbarUI.hideFlags |= HideFlags.HideAndDontSave;
         HierarchyUI = assetBundle.LoadAsset<GameObject>("BetterBuildHierarchy");
@@ -117,10 +116,6 @@ public static class AssetManager
                 SeperatedMeshes.Add(loadAllAsset.name, loadAllAsset.Cast<Mesh>());
             }
         }
-       
-        
-        
-        
         yield return new WaitForEndOfFrame();
         yield return new WaitForEndOfFrame();
         if (ToolbarUI == null)

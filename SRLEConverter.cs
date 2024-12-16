@@ -100,14 +100,14 @@ public static class SRLEConverter
                                 foreach (var meshFilter in meshFilters)
                                 {
 
-                                    if (meshFilter.sharedMesh is not null)
+                                    if (!meshFilter.sharedMesh)
                                     {
                                         text += meshFilter.sharedMesh.name;
                                     }
                                 }
                                 foreach (var renderer in renderers)
                                 {
-                                    if (renderer.material is not null)
+                                    if (!renderer.material)
                                     {
                                         text += renderer.material.name;
                                     }
@@ -139,18 +139,23 @@ public static class SRLEConverter
             }
 
             List<IdCategoryData> categories = new List<IdCategoryData>();
-            // static IdCategoryData FindCategory(string CategoryName, List<IdCategoryData> categories)
-            // {
-            //     IdCategoryData category = categories.FirstOrDefault(x => x.CategoryName.Equals(CategoryName));
-            //     if (category != null)
-            //     {
-            //         var item = new IdCategoryData {Objects = new List<IdClass>(), CategoryName = CategoryName};
-            //         categories.Add(item);
-            //         category = item;
-            //     }
-            //     // MelonLogger.Msg(category.Objects == null);
-            //     return category;
-            // }
+
+
+            foreach (var element in listOfCategory)
+            {
+                var path = element.Key.GetFullName();
+                var strings = path.Split('/', '/');
+                var category = InBounds(3, strings) ? strings[3] : "None";
+                var idClass = new IdClass {Id = aa, Name = element.Key.name, Path = path, Scene = element.Key.scene.name, HashCode = element.Value};
+                FindCategory(category, categories).Objects.Add(idClass);
+                aa++;
+            }
+            File.WriteAllText(@"BuildObjects.json", JsonSerializer.Serialize(categories, new JsonSerializerOptions()
+            {
+                WriteIndented = true
+            }));
+            CategoryDatas = categories;
+
             static IdCategoryData FindCategory(string categoryName, List<IdCategoryData> categories)
             {
                 IdCategoryData category = categories.FirstOrDefault(x => x.CategoryName.Equals(categoryName));
@@ -163,24 +168,6 @@ public static class SRLEConverter
                 categories.Add(newCategory);
                 return newCategory;
             }
-
-
-            foreach (var element in listOfCategory)
-            {
-                var path = element.Key.GetFullName();
-                var strings = path.Split('/', '/');
-                var category = InBounds(3, strings) ? strings[3] : "None";
-                var idClass = new IdClass {Id = aa, Name = element.Key.name, Path = path, Scene = element.Key.scene.name, HashCode = element.Value};
-                FindCategory(category, categories).Objects.Add(idClass);
-                // MelonLogger.Msg(category == null);
-
-                aa++;
-            }
-            File.WriteAllText(@"BuildObjects.json", JsonSerializer.Serialize(categories, new JsonSerializerOptions()
-            {
-                WriteIndented = true
-            }));
-            CategoryDatas = categories;
         };
 
     }

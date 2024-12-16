@@ -37,18 +37,17 @@ public static class Patch_SceneLoader
         var defaultGameplayScene = __instance._defaultGameplaySceneGroup;
         var labyrinth = findObjectsOfTypeAll.FirstOrDefault(x => x.name.Contains("Labyrinth"))._sceneReferences.ToList();
         // sceneGroup = ScriptableObject.CreateInstance<SceneGroup>();
-        var assetReferences = sceneGroup._sceneReferences.ToList();
-        assetReferences.AddRange(labyrinth);
-        sceneGroup._sceneReferences = assetReferences.ToArray();
+        var oldAssetReferences = sceneGroup._sceneReferences.ToArray();
+        var newAssetReferences = oldAssetReferences.ToList();
+        newAssetReferences.AddRange(labyrinth);
+        sceneGroup._sceneReferences = newAssetReferences.ToArray();
         sceneGroup._coreSceneReference = defaultGameplayScene.CoreSceneReference;
-
-        // var ConservatoryFields = findObjectsOfTypeAll.FirstOrDefault(x => x.name.Contains("ConservatoryFields"))._sceneReferences.ToList();
-        // ConservatoryFields.AddRange(findObjectsOfTypeAll.FirstOrDefault(x => x.name.Contains("LuminousStrand"))._sceneReferences);
-        // sceneGroup._sceneReferences = ConservatoryFields.ToArray();
-        // sceneGroup.
+        
         parameters.TeleportPlayer = true;
+        var group = sceneGroup;
         parameters.OnSceneGroupLoadedPhase2 += new System.Action<Il2CppSystem.Action<SceneLoadErrorData>>(action =>
         {
+            group._sceneReferences = oldAssetReferences;
             if (SRLEConverter.IsConverting)
             {
                 SRLEConverter.ConvertToBuildObjects();

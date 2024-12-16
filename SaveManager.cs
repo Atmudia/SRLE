@@ -8,6 +8,7 @@ using Il2CppMonomiPark.SlimeRancher.DataModel;
 using Il2CppMonomiPark.SlimeRancher.Options;
 using Il2CppMonomiPark.SlimeRancher.SceneManagement;
 using MelonLoader;
+using MelonLoader.Utils;
 using SRLE.Components;
 using SRLE.Models;
 using UnityEngine;
@@ -16,8 +17,8 @@ namespace SRLE;
 
 public static class SaveManager
 {
-    public static string DataPath => Path.Combine(Application.dataPath, "..", "SRLE");
-        public static string LevelsPath => Path.Combine(DataPath, "Levels");
+    public static string DataPath => Path.Combine(MelonEnvironment.UserDataDirectory, "SRLE");
+    public static string LevelsPath => Path.Combine(DataPath, "Levels");
     public static string TexturesDataPath => Path.Combine(DataPath, "Textures");
     public static LevelData CurrentLevel;
     public static SettingsUI.Settings Settings;
@@ -27,7 +28,7 @@ public static class SaveManager
     static SaveManager()
     {
         EnsureFoldersExist();
-        Melon<SRLE.EntryPoint>.Logger.Msg("Initializing Save Manager");
+        Melon<EntryPoint>.Logger.Msg("Initializing Save Manager");
     }
 
     private static void EnsureFoldersExist()
@@ -48,7 +49,8 @@ public static class SaveManager
             File.WriteAllText(
                 Path.Combine(DataPath, "favorites.txt"),
                 JsonSerializer.Serialize(new List<uint>())
-            );    }
+            );    
+    }
     public static void LoadLevel(string levelPath)
     {
         LevelManager.SetMode(LevelManager.Mode.BUILD);
@@ -65,10 +67,6 @@ public static class SaveManager
             {
                         
             }));
-       
-        
-        //loadNewGameMetadata.gameSettingsModel.SetGameIconForNewGame(gameIconDefinition);
-
     }
     public static void CreateLevel(string levelName)
     {
@@ -77,8 +75,8 @@ public static class SaveManager
         CurrentLevel = new LevelData()
         {
             LevelName = levelName,
-            BuildObjects = new System.Collections.Generic.Dictionary<uint, System.Collections.Generic.List<BuildObjectData>>(),
-            Dependencies = new System.Collections.Generic.Dictionary<string, string>(), 
+            BuildObjects = new Dictionary<uint, List<BuildObjectData>>(),
+            Dependencies = new Dictionary<string, string>(), 
             Path = Path.Combine(LevelsPath, $"{levelName}.srle")
         };
         
@@ -109,7 +107,7 @@ public static class SaveManager
                     Pos = BuildObjectData.Vector3Save.ToVector3Save(obj.transform.localPosition),
                     Rot = BuildObjectData.Vector3Save.ToVector3Save(obj.transform.localEulerAngles),
                     Scale = BuildObjectData.Vector3Save.ToVector3Save(obj.transform.localScale),
-                    Properties = new System.Collections.Generic.Dictionary<string, string>(),
+                    Properties = new Dictionary<string, string>(),
                     //TODO Add here teleports etc;
 
                 });

@@ -232,7 +232,7 @@ namespace SRLE.Components
             uint objectID = previewToLoad.Item1;
             GameObject buildObj = previewToLoad.Item2;
 
-            string filePath = Path.Combine(SaveManager.DataPath, "Textures", objectID + ".jpg");
+            string filePath = Path.Combine(SaveManager.DataPath, "Textures", objectID + ".png");
 
             if (File.Exists(filePath))
             {
@@ -258,17 +258,19 @@ namespace SRLE.Components
                 {
                     Texture2D texture = RuntimePreviewGenerator.GenerateModelPreview(previewObj.transform);
                     byte[] bytes = texture.EncodeToPNG();
+                    if (bytes != null)
+                    {
+                        Task asyncBytes = File.WriteAllBytesAsync(filePath, bytes);
+                        while (!asyncBytes.IsCompleted)
+                            yield return null;
+                        BuildObjectsPreview.Add(objectID, texture);
 
-                    Task asyncBytes = File.WriteAllBytesAsync(filePath, bytes);
-                    while (!asyncBytes.IsCompleted)
-                        yield return null;
-
-                    BuildObjectsPreview.Add(objectID, texture);
-
-                    if (buildObj != null)
-                        buildObj.GetComponentInChildren<RawImage>().texture = texture;
+                        if (buildObj != null)
+                            buildObj.GetComponentInChildren<RawImage>().texture = texture;
+                    }
+                    else Melon<EntryPoint>.Logger.Warning($"Generated texture for Id {objectID} is null");
                 }
-                else MelonLogger.Warning("Attempting model generation of non-existent object! Skipping ...");
+                else Melon<EntryPoint>.Logger.Warning("Attempting model generation of non-existent object! Skipping ...");
             }
 
             if (previewQueue.Count == 0)

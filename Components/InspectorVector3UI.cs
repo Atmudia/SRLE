@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,7 +18,6 @@ namespace SRLE.Components
 
         public Action OnBeforeChange;
         public string Name { set => Label.text = value; }
-        // public string Name = null;
 
         public void Awake()
         {
@@ -37,9 +37,9 @@ namespace SRLE.Components
             if (Vector3.Distance(m_LastVector, vector) > 0.01f)
             {
                 m_LastVector = vector;
-                XInput.text = vector.x.ToString();
-                YInput.text = vector.y.ToString();
-                ZInput.text = vector.z.ToString();
+                XInput.text = vector.x.ToString(CultureInfo.InvariantCulture);
+                YInput.text = vector.y.ToString(CultureInfo.InvariantCulture);
+                ZInput.text = vector.z.ToString(CultureInfo.InvariantCulture);;
             }
         }
 

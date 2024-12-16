@@ -54,13 +54,8 @@ internal static class Patch_InputDirector
         
         if (SRLECamera.Instance != null && SRLECamera.Instance.isActiveAndEnabled)
         {
-            // if (__instance._screenshot.asset.)
-            // {
-            //     SRSingleton<GameContext>.Instance.TakeScreenshot();
-            // }
             __instance._mainGame.Map.Disable();
             __instance._paused.Map.Enable();
-            // __instance._paused.Map.Enable();
             return false;
         }
         __instance._mainGame.Map.Enable();

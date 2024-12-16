@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using MelonLoader;
 using UnityEngine.UI;
 
@@ -28,7 +29,7 @@ namespace SRLE.Components
 
         private void Start()
         {
-            Input.text = Convert.ToString(getter()); ;
+            Input.text = Convert.ToString(getter(), CultureInfo.InvariantCulture); ;
         }
 
         private void OnEndEdit(string arg0)
@@ -43,7 +44,6 @@ namespace SRLE.Components
                 {
                     setter(0);
                 }
-
             }
             else
             {

@@ -64,9 +64,6 @@ public class SRLECamera : MonoBehaviour
         playerController.BypassGravity = true;
         playerController.ResetVelocity(false);;
         playerController.enabled = false;
-        // SRSingleton<SceneContext>.Instance.PlayerState.InGadgetMode = true;
-        // base.transform.position = playerCamera.transform.position;
-        // this.transform.localPosition = playerCamera.transform.localPosition;
         playerCamera.SetActive(false);
         foreach (var o in playerController.transform)
         {
@@ -79,7 +76,7 @@ public class SRLECamera : MonoBehaviour
 
     public void OnDisable()
     {
-        if (SRSingleton<HudUI>.Instance == null) return;
+        if (!SRSingleton<HudUI>.Instance) return;
         SRSingleton<HudUI>.Instance.gameObject.SetActive(true);
         playerController.Position = transform.position;
         playerController.Rotation = transform.rotation;
@@ -131,7 +128,7 @@ public class SRLECamera : MonoBehaviour
             foreach (var directedActorSpawner in Resources.FindObjectsOfTypeAll<DirectedSlimeSpawner>() )
             {
                 var component = directedActorSpawner.GetComponent<Renderer>();
-                if (component != null)
+                if (component)
                     component.enabled = true;
             }
             

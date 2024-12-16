@@ -30,11 +30,6 @@ public class InspectorSpawner : InspectorBase
     {
         m_Label = transform.Find("Label").GetComponent<Text>();
         m_Dropdown = GetComponentInChildren<Dropdown>();
-        // var optionData = option[^1];
-        // transform.Find("Triangle").GetComponent<Button>().onClick.AddListener(new System.Action(() =>
-        // {
-        //     transform.Find("Dropdown").gameObject.SetActive(!transform.Find("Dropdown").gameObject.activeSelf);
-        // }));
     }
 
     private void Start()
@@ -152,9 +147,9 @@ public class InspectorSpawner : InspectorBase
                 }));
                 m_Dropdown.onValueChanged.Invoke(0);
         }
-        if (getter1 is Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<SlimeSet.Member>)
+        if (getter1 is Il2CppReferenceArray<SlimeSet.Member>)
         {
-            SlimeSet.Member[] array = (Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<SlimeSet.Member>)getter();
+            SlimeSet.Member[] array = (Il2CppReferenceArray<SlimeSet.Member>)getter();
             foreach (var tMember in array)
             {
                 m_Dropdown.options.Add(new Dropdown.OptionData()
@@ -193,7 +188,7 @@ public class InspectorSpawner : InspectorBase
                             Object.Destroy(mTransform.gameObject);
                         }
                         m_Transforms.Clear();
-                        SlimeSet.Member[] array = (Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<SlimeSet.Member>)getter();
+                        SlimeSet.Member[] array = (Il2CppReferenceArray<SlimeSet.Member>)getter();
                         var member = array[i];
 
                         var inspectorSpawner = Instantiate(AssetManager.InspectorArray, transform.parent).AddComponent<InspectorSpawner>();

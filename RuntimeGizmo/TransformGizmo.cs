@@ -24,7 +24,7 @@ namespace SRLE.RuntimeGizmo
 	//you should call ClearTargets before doing so just to be sure nothing unexpected happens... as well as call UndoRedoManager.Clear()
 	//For example, if you select an object that has children, move the children elsewhere, deselect the original object, then try to add those old children to the selection, I think it wont work.
 
-	[RegisterTypeInIl2Cpp]
+	[RegisterTypeInIl2Cpp(false)]
 	public class TransformGizmo : MonoBehaviour
 	{
 		public TransformSpace space = TransformSpace.Global;

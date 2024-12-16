@@ -5,7 +5,8 @@ namespace SRLE.RuntimeGizmo.UndoRedo
 	public class DropoutStack<T> : LinkedList<T>
 	{
 		int _maxLength = int.MaxValue;
-		public int maxLength {get {return _maxLength;} set => SetMaxLength(value);
+		public int maxLength {get => _maxLength;
+			set => SetMaxLength(value);
 		}
 
 		public DropoutStack() {}

@@ -11,7 +11,7 @@ internal static class Patch_RegionLoader
     public static bool Prefix(RegionLoader __instance)
     {
         var srleCamera = SRLECamera.Instance;
-        if (LevelManager.CurrentMode != LevelManager.Mode.BUILD || srleCamera == null) return true;
+        if (LevelManager.CurrentMode != LevelManager.Mode.BUILD || !srleCamera) return true;
         if (!srleCamera.isActiveAndEnabled)
             return true;
         var position = srleCamera.transform.position;

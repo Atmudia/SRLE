@@ -141,20 +141,20 @@ namespace SRLE.Utils
                 m_renderLight.shadowNormalBias = 0;
                 m_renderLight.shadowBias = 0.15f;
 
-                HDAdditionalLightData hddata = m_renderLight.gameObject.AddComponent<HDAdditionalLightData>();
-                hddata.lightUnit = LightUnit.Lux;
-                hddata.m_Version = HDAdditionalLightData.Version.MoveEmissionMesh;
-                hddata.angularDiameter = 0;
-                hddata.enableSpotReflector = false;
-                hddata.flareFalloff = 0.75f;
-                hddata.flareSize = 4;
-                hddata.flareTint = new Color(1, 0.8353f, 0.4588f, 1);
-                hddata.intensity = 300;
-                hddata.interactsWithSky = false;
-                hddata.normalBias = 1;
-                hddata.shadowTint = new Color(0.3302f, 0.3302f, 0.3302f, 1);
-                hddata.surfaceTint = new Color(1, 0.8196f, 0.5804f, 1);
-                hddata.useColorTemperature = false;
+                HDAdditionalLightData hddData = m_renderLight.gameObject.AddComponent<HDAdditionalLightData>();
+                hddData.lightUnit = LightUnit.Lux;
+                hddData.m_Version = HDAdditionalLightData.Version.MoveEmissionMesh;
+                hddData.angularDiameter = 0;
+                hddData.enableSpotReflector = false;
+                hddData.flareFalloff = 0.75f;
+                hddData.flareSize = 4;
+                hddData.flareTint = new Color(1, 0.8353f, 0.4588f, 1);
+                hddData.intensity = 300;
+                hddData.interactsWithSky = false;
+                hddData.normalBias = 1;
+                hddData.shadowTint = new Color(0.3302f, 0.3302f, 0.3302f, 1);
+                hddData.surfaceTint = new Color(1, 0.8196f, 0.5804f, 1);
+                hddData.useColorTemperature = false;
 
                 m_renderLight.transform.rotation = Quaternion.Euler(90, 0, 0);
                 m_renderLight.enabled = false;
@@ -404,7 +404,7 @@ namespace SRLE.Utils
                 if (shader == null)
                     renderCamera.Render();
                 else
-                    renderCamera.RenderWithShader(shader, replacementTag == null ? string.Empty : replacementTag);
+                    renderCamera.RenderWithShader(shader, replacementTag ?? string.Empty);
 
                 renderCamera.targetTexture = null;
 

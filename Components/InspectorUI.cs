@@ -93,18 +93,18 @@ namespace SRLE.Components
                 // }
                 return;
 
-                if (obj.GetComponentInChildren<DirectedSlimeSpawner>())
-                {
-                    var  inspectorArray = Instantiate(AssetManager.InspectorArray, m_InspectorScroll.content);
-                    var inspectorUI = inspectorArray.AddComponent<InspectorSpawner>(); 
-                    inspectorUI.BindTo(obj.GetComponentInChildren<DirectedSlimeSpawner>(), typeof(DirectedActorSpawner).GetMember("Constraints")[0]);
-
-                    // var  inspectorFeral = Instantiate(AssetManager.InspectorBool, m_InspectorScroll.content);
-                    // var inspectorBool = inspectorArray.AddComponent<InspectorBool>(); 
-                    // inspectorBool.BindTo(obj.GetComponentInChildren<DirectedSlimeSpawner>(), typeof(DirectedSlimeSpawner).GetMember("Constraints")[0]);
-
-                    
-                }
+                // if (obj.GetComponentInChildren<DirectedSlimeSpawner>())
+                // {
+                //     var  inspectorArray = Instantiate(AssetManager.InspectorArray, m_InspectorScroll.content);
+                //     var inspectorUI = inspectorArray.AddComponent<InspectorSpawner>(); 
+                //     inspectorUI.BindTo(obj.GetComponentInChildren<DirectedSlimeSpawner>(), typeof(DirectedActorSpawner).GetMember("Constraints")[0]);
+                //
+                //     // var  inspectorFeral = Instantiate(AssetManager.InspectorBool, m_InspectorScroll.content);
+                //     // var inspectorBool = inspectorArray.AddComponent<InspectorBool>(); 
+                //     // inspectorBool.BindTo(obj.GetComponentInChildren<DirectedSlimeSpawner>(), typeof(DirectedSlimeSpawner).GetMember("Constraints")[0]);
+                //
+                //     
+                // }
                 
                 // if (obj.GetComponentInChildren<TeleportDestination>() != null)
                 // {

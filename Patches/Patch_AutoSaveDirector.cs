@@ -29,8 +29,6 @@ internal static class Patch_AutoSaveDirector
     [HarmonyPrefix]
     public static void OnGameLoaded()
     {
-        
-        
         if (LevelManager.CurrentMode == LevelManager.Mode.BUILD)
         {
 
