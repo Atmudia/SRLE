@@ -120,6 +120,49 @@ namespace SRLE.Utils
             }
         }
 
+        private static Light m_renderLight = null;
+        private static Light RenderLight
+        {
+            get
+            {
+                if (m_renderLight != null) return m_renderLight;
+
+                m_renderLight = new GameObject("ModelPreviewGeneratorLight").AddComponent<Light>();
+                m_renderLight.cullingMask = 1 << PREVIEW_LAYER;
+                m_renderLight.type = LightType.Directional;
+                m_renderLight.lightShadowCasterMode = LightShadowCasterMode.Everything;
+                m_renderLight.shadows = LightShadows.Soft;
+
+                m_renderLight.bounceIntensity = 16;
+                m_renderLight.color = new Color(1, 1, 1, 1);
+                m_renderLight.useColorTemperature = false;
+                m_renderLight.colorTemperature = 4600;
+                m_renderLight.intensity = 500;
+                m_renderLight.shadowNormalBias = 0;
+                m_renderLight.shadowBias = 0.15f;
+
+                HDAdditionalLightData hddata = m_renderLight.gameObject.AddComponent<HDAdditionalLightData>();
+                hddata.lightUnit = LightUnit.Lux;
+                hddata.m_Version = HDAdditionalLightData.Version.MoveEmissionMesh;
+                hddata.angularDiameter = 0;
+                hddata.enableSpotReflector = false;
+                hddata.flareFalloff = 0.75f;
+                hddata.flareSize = 4;
+                hddata.flareTint = new Color(1, 0.8353f, 0.4588f, 1);
+                hddata.intensity = 300;
+                hddata.interactsWithSky = false;
+                hddata.normalBias = 1;
+                hddata.shadowTint = new Color(0.3302f, 0.3302f, 0.3302f, 1);
+                hddata.surfaceTint = new Color(1, 0.8196f, 0.5804f, 1);
+                hddata.useColorTemperature = false;
+
+                m_renderLight.transform.rotation = Quaternion.Euler(90, 0, 0);
+                m_renderLight.enabled = false;
+
+                return m_renderLight;
+            }
+        }
+
         private static Camera m_previewRenderCamera;
         public static Camera PreviewRenderCamera
         {
@@ -209,6 +252,12 @@ namespace SRLE.Utils
         {
             if (model == null || model.Equals(null))
                 return null;
+
+            foreach (Light l in UnityEngine.Object.FindObjectsOfType<Light>())
+            {
+                if (l != RenderLight)
+                    l.cullingMask &= ~(1 << PREVIEW_LAYER);
+            }
 
             Texture2D result = null;
 
@@ -341,6 +390,9 @@ namespace SRLE.Utils
                 renderCamera.transform.position = boundsCenter - previewDir * distance;
                 renderCamera.farClipPlane = distance * 4f;
 
+                RenderLight.transform.rotation = renderCamera.transform.rotation;
+                RenderLight.enabled = true;
+
                 RenderTexture temp = RenderTexture.active;
                 RenderTexture renderTex = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Default);
                 RenderTexture.active = renderTex;
@@ -359,6 +411,8 @@ namespace SRLE.Utils
                 result = new Texture2D(width, height, TextureFormat.ARGB32, false);
                 result.ReadPixels(new Rect(0, 0, width, height), 0, 0, false);
                 result.Apply(false, false);
+
+                RenderLight.enabled = false;
 
                 RenderTexture.active = temp;
                 RenderTexture.ReleaseTemporary(renderTex);
