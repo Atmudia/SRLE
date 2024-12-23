@@ -140,7 +140,7 @@ namespace SRLE.Components
 
         private void LoadOrUpdateObjectPreview(uint objectID, GameObject buildObj)
         {
-            if (!BuildObjectsPreview.ContainsKey(objectID))
+            if (!BuildObjectsPreview.TryGetValue(objectID, out var value))
             {
                 previewQueue.Enqueue((objectID, buildObj));
                 if (!currentlyProcessingPreviews)
@@ -148,7 +148,7 @@ namespace SRLE.Components
             }
             else
             {
-                buildObj.GetComponentInChildren<RawImage>().texture = BuildObjectsPreview[objectID];
+                buildObj.GetComponentInChildren<RawImage>().texture = value;
             }
         }
         

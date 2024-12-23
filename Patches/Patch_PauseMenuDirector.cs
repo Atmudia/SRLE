@@ -25,11 +25,6 @@ internal static class Patch_PauseMenuDirector
         SRLECamera.Instance.SetActive(false);
         MelonCoroutines.Stop(SRLECamera.Instance.DestroyDelayedObject);
         SRSingleton<GameContext>.Instance.InputDirector._paused.Map.Enable();
-        UnityEngine.Object.Destroy(LevelManager.SRLEGameObject);
-        UnityEngine.Object.Destroy(ObjectManager.World);
-        UnityEngine.Object.Destroy(ObjectManager.CachedGameObjects);
-        ObjectManager.BuildObjects.Clear();
-        // SRSingleton<GameContext>.Instance.InputDirector._mainGame.Map.Enable();
 
 
     }

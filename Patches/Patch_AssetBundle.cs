@@ -11,7 +11,7 @@ internal static class Patch_AssetBundle
 {
     public static void Prefix(ref bool unloadAllLoadedObjects)
     {
-        if (LevelManager.CurrentMode == LevelManager.Mode.BUILD)
+        if (LevelManager.CurrentMode == LevelManager.Mode.BUILD || LevelManager.CurrentMode == LevelManager.Mode.TEST)
             unloadAllLoadedObjects = false;
     }
 }

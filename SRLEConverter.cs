@@ -22,7 +22,7 @@ public static class SRLEConverter
         "Colliders", "Loot", "Audio", "Build Sites", "Roots", "Upgrades",
         "Ranch Features", "Drone Network"
     };
-    public static string GetFullName(this GameObject obj)
+    public static string GetFullPath(this GameObject obj)
     {
         string str = obj.name;
         for (Transform parent = obj.transform.parent;
@@ -51,7 +51,7 @@ public static class SRLEConverter
             {
                 foreach (var cellDirector in rootGameObject.GetComponentsInChildren<CellDirector>())
                 {
-                    if (cellDirector.transform.parent != null)
+                    if (cellDirector.transform.parent)
                     {
                         if (cellDirector.transform.parent.name == "PrefabParent")
                         {
@@ -133,17 +133,12 @@ public static class SRLEConverter
             }
             uint aa = 1;
 
-            bool InBounds (int index, string[] array) 
-            {
-                return (index >= 0) && (index < array.Length);
-            }
-
             List<IdCategoryData> categories = new List<IdCategoryData>();
 
 
             foreach (var element in listOfCategory)
             {
-                var path = element.Key.GetFullName();
+                var path = element.Key.GetFullPath();
                 var strings = path.Split('/', '/');
                 var category = InBounds(3, strings) ? strings[3] : "None";
                 var idClass = new IdClass {Id = aa, Name = element.Key.name, Path = path, Scene = element.Key.scene.name, HashCode = element.Value};
@@ -155,6 +150,11 @@ public static class SRLEConverter
                 WriteIndented = true
             }));
             CategoryDatas = categories;
+
+            bool InBounds (int index, string[] array) 
+            {
+                return (index >= 0) && (index < array.Length);
+            }
 
             static IdCategoryData FindCategory(string categoryName, List<IdCategoryData> categories)
             {

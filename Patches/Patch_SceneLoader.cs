@@ -30,8 +30,7 @@ public static class Patch_SceneLoader
             return;
         if (ObjectManager.CachedGameObjects != null && ObjectManager.CachedGameObjects.transform.GetChildCount() != 0)
             return;
-
-
+        
         var findObjectsOfTypeAll = Resources.FindObjectsOfTypeAll<SceneGroup>();
         sceneGroup = findObjectsOfTypeAll.FirstOrDefault(x => x.name.Contains("AllZones"));
         var defaultGameplayScene = __instance._defaultGameplaySceneGroup;
@@ -44,10 +43,10 @@ public static class Patch_SceneLoader
         sceneGroup._coreSceneReference = defaultGameplayScene.CoreSceneReference;
         
         parameters.TeleportPlayer = true;
-        var group = sceneGroup;
+        // var group = sceneGroup;
         parameters.OnSceneGroupLoadedPhase2 += new System.Action<Il2CppSystem.Action<SceneLoadErrorData>>(action =>
         {
-            group._sceneReferences = oldAssetReferences;
+            // group._sceneReferences = oldAssetReferences;
             if (SRLEConverter.IsConverting)
             {
                 SRLEConverter.ConvertToBuildObjects();

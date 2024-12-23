@@ -10,13 +10,6 @@ namespace SRLE.Patches;
 internal static class Patch_AutoSaveDirector
 {
     [HarmonyPatch(nameof(AutoSaveDirector.SaveGame))]
-    [HarmonyPrefix]
-    public static bool SaveGame()
-    {
-        return LevelManager.CurrentMode != LevelManager.Mode.BUILD;
-    }
-
-    [HarmonyPatch(nameof(AutoSaveDirector.SaveGame))]
     [HarmonyFinalizer]
     public static Exception FinalizerSaveGame(Exception __exception)
     {

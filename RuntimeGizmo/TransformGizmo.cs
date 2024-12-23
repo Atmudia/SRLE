@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using Il2CppMonomiPark.SlimeRancher;
 using Il2CppMonomiPark.SlimeRancher.DataModel;
+using Il2CppMonomiPark.SlimeRancher.Util.Extensions;
 using MelonLoader;
 using SRLE.Components;
 using SRLE.RuntimeGizmo.Helpers;
@@ -472,9 +474,11 @@ namespace SRLE.RuntimeGizmo
 
 						for(int i = 0; i < targetRootsOrdered.Count; i++)
 						{
+							
 							Transform target = targetRootsOrdered[i];
-
 							target.Translate(movement, Space.World);
+							
+							
 						}
 
 						SetPivotPointOffset(movement);
@@ -690,6 +694,10 @@ namespace SRLE.RuntimeGizmo
 				AddTargetHighlightedRenderers(target);
 
 				SetPivotPoint();
+				if (target.SRTryGetComponent(out FloatingRock floatingRock))
+				{
+					floatingRock.enabled = false;
+				}
 				InspectorUI.Instance.SetActive(true);
 			}
 		}
@@ -710,8 +718,18 @@ namespace SRLE.RuntimeGizmo
 				RemoveTargetRoot(target);
 
 				SetPivotPoint();
-				
+
 			}
+
+			foreach (var buildObject in target.transform.GetComponentsInParent<BuildObject>())
+			{
+				if (buildObject.gameObject.SRTryGetComponent(out FloatingRock rock))
+				{
+					rock.initialPosition = target.position;
+					rock.enabled = true;
+				}
+			}
+			
 			InspectorUI.Instance.SetActive(false);
 		}
 
@@ -720,10 +738,20 @@ namespace SRLE.RuntimeGizmo
 			if(addCommand) UndoRedoManager.Insert(new ClearTargetsCommand(this, targetRootsOrdered));
 
 			ClearAllHighlightedRenderers();
+			foreach (var buildObject in targetRoots.Keys)
+			{
+				if (buildObject.gameObject.SRTryGetComponent(out FloatingRock rock))
+				{
+					rock.initialPosition = buildObject.position;
+					rock.enabled = true;
+				}
+			}
+
 			targetRoots.Clear();
 			targetRootsOrdered.Clear();
 			children.Clear();
 			InspectorUI.Instance.SetActive(false);
+			
 		}
 
 		public void ClearAndAddTarget(Transform target)

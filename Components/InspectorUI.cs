@@ -51,7 +51,7 @@ namespace SRLE.Components
                 var rotationObj = Instantiate(AssetManager.InspectorVector3, m_InspectorScroll.content);
                 var rotationUI = rotationObj.AddComponent<InspectorVector3UI>();
                 rotationUI.Name = "Rotation";
-                rotationUI.BindTo(SRLECamera.Instance.transformGizmo.targetRootsOrdered[0].transform, typeof(Transform).GetMember("eulerAngles")[0]);
+                rotationUI.BindTo(SRLECamera.Instance.transformGizmo.targetRootsOrdered[0].transform, typeof(Transform).GetMember("localEulerAngles")[0]);
                 rotationUI.OnBeforeChange = () =>
                 {
                     // UndoManager.RegisterState(new UndoHandlemove(Gizmo.Tool.Rotate), "Moveing objects");
