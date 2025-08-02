@@ -1,119 +1,105 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
-using Il2Cpp;
-using Il2CppMonomiPark.SlimeRancher;
-using Il2CppMonomiPark.SlimeRancher.DataModel;
-using Il2CppMonomiPark.SlimeRancher.Options;
-using Il2CppMonomiPark.SlimeRancher.SceneManagement;
-using MelonLoader;
-using MelonLoader.Utils;
+using MonomiPark.SlimeRancher;
+using MonomiPark.SlimeRancher.DataModel;
+using Newtonsoft.Json;
 using SRLE.Components;
 using SRLE.Models;
 using UnityEngine;
 
-namespace SRLE;
-
-public static class SaveManager
+namespace SRLE
 {
-    public static string DataPath => Path.Combine(MelonEnvironment.UserDataDirectory, "SRLE");
-    public static string LevelsPath => Path.Combine(DataPath, "Levels");
-    public static string TexturesDataPath => Path.Combine(DataPath, "Textures");
-    public static LevelData CurrentLevel;
-    public static SettingsUI.Settings Settings;
-
-
-
-    static SaveManager()
+    public static class SaveManager
     {
-        EnsureFoldersExist();
-        Melon<EntryPoint>.Logger.Msg("Initializing Save Manager");
-    }
-
-    private static void EnsureFoldersExist()
-    {
-        if (!Directory.Exists(DataPath))
+        public static string DataPath => Path.Combine(new DirectoryInfo(Application.dataPath).Parent.FullName, "SRLE");
+        public static string LevelsPath => Path.Combine(DataPath, "Levels");
+        public static string TexturesDataPath => Path.Combine(DataPath, "Textures");
+        public static LevelData CurrentLevel;
+        public static SettingsUI.Settings Settings;
+        
+        static SaveManager()
         {
-            Directory.CreateDirectory(DataPath);
+            EnsureFoldersExist();
+            EntryPoint.ConsoleInstance.Log("Initializing Save Manager");
         }
-        if (!Directory.Exists(LevelsPath))
-        {
-            Directory.CreateDirectory(LevelsPath);
-        }    
-        if (!Directory.Exists(TexturesDataPath))
-        {
-            Directory.CreateDirectory(TexturesDataPath);
-        } 
-        if (!File.Exists(Path.Combine(DataPath, "favorites.txt")))
-            File.WriteAllText(
-                Path.Combine(DataPath, "favorites.txt"),
-                JsonSerializer.Serialize(new List<uint>())
-            );    
-    }
-    public static void LoadLevel(string levelPath)
-    {
-        LevelManager.SetMode(LevelManager.Mode.BUILD);
-        CurrentLevel = JsonSerializer.Deserialize<LevelData>(File.ReadAllText(levelPath));
-        CurrentLevel.Path = levelPath;
-        var loadNewGameMetadata = new AutoSaveDirector.LoadNewGameMetadata
-        {
-            saveSlotIndex = 999,
-            gameSettingsModel = new GameSettingsModel(new Il2CppSystem.Collections.Generic.List<OptionsItemDefinition>().Cast<Il2CppSystem.Collections.Generic.IEnumerable<OptionsItemDefinition>>()),
-            
-        };
-        SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame(loadNewGameMetadata, new System.Action(
-            () =>
-            {
-                        
-            }));
-    }
-    public static void CreateLevel(string levelName)
-    {
-        
-        LevelManager.SetMode(LevelManager.Mode.BUILD);
-        CurrentLevel = new LevelData()
-        {
-            LevelName = levelName,
-            BuildObjects = new Dictionary<uint, List<BuildObjectData>>(),
-            Dependencies = new Dictionary<string, string>(), 
-            Path = Path.Combine(LevelsPath, $"{levelName}.srle")
-        };
-        
-        var loadNewGameMetadata = new AutoSaveDirector.LoadNewGameMetadata
-        {
-            saveSlotIndex = 999,
-            gameSettingsModel = new GameSettingsModel(new Il2CppSystem.Collections.Generic.List<OptionsItemDefinition>().Cast<Il2CppSystem.Collections.Generic.IEnumerable<OptionsItemDefinition>>()),
-                    
-        };
-        SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame(loadNewGameMetadata, new System.Action(
-            () =>
-            {
-                        
-            }));
-    
-    }
-    public static void SaveLevel()
-    {
-        CurrentLevel.BuildObjects.Clear();
-        foreach (KeyValuePair<uint, Il2CppSystem.Collections.Generic.List<GameObject>> data in ObjectManager.BuildObjects)
-        {
-            MelonLogger.Msg(data.Key);
-            CurrentLevel.BuildObjects.Add(data.Key, new List<BuildObjectData>());
-            foreach (var obj in data.Value)
-            {
-                CurrentLevel.BuildObjects[data.Key].Add(new BuildObjectData()
-                {
-                    Pos = BuildObjectData.Vector3Save.ToVector3Save(obj.transform.localPosition),
-                    Rot = BuildObjectData.Vector3Save.ToVector3Save(obj.transform.localEulerAngles),
-                    Scale = BuildObjectData.Vector3Save.ToVector3Save(obj.transform.localScale),
-                    Properties = new Dictionary<string, string>(),
-                    //TODO Add here teleports etc;
 
-                });
-
+        private static void EnsureFoldersExist()
+        {
+            if (!Directory.Exists(DataPath))
+            {
+                Directory.CreateDirectory(DataPath);
             }
-           
+            if (!Directory.Exists(LevelsPath))
+            {
+                Directory.CreateDirectory(LevelsPath);
+            }    
+            if (!Directory.Exists(TexturesDataPath))
+            {
+                Directory.CreateDirectory(TexturesDataPath);
+            } 
+            if (!File.Exists(Path.Combine(DataPath, "favorites.txt")))
+                File.WriteAllText(
+                    Path.Combine(DataPath, "favorites.txt"),
+                    JsonConvert.SerializeObject(new List<uint>())
+                );    
+            if(!File.Exists(Path.Combine(SaveManager.DataPath, "settings.txt")))
+            {
+                SaveManager.Settings = new SettingsUI.Settings()
+                {
+                    EnableFog = true,
+                    HighlightMethod = ObjectHighlight.HighlightType.Wireframe,
+                    HighlightStrength = 10,
+                    RenderDistance = 1000
+                };
+            }
+            else SaveManager.Settings = JsonConvert.DeserializeObject<SettingsUI.Settings>(File.ReadAllText(Path.Combine(SaveManager.DataPath, "settings.txt")));
+
         }
-        File.WriteAllText(CurrentLevel.Path, JsonSerializer.Serialize(CurrentLevel)); }
+        public static void LoadLevel(string levelPath)
+        {
+            LevelManager.SetMode(LevelManager.Mode.BUILD);
+            CurrentLevel = JsonConvert.DeserializeObject<LevelData>(File.ReadAllText(levelPath));
+            CurrentLevel.Path = levelPath;
+            SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("srle", Identifiable.Id.HEN, PlayerState.GameMode.CLASSIC, () => {});
+        }
+        public static void CreateLevel(string levelName)
+        {
+            LevelManager.SetMode(LevelManager.Mode.BUILD);
+            CurrentLevel = new LevelData()
+            {
+                LevelName = levelName,
+                BuildObjects = new Dictionary<uint, List<BuildObjectData>>(),
+                Dependencies = new Dictionary<string, string>(), 
+                Path = Path.Combine(LevelsPath, $"{levelName}.srle")
+            };
+        
+            SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("srle", Identifiable.Id.HEN, PlayerState.GameMode.CLASSIC, () => {});
+
+    
+        }
+        public static void SaveLevel()
+        {
+            CurrentLevel.BuildObjects.Clear();
+            foreach (KeyValuePair<uint, System.Collections.Generic.List<GameObject>> data in ObjectManager.BuildObjects)
+            {
+                EntryPoint.ConsoleInstance.Log(data.Key);
+                CurrentLevel.BuildObjects.Add(data.Key, new List<BuildObjectData>());
+                foreach (var obj in data.Value)
+                {
+                    ObjectManager.GetBuildObject(obj, out var buildObject);
+                    CurrentLevel.BuildObjects[data.Key].Add(new BuildObjectData()
+                    {
+                        Pos = BuildObjectData.Vector3Save.ToVector3Save(obj.transform.localPosition),
+                        Rot = BuildObjectData.Vector3Save.ToVector3Save(obj.transform.localEulerAngles),
+                        Scale = BuildObjectData.Vector3Save.ToVector3Save(obj.transform.localScale),
+                        Properties = buildObject.GetData()
+
+                    });
+
+                }
+           
+            }
+            File.WriteAllText(CurrentLevel.Path, JsonConvert.SerializeObject(CurrentLevel)); }
+    }
 }

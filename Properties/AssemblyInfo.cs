@@ -1,7 +1,5 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using MelonLoader;
-using SRLE;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -11,7 +9,7 @@ using SRLE;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SRLE")]
-[assembly: AssemblyCopyright("Copyright ©  2022")]
+[assembly: AssemblyCopyright("Copyright ©  2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -21,7 +19,7 @@ using SRLE;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("D1B34AAD-BEA9-404E-A53A-3125E7AE08B3")]
+[assembly: Guid("F2ABB6F8-2A4D-4906-8D74-790E5169F960")]
 
 // Version information for an assembly consists of the following four values:
 //

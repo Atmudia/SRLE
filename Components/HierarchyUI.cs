@@ -1,24 +1,18 @@
-﻿using System;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Il2CppMonomiPark.SlimeRancher.SceneManagement;
-using Il2CppMonomiPark.SlimeRancher.UI;
-using Il2CppSystem;
-using Il2CppTMPro;
-using MelonLoader;
+using Newtonsoft.Json;
 using SRLE.Models;
 using SRLE.Utils;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
-using Action = System.Action;
-using IntPtr = System.IntPtr;
 
 namespace SRLE.Components
 {
-    [RegisterTypeInIl2Cpp]
     public class HierarchyUI : MonoBehaviour
     {
         public static HierarchyUI Instance;
@@ -30,10 +24,9 @@ namespace SRLE.Components
         private Dictionary<uint, Texture2D> BuildObjectsPreview;
 
         private bool currentlyProcessingPreviews = false;
-        private object currPreviewEnumerator = null;
+        private Coroutine currPreviewEnumerator = null;
         private Queue<(uint, GameObject)> previewQueue = new Queue<(uint, GameObject)>();
-
-        public HierarchyUI(IntPtr value) : base(value) { }
+        
 
         public void Awake()
         {
@@ -57,7 +50,7 @@ namespace SRLE.Components
             ClearChildObjects(CategoryScroll.content);
             ClearChildObjects(ObjectsScroll.content);
 
-            SearchInput.onValueChanged.AddListener(new System.Action<string>(Search));
+            SearchInput.onValueChanged.AddListener(Search);
         }
 
         private void ClearChildObjects(Transform parent)
@@ -79,7 +72,7 @@ namespace SRLE.Components
             SelectCategory("Favorites");
         }
 
-        private void CreateCategoryButton(string categoryName, Action onClickAction)
+        private void CreateCategoryButton(string categoryName, UnityAction onClickAction)
         {
             GameObject categoryButton = Instantiate(AssetManager.CategoryButtonPrefab, CategoryScroll.content, false);
             categoryButton.GetComponentInChildren<Button>().onClick.AddListener(onClickAction);
@@ -105,7 +98,7 @@ namespace SRLE.Components
             string objectName = buildObject.Name;
 
             GameObject buildObj = Instantiate(AssetManager.ObjectButtonPrefab, ObjectsScroll.content, false);
-            buildObj.GetComponentInChildren<Button>().onClick.AddListener(new Action(() => SpawnObject(objectID)));
+            buildObj.GetComponentInChildren<Button>().onClick.AddListener(() => SpawnObject(objectID));
             buildObj.GetComponentInChildren<Text>().text = objectName;
 
             CreateFavoriteButton(buildObj, objectID);
@@ -117,7 +110,7 @@ namespace SRLE.Components
         {
             var favorite = buildObj.transform.Find("Favorite");
             favorite.GetComponent<Image>().color = ObjectManager.BuildCategories["Favorites"].Contains(objectID) ? Color.yellow : Color.gray;
-            favorite.GetComponent<Button>().onClick.AddListener(new Action(() => ToggleFavorite(objectID, favorite)));
+            favorite.GetComponent<Button>().onClick.AddListener(() => ToggleFavorite(objectID, favorite));
 
             void ToggleFavorite(uint id, Transform favoriteTransform)
             {
@@ -134,7 +127,7 @@ namespace SRLE.Components
                     favoriteTransform.GetComponent<Image>().color = Color.gray;
                 }
 
-                File.WriteAllText(Path.Combine(SaveManager.DataPath, "favorites.txt"), JsonSerializer.Serialize(favorites));
+                File.WriteAllText(Path.Combine(SaveManager.DataPath, "favorites.txt"), JsonConvert.SerializeObject(favorites));
             }
         }
 
@@ -144,7 +137,7 @@ namespace SRLE.Components
             {
                 previewQueue.Enqueue((objectID, buildObj));
                 if (!currentlyProcessingPreviews)
-                    currPreviewEnumerator = MelonCoroutines.Start(LoadPreviewAsync());
+                    currPreviewEnumerator = this.StartCoroutine(LoadPreviewAsync());
             }
             else
             {
@@ -180,7 +173,9 @@ namespace SRLE.Components
                 if (previewObj == null) return;
                 if (buildObj == null) return;
 
-                Texture2D texture = RuntimePreviewGenerator.GenerateModelPreview(previewObj.transform);
+                
+                
+                Texture2D texture = RuntimePreviewGenerator.GenerateModelPreview(previewObj.GameObject.transform);
                 byte[] bytes = texture.EncodeToPNG();
                 File.WriteAllBytes(Path.Combine(SaveManager.DataPath, "Textures", objectID + ".jpg"), bytes);
 
@@ -188,19 +183,20 @@ namespace SRLE.Components
                 BuildObjectsPreview.Add(objectID, texture);
             });
         }
-
+        
         private void SpawnObject(uint id)
         {
             ObjectManager.RequestObject(id, (buildObject) =>
             {
                 if (buildObject == null) return;
 
-                GameObject obj = Instantiate(buildObject, SRLECamera.Instance.transform.position + (SRLECamera.Instance.transform.forward * 10), Quaternion.identity, ObjectManager.World.transform);
-                obj.SetActive(true);
+                GameObject obj = Instantiate(buildObject.GameObject, SRLECamera.Instance.transform.position + (SRLECamera.Instance.transform.forward * 10), Quaternion.identity, ObjectManager.World.transform);
                 var addComponent = obj.AddComponent<BuildObject>();
                 addComponent.ID = ObjectManager.BuildObjectsData[id];
+                addComponent.Region = SRSingleton<SceneContext>.Instance.RegionRegistry.GetCurrentRegionSetId();
                 ObjectManager.AddObject(id, obj);
-                
+                obj.SetActive(true);
+
                 SRLECamera.Instance.transformGizmo.ClearAndAddTarget(obj.transform);
 
                 
@@ -224,69 +220,67 @@ namespace SRLE.Components
             }
         }
 
-        private System.Collections.IEnumerator LoadPreviewAsync()
+        private IEnumerator LoadPreviewAsync()
         {
             currentlyProcessingPreviews = true;
 
-            (uint, GameObject) previewToLoad = previewQueue.Dequeue();
-            uint objectID = previewToLoad.Item1;
-            GameObject buildObj = previewToLoad.Item2;
-
-            string filePath = Path.Combine(SaveManager.DataPath, "Textures", objectID + ".png");
-
-            if (File.Exists(filePath))
+            while (previewQueue.Count > 0)
             {
-                Task<byte[]> asyncBytes = File.ReadAllBytesAsync(filePath);
-                while (!asyncBytes.IsCompleted)
-                    yield return null;
+                var (objectID, buildObj) = previewQueue.Dequeue();
+                string filePath = Path.Combine(SaveManager.DataPath, "Textures", objectID + ".png");
 
-                Texture2D result = new Texture2D(64, 64, TextureFormat.RGB24, false);
-                result.LoadImage(asyncBytes.Result, false);
-                result.Apply(false, false);
-
-                BuildObjectsPreview.Add(objectID, result);
-
-                if (buildObj != null)
-                    buildObj.GetComponentInChildren<RawImage>().texture = result;
-            }
-            else
-            {
-                GameObject previewObj = null;
-                ObjectManager.RequestObject(objectID, x => previewObj = x);
-
-                if (previewObj != null)
+                if (File.Exists(filePath))
                 {
-                    Texture2D texture = RuntimePreviewGenerator.GenerateModelPreview(previewObj.transform);
-                    byte[] bytes = texture.EncodeToPNG();
-                    if (bytes != null)
-                    {
-                        Task asyncBytes = File.WriteAllBytesAsync(filePath, bytes);
-                        while (!asyncBytes.IsCompleted)
-                            yield return null;
-                        BuildObjectsPreview.Add(objectID, texture);
+                    byte[] asyncBytes = File.ReadAllBytes(filePath);
+                    Texture2D result = new Texture2D(64, 64, TextureFormat.RGB24, false);
+                    result.LoadImage(asyncBytes, false);
+                    result.Apply(false, false);
+                    BuildObjectsPreview[objectID] = result;
 
-                        if (buildObj != null)
-                            buildObj.GetComponentInChildren<RawImage>().texture = texture;
-                    }
-                    else Melon<EntryPoint>.Logger.Warning($"Generated texture for Id {objectID} is null");
+                    if (buildObj != null)
+                        buildObj.GetComponentInChildren<RawImage>().texture = result;
                 }
-                else Melon<EntryPoint>.Logger.Warning("Attempting model generation of non-existent object! Skipping ...");
+                else
+                {
+                    bool finished = false;
+
+                    ObjectManager.RequestObject(objectID, previewObj =>
+                    {
+                        if (previewObj?.GameObject != null)
+                        {
+                            Texture2D texture = RuntimePreviewGenerator.GenerateModelPreview(previewObj.GameObject.transform);
+                            if (texture != null)
+                            {
+                                byte[] bytes = texture.EncodeToPNG();
+                                File.WriteAllBytes(filePath, bytes);
+                                BuildObjectsPreview[objectID] = texture;
+
+                                if (buildObj != null)
+                                    buildObj.GetComponentInChildren<RawImage>().texture = texture;
+                            }
+                        }
+                        else
+                        {
+                            EntryPoint.ConsoleInstance.LogWarning($"[SRLE] Failed to generate preview for ID {objectID}");
+                        }
+
+                        finished = true;
+                    });
+
+                    yield return new WaitUntil(() => finished);
+                }
+
+                yield return null; // Yield one frame between loads
             }
 
-            if (previewQueue.Count == 0)
-            {
-                currentlyProcessingPreviews = false;
-                currPreviewEnumerator = null;
-                yield break;
-            }
-            currPreviewEnumerator = MelonCoroutines.Start(LoadPreviewAsync());
-            yield return null;
+            currentlyProcessingPreviews = false;
+            currPreviewEnumerator = null;
         }
 
         public void KillCurrentPreviewQueue()
         {
             if (currPreviewEnumerator != null)
-                MelonCoroutines.Stop(currPreviewEnumerator);
+                this.StopCoroutine(currPreviewEnumerator);
             previewQueue.Clear();
             currentlyProcessingPreviews = false;
         }

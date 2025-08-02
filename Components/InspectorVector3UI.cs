@@ -1,12 +1,11 @@
-﻿using System;
+using System;
 using System.Globalization;
-using MelonLoader;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace SRLE.Components
 {
-    [RegisterTypeInIl2Cpp]
     public class InspectorVector3UI : InspectorBase
     {
         private Text Label;
@@ -26,9 +25,9 @@ namespace SRLE.Components
             YInput = transform.Find("YInput").GetComponent<InputField>();
             ZInput = transform.Find("ZInput").GetComponent<InputField>();
             
-            XInput.onEndEdit.AddListener(new Action<string>(OnValueChanged));
-            YInput.onEndEdit.AddListener(new Action<string>(OnValueChanged));
-            ZInput.onEndEdit.AddListener(new Action<string>(OnValueChanged));
+            XInput.onEndEdit.AddListener(new UnityAction<string>(OnValueChanged));
+            YInput.onEndEdit.AddListener(new UnityAction<string>(OnValueChanged));
+            ZInput.onEndEdit.AddListener(new UnityAction<string>(OnValueChanged));
         }
 
         private void Update()

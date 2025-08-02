@@ -1,377 +1,184 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <OutputType>Library</OutputType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <LangVersion>preview</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<DebugType>embedded</DebugType>
-	<Nullable>disable</Nullable>
-	<UserSecretsId>34473185-8b32-4be7-959d-7d69c367dc79</UserSecretsId>
-	<RunPostBuildEvent>Always</RunPostBuildEvent>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Persistance\BuildObjectV01.cs" />
-    <Compile Remove="Persistance\BuildObjectV02.cs" />
-    <Compile Remove="Persistance\BuildObjectV03.cs" />
-    <Compile Remove="Persistance\BuildObjectV04.cs" />
-    <Compile Remove="Persistance\StringV01.cs" />
-    <Compile Remove="Persistance\WorldV01.cs" />
-    <Compile Remove="RuntimeGizmoOld\**" />
-    <Compile Remove="RuntimeGizmoOlder\**" />
-    <Compile Remove="Unity\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\net6\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2Cppcom.rlabrecque.steamworks.net">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2Cppcom.rlabrecque.steamworks.net.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppDOTween">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppDOTween.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppFebucci.TextAnimator.Demo.Runtime">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppFebucci.TextAnimator.Demo.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppFebucci.TextAnimator.Runtime">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppFebucci.TextAnimator.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppInterop.Common">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppInterop.Generator">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\net6\Il2CppInterop.Generator.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppInterop.Runtime">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppMono.Security">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppMono.Security.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2Cppmscorlib">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppPlayFab">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppPlayFab.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppSystem">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppSystem.Configuration">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppSystem.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppSystem.Core">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppSystem.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppSystem.Data">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppSystem.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppSystem.Numerics">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppSystem.Numerics.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppSystem.Runtime.Serialization">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppSystem.Runtime.Serialization.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppSystem.Xml">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppSystem.Xml.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppSystem.Xml.Linq">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppSystem.Xml.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppXGamingRuntime">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Il2CppXGamingRuntime.dll</HintPath>
-    </Reference>
-    <Reference Include="MelonLoader">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\net6\MelonLoader.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Json">
-      <HintPath>..\..\..\..\..\home\komik\.local\share\Steam\steamapps\common\Slime Rancher 2\MelonLoader\net6\System.Text.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.Animation.Runtime">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.2D.Animation.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Addressables">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.Addressables.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Burst">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.Burst.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Burst.Unsafe">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.Burst.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.InputSystem">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.InputSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.InternalAPIEngineBridge.001">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.InternalAPIEngineBridge.001.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Localization">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.Localization.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Mathematics">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.Mathematics.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Polybrush">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.Polybrush.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.Runtime">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.HighDefinition.Config.Runtime">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.RenderPipelines.HighDefinition.Config.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.ResourceManager">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.ResourceManager.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Timeline">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.Timeline.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualEffectGraph.Runtime">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\Unity.VisualEffectGraph.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AccessibilityModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.AccessibilityModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AIModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.AIModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AndroidJNIModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.AndroidJNIModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.AnimationModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ARModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.ARModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.AssetBundleModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AudioModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.AudioModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ClothModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.ClothModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ClusterInputModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.ClusterInputModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ClusterRendererModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.ClusterRendererModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CrashReportingModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.CrashReportingModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.DirectorModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.DirectorModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.DSPGraphModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.DSPGraphModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.GameCenterModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.GameCenterModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.GIModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.GIModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.GridModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.GridModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.HotReloadModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.HotReloadModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.ImageConversionModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.InputModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.InputModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.JSONSerializeModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.JSONSerializeModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.LocalizationModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.LocalizationModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.NVIDIAModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.NVIDIAModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.ParticleSystemModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.PerformanceReportingModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.PerformanceReportingModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Physics2DModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.Physics2DModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.PhysicsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ProfilerModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.ProfilerModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ScreenCaptureModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.ScreenCaptureModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.SharedInternalsModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.SharedInternalsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.SpriteMaskModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.SpriteMaskModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.SpriteShapeModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.SpriteShapeModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.StreamingModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.StreamingModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.SubstanceModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.SubstanceModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.SubsystemsModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.SubsystemsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TerrainModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.TerrainModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TerrainPhysicsModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.TerrainPhysicsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TextCoreFontEngineModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TextCoreTextEngineModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.TextCoreTextEngineModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.TextRenderingModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TilemapModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.TilemapModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TLSModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.TLSModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIElementsModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UIElementsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIElementsNativeModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UIElementsNativeModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UIModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UmbraModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UmbraModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UNETModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UNETModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UnityAnalyticsModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UnityAnalyticsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UnityConnectModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UnityConnectModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UnityCurlModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UnityCurlModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UnityTestProtocolModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UnityTestProtocolModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestAudioModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestTextureModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestWWWModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.VehiclesModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.VehiclesModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.VFXModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.VFXModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.VideoModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.VideoModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.VirtualTexturingModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.VirtualTexturingModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.VRModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.VRModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.WindModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.WindModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.XRModule">
-      <HintPath>/home/komik/.local/share/Steam/steamapps\common\Slime Rancher 2\MelonLoader\Il2CppAssemblies\UnityEngine.XRModule.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="RuntimeGizmoTest\**" />
-    <None Remove="RuntimeGizmoOld\**" />
-    <None Remove="RuntimeGizmoOlder\**" />
-    <None Remove="Unity\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Remove="RuntimeGizmoOld\**" />
-    <EmbeddedResource Remove="RuntimeGizmoOlder\**" />
-    <EmbeddedResource Remove="Unity\**" />
-    <None Remove="BuildObjects.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\SRLEInUnity\Assets\AssetBundles\srle">
-      <Link>srle</Link>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\SRLEInUnity\Assets\AssetBundles\srlemeshes">
-      <Link>srlemeshes</Link>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\..\..\..\..\home\komik\.local\share\Steam\steamapps\common\Slime Rancher 2\BuildObjects.json">
-      <Link>BuildObjects.json</Link>
-    </EmbeddedResource>
-  </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cp &quot;/HDD/Modding/SlimeRancher/SR2/SRLE/bin/Debug/net6.0/SRLE.dll&quot; &quot;/home/komik/.local/share/Steam/steamapps/common/Slime Rancher 2/Mods/&quot;" />
-  </Target>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.props" Condition="Exists('packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.props')" />
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{F2ABB6F8-2A4D-4906-8D74-790E5169F960}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>SRLE</RootNamespace>
+        <AssemblyName>SRLE</AssemblyName>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+        <LangVersion>9</LangVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <ItemGroup>
+        <Publicize Include="Assembly-CSharp" IncludeCompilerGeneratedMembers="false" />
+        <Reference Include="0Harmony">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SRML\Libs\0Harmony.dll</HintPath>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\Assembly-CSharp.dll</HintPath>
+        </Reference>
+        <Reference Include="Newtonsoft.Json">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SRML\Libs\Newtonsoft.Json.dll</HintPath>
+        </Reference>
+        <Reference Include="SRML">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\SRML.dll</HintPath>
+        </Reference>
+        <Reference Include="System" />
+        <Reference Include="System.Core" />
+        <Reference Include="System.Data" />
+        <Reference Include="System.Xml" />
+        <Reference Include="Unity.TextMeshPro">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.AssetBundleModule">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.IMGUIModule">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.InputLegacyModule">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.InputModule">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\UnityEngine.InputModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.PhysicsModule">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\UnityEngine.UI.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UIModule">
+          <HintPath>..\..\..\..\..\..\home\ati\.local\share\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="AssetManager.cs" />
+        <Compile Include="Commands\ConvertBetterBuildCommand.cs" />
+        <Compile Include="Commands\DisableOcclusionCommand.cs" />
+        <Compile Include="Components\BuildObject.cs" />
+        <Compile Include="Components\HierarchyUI.cs" />
+        <Compile Include="Components\InspectorBase.cs" />
+        <Compile Include="Components\InspectorInput.cs" />
+        <Compile Include="Components\InspectorUI.cs" />
+        <Compile Include="Components\InspectorVector3UI.cs" />
+        <Compile Include="Components\MainMenuUIs\LevelSummaryEntry.cs" />
+        <Compile Include="Components\MainMenuUIs\LevelSummaryPanel.cs" />
+        <Compile Include="Components\MainMenuUIs\SRLELoadLevelUI.cs" />
+        <Compile Include="Components\MainMenuUIs\SRLENewLevelUI.cs" />
+        <Compile Include="Components\ObjectHighlight.cs" />
+        <Compile Include="Components\SettingsUI.cs" />
+        <Compile Include="Components\SRLECamera.cs" />
+        <Compile Include="Components\SRLEMod.cs" />
+        <Compile Include="Components\TeleportUI.cs" />
+        <Compile Include="Components\ToolbarUI.cs" />
+        <Compile Include="Components\UIInitializer.cs" />
+        <Compile Include="EntryPoint.cs" />
+        <Compile Include="Extensions.cs" />
+        <Compile Include="LevelManager.cs" />
+        <Compile Include="Models\IdClass.cs" />
+        <Compile Include="Models\LevelData.cs" />
+        <Compile Include="Models\TeleportModel.cs" />
+        <Compile Include="ObjectManager.cs" />
+        <Compile Include="Patches\Patch_AchievementsDirector.cs" />
+        <Compile Include="Patches\Patch_AutoSaveDirector.cs" />
+        <Compile Include="Patches\Patch_Director.cs" />
+        <Compile Include="Patches\Patch_GordoEat.cs" />
+        <Compile Include="Patches\Patch_IdHandler.cs" />
+        <Compile Include="Patches\Patch_Journal.cs" />
+        <Compile Include="Patches\Patch_PauseMenu.cs" />
+        <Compile Include="Patches\Patch_RegionLoader.cs" />
+        <Compile Include="Patches\Patch_SavedGame.cs" />
+        <Compile Include="Patches\Patch_Spawners.cs" />
+        <Compile Include="Patches\Patch_SpawnResource.cs" />
+        <Compile Include="Patches\Patch_TeleportDestination.cs" />
+        <Compile Include="Patches\Patch_WakeUpDestination.cs" />
+        <Compile Include="Patches\SuppressErrors.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="RuntimeGizmo\CopyPasteManager.cs" />
+        <Compile Include="RuntimeGizmo\Helpers\ExtMathf.cs" />
+        <Compile Include="RuntimeGizmo\Helpers\ExtTransform.cs" />
+        <Compile Include="RuntimeGizmo\Helpers\ExtTransformType.cs" />
+        <Compile Include="RuntimeGizmo\Helpers\ExtVector3.cs" />
+        <Compile Include="RuntimeGizmo\Helpers\Geometry.cs" />
+        <Compile Include="RuntimeGizmo\Objects\AxisInfo.cs" />
+        <Compile Include="RuntimeGizmo\Objects\AxisVectors.cs" />
+        <Compile Include="RuntimeGizmo\Objects\Commands\PasteCommand.cs" />
+        <Compile Include="RuntimeGizmo\Objects\Commands\SelectCommand.cs" />
+        <Compile Include="RuntimeGizmo\Objects\Commands\TransformCommand.cs" />
+        <Compile Include="RuntimeGizmo\Objects\Enums.cs" />
+        <Compile Include="RuntimeGizmo\Objects\IntersectPoints.cs" />
+        <Compile Include="RuntimeGizmo\Objects\Square.cs" />
+        <Compile Include="RuntimeGizmo\Objects\TargetInfo.cs" />
+        <Compile Include="RuntimeGizmo\TransformGizmo.cs" />
+        <Compile Include="RuntimeGizmo\UndoRedo\CommandGroup.cs" />
+        <Compile Include="RuntimeGizmo\UndoRedo\DropoutStack.cs" />
+        <Compile Include="RuntimeGizmo\UndoRedo\ICommand.cs" />
+        <Compile Include="RuntimeGizmo\UndoRedo\UndoRedo.cs" />
+        <Compile Include="RuntimeGizmo\UndoRedo\UndoRedoManager.cs" />
+        <Compile Include="SaveManager.cs" />
+        <Compile Include="SRLEConverter.cs" />
+        <Compile Include="Utils\RuntimePreviewGenerator.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="..\..\SR2\SRLEInUnity\Assets\AssetBundles\srleinbuilt">
+        <Link>srleinbuilt</Link>
+      </EmbeddedResource>
+      <EmbeddedResource Include="modinfo.json" />
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="..\..\SR2\SRLEInUnity\Assets\AssetBundles\srle">
+        <Link>srle</Link>
+      </EmbeddedResource>
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="packages.config" />
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+      <PropertyGroup>
+        <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+      </PropertyGroup>
+      <Error Condition="!Exists('packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.props'))" />
+      <Error Condition="!Exists('packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets'))" />
+    </Target>
+    <Import Project="packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets" Condition="Exists('packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets')" />
+    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+         Other similar extension points exist, see Microsoft.Common.targets.
+    <Target Name="BeforeBuild">
+    </Target>
+    <Target Name="AfterBuild">
+    </Target>
+    -->
+
 </Project>

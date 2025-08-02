@@ -2,22 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Il2CppMonomiPark.SlimeRancher;
-using Il2CppMonomiPark.SlimeRancher.DataModel;
-using Il2CppMonomiPark.SlimeRancher.Util.Extensions;
-using MelonLoader;
 using SRLE.Components;
 using SRLE.RuntimeGizmo.Helpers;
 using SRLE.RuntimeGizmo.Objects;
 using SRLE.RuntimeGizmo.Objects.Commands;
 using SRLE.RuntimeGizmo.UndoRedo;
-using SRLE.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
-using InputManager = SRLE.Utils.InputManager;
 using Object = UnityEngine.Object;
 
 namespace SRLE.RuntimeGizmo
@@ -26,7 +18,6 @@ namespace SRLE.RuntimeGizmo
 	//you should call ClearTargets before doing so just to be sure nothing unexpected happens... as well as call UndoRedoManager.Clear()
 	//For example, if you select an object that has children, move the children elsewhere, deselect the original object, then try to add those old children to the selection, I think it wont work.
 
-	[RegisterTypeInIl2Cpp(false)]
 	public class TransformGizmo : MonoBehaviour
 	{
 		public TransformSpace space = TransformSpace.Global;
@@ -34,21 +25,21 @@ namespace SRLE.RuntimeGizmo
 		public ScaleType scaleType = ScaleType.FromPoint;
 
 		//These are the same as the unity editor hotkeys
-		public Key SetMoveType = Key.Digit1;
-		public Key SetRotateType = Key.Digit2;
-		public Key SetScaleType = Key.Digit3;
+		public KeyCode SetMoveType = KeyCode.Alpha1;
+		public KeyCode SetRotateType = KeyCode.Alpha2;
+		public KeyCode SetScaleType = KeyCode.Alpha3;
 		//public KeyCode SetRectToolType = KeyCode.T;
-		public Key SetAllTransformType = Key.Digit4;
-		public Key SetSpaceToggle = Key.X;
-		public Key SetCenterTypeToggle = Key.C;
-		public Key SetScaleTypeToggle = Key.S;
-		public Key translationSnapping = Key.LeftCtrl;
-		public Key AddSelection = Key.LeftShift;
-		public Key RemoveSelection = Key.LeftCtrl;
-		public Key ActionKey = Key.LeftShift; //Its set to shift instead of control so that while in the editor we dont accidentally undo editor changes =/
-		public Key UndoAction = Key.Z;
-		public Key RedoAction = Key.Y;
-		public Key PasteAction = Key.V;
+		public KeyCode SetAllTransformType = KeyCode.Alpha4;
+		public KeyCode SetSpaceToggle = KeyCode.X;
+		public KeyCode SetCenterTypeToggle = KeyCode.C;
+		public KeyCode SetScaleTypeToggle = KeyCode.S;
+		public KeyCode translationSnapping = KeyCode.LeftControl;
+		public KeyCode AddSelection = KeyCode.LeftShift;
+		public KeyCode RemoveSelection = KeyCode.LeftControl;
+		public KeyCode ActionKey = KeyCode.LeftShift; //Its set to shift instead of control so that while in the editor we dont accidentally undo editor changes =/
+		public KeyCode UndoAction = KeyCode.Z;
+		public KeyCode RedoAction = KeyCode.Y;
+		public KeyCode PasteAction = KeyCode.V;
 		public Color xColor = new Color(1, 0, 0, 0.8f);
 		public Color yColor = new Color(0, 1, 0, 0.8f);
 		public Color zColor = new Color(0, 0, 1, 0.8f);
@@ -112,7 +103,7 @@ namespace SRLE.RuntimeGizmo
 		private Vector3 pivotPoint {get; set;}
 		private Vector3 totalCenterPivotPoint;
 
-		public Transform mainTargetRoot => (targetRootsOrdered.Count > 0) ? (useFirstSelectedAsMain) ? targetRootsOrdered[0] : targetRootsOrdered[^1] : null;
+		public Transform mainTargetRoot => (targetRootsOrdered.Count > 0) ? (useFirstSelectedAsMain) ? targetRootsOrdered[0] : targetRootsOrdered[targetRootsOrdered.Count - 1] : null;
 
 		private AxisInfo axisInfo;
 		public Axis nearAxis = Axis.None;
@@ -142,7 +133,7 @@ namespace SRLE.RuntimeGizmo
 		List<Transform> childrenBuffer = new List<Transform>();
 
 		WaitForEndOfFrame waitForEndOFFrame = new WaitForEndOfFrame();
-		object forceUpdatePivotCoroutine;
+		Coroutine forceUpdatePivotCoroutine;
 
 		static Material lineMaterial;
 
@@ -151,22 +142,16 @@ namespace SRLE.RuntimeGizmo
 			myCamera = GetComponent<Camera>();
 			lineMaterial = AssetManager.Lines;
 		}
-		private void RenderPipelineManager_endFrameRendering(ScriptableRenderContext context, Il2CppReferenceArray<Camera> il2CppReferenceArray)
-		{
-			OnPostRender();
-		}
 
 		void OnEnable()
 		{
-			RenderPipelineManager.endFrameRendering += new Action<ScriptableRenderContext, Il2CppReferenceArray<Camera>>(RenderPipelineManager_endFrameRendering);
-			forceUpdatePivotCoroutine = MelonCoroutines.Start(ForceUpdatePivotPointAtEndOfFrame());
+			forceUpdatePivotCoroutine = StartCoroutine(ForceUpdatePivotPointAtEndOfFrame());
 		}
 
 		void OnDisable()
 		{
 			ClearTargets();
-			RenderPipelineManager.endFrameRendering -= new Action<ScriptableRenderContext, Il2CppReferenceArray<Camera>>(RenderPipelineManager_endFrameRendering);
-			MelonCoroutines.Stop(forceUpdatePivotCoroutine);
+			StopCoroutine(forceUpdatePivotCoroutine);
 		}
 
 		void OnDestroy()
@@ -282,13 +267,13 @@ namespace SRLE.RuntimeGizmo
 		{
 			if(maxUndoStored != UndoRedoManager.maxUndoStored) { UndoRedoManager.maxUndoStored = maxUndoStored; }
 
-			if(InputManager.GetKey(ActionKey))
+			if(Input.GetKey(ActionKey))
 			{
-				if(InputManager.GetKeyDown(UndoAction))
+				if(Input.GetKeyDown(UndoAction))
 				{
 					UndoRedoManager.Undo();
 				}
-				else if(InputManager.GetKeyDown(RedoAction))
+				else if(Input.GetKeyDown(RedoAction))
 				{
 					UndoRedoManager.Redo();
 				}
@@ -297,9 +282,9 @@ namespace SRLE.RuntimeGizmo
 
 		public void HandleCopyPaste()
 		{
-			if(InputManager.GetKey(ActionKey))
+			if(Input.GetKey(ActionKey))
 			{
-				if(InputManager.GetKeyDown(PasteAction))
+				if(Input.GetKeyDown(PasteAction))
 				{ 
 					CopyPasteManager.Paste();
 				}
@@ -307,7 +292,7 @@ namespace SRLE.RuntimeGizmo
 		}
 		public void HandleDelete()
 		{
-			if(InputManager.GetKeyDown(Key.Delete))
+			if(Input.GetKeyDown(KeyCode.Delete))
 			{ 
 				ObjectManager.RemoveObject(mainTargetRoot.gameObject);
 			}
@@ -352,25 +337,25 @@ namespace SRLE.RuntimeGizmo
 
 		void SetSpaceAndType()
 		{
-			if(InputManager.GetKey(ActionKey)) return;
+			if(Input.GetKey(ActionKey)) return;
 
-			if(InputManager.GetKeyDown(SetMoveType)) transformType = TransformType.Move;
-			else if(InputManager.GetKeyDown(SetRotateType)) transformType = TransformType.Rotate;
-			else if(InputManager.GetKeyDown(SetScaleType)) transformType = TransformType.Scale;
+			if(Input.GetKeyDown(SetMoveType)) transformType = TransformType.Move;
+			else if(Input.GetKeyDown(SetRotateType)) transformType = TransformType.Rotate;
+			else if(Input.GetKeyDown(SetScaleType)) transformType = TransformType.Scale;
 			//else if(Input.GetKeyDown(SetRectToolType)) type = TransformType.RectTool;
-			else if(InputManager.GetKeyDown(SetAllTransformType)) transformType = TransformType.All;
+			else if(Input.GetKeyDown(SetAllTransformType)) transformType = TransformType.All;
 
 			if(!isTransforming) translatingType = transformType;
 			SetPivotPoint();
 
 
-			if(InputManager.GetKeyDown(SetSpaceToggle))
+			if(Input.GetKeyDown(SetSpaceToggle))
 			{
 				if(space == TransformSpace.Global) space = TransformSpace.Local;
 				else if(space == TransformSpace.Local) space = TransformSpace.Global;
 			}
 
-			if(InputManager.GetKeyDown(SetScaleTypeToggle))
+			if(Input.GetKeyDown(SetScaleTypeToggle))
 			{
 				if(scaleType == ScaleType.FromPoint) scaleType = ScaleType.FromPointOffset;
 				else if(scaleType == ScaleType.FromPointOffset) scaleType = ScaleType.FromPoint;
@@ -382,9 +367,9 @@ namespace SRLE.RuntimeGizmo
 		{
 			if(mainTargetRoot != null)
 			{
-				if(nearAxis != Axis.None && InputManager.GetMouseButtonDown(0))
+				if(nearAxis != Axis.None && Input.GetMouseButtonDown(0))
 				{
-					MelonCoroutines.Start(TransformSelected(translatingType));
+					StartCoroutine(TransformSelected(translatingType));
 				}
 			}
 		}
@@ -413,11 +398,11 @@ namespace SRLE.RuntimeGizmo
 				transformCommands.Add(new TransformCommand(this, targetRootsOrdered[i]));
 			}
 
-			while(!InputManager.GetMouseButtonUp(0))
+			while(!Input.GetMouseButtonUp(0))
 			{
-				Ray mouseRay = myCamera.ScreenPointToRay(InputManager.MousePosition);
+				Ray mouseRay = myCamera.ScreenPointToRay(Input.mousePosition);
 				Vector3 mousePosition = Geometry.LinePlaneIntersect(mouseRay.origin, mouseRay.direction, originalPivot, planeNormal);
-				bool isSnapping = InputManager.GetKey(translationSnapping);
+				bool isSnapping = Input.GetKey(translationSnapping);
 
 				if(previousMousePosition != Vector3.zero && mousePosition != Vector3.zero)
 				{
@@ -530,13 +515,12 @@ namespace SRLE.RuntimeGizmo
 					
 					else if(transType == TransformType.Rotate)
 					{
-						var vector2 = Mouse.current.delta.ReadValue();
 						float rotateAmount;
 						Vector3 rotationAxis = axis;
 
 						if(nearAxis == Axis.Any)
 						{
-							Vector3 rotation = transform.TransformDirection(new Vector3(vector2.y, -vector2.x, 0));
+							Vector3 rotation = transform.TransformDirection(new Vector3(Input.GetAxis("Mouse Y"), -Input.GetAxis("Mouse X"), 0));
 							Quaternion.Euler(rotation).ToAngleAxis(out rotateAmount, out rotationAxis);
 							rotateAmount *= allRotateSpeedMultiplier;
 						}else{
@@ -648,13 +632,13 @@ namespace SRLE.RuntimeGizmo
 
 		void GetTarget()
 		{
-			if (nearAxis == Axis.None && InputManager.GetMouseButtonDown(0))
+			if (nearAxis == Axis.None && Input.GetMouseButtonDown(0))
 			{
-				bool isAdding = InputManager.GetKey(AddSelection);
-				bool isRemoving = InputManager.GetKey(RemoveSelection);
+				bool isAdding = Input.GetKey(AddSelection);
+				bool isRemoving = Input.GetKey(RemoveSelection);
 				if (EventSystem.current.IsPointerOverGameObject())
 					return;
-				if (Physics.Raycast(myCamera.ScreenPointToRay(InputManager.MousePosition), out var hitInfo, Mathf.Infinity, selectionMask) && ObjectManager.GetBuildObject(hitInfo.collider.gameObject, out var buildObject))
+				if (Physics.Raycast(myCamera.ScreenPointToRay(Input.mousePosition), out var hitInfo, Mathf.Infinity, selectionMask) && ObjectManager.GetBuildObject(hitInfo.collider.gameObject, out var buildObject))
 				{
 					Transform target = buildObject.transform;
 					if (isAdding)
@@ -685,7 +669,7 @@ namespace SRLE.RuntimeGizmo
 		{
 			if(target != null)
 			{
-				if(targetRoots.ContainsKeyInIL2CPP(target)) return;
+				if(targetRoots.ContainsKey(target)) return;
 				if(children.Contains(target)) return;
 
 				if(addCommand) UndoRedoManager.Insert(new AddTargetCommand(this, target, targetRootsOrdered)); 
@@ -694,10 +678,6 @@ namespace SRLE.RuntimeGizmo
 				AddTargetHighlightedRenderers(target);
 
 				SetPivotPoint();
-				if (target.SRTryGetComponent(out FloatingRock floatingRock))
-				{
-					floatingRock.enabled = false;
-				}
 				InspectorUI.Instance.SetActive(true);
 			}
 		}
@@ -720,15 +700,6 @@ namespace SRLE.RuntimeGizmo
 				SetPivotPoint();
 
 			}
-
-			foreach (var buildObject in target.transform.GetComponentsInParent<BuildObject>())
-			{
-				if (buildObject.gameObject.SRTryGetComponent(out FloatingRock rock))
-				{
-					rock.initialPosition = target.position;
-					rock.enabled = true;
-				}
-			}
 			
 			InspectorUI.Instance.SetActive(false);
 		}
@@ -738,14 +709,6 @@ namespace SRLE.RuntimeGizmo
 			if(addCommand) UndoRedoManager.Insert(new ClearTargetsCommand(this, targetRootsOrdered));
 
 			ClearAllHighlightedRenderers();
-			foreach (var buildObject in targetRoots.Keys)
-			{
-				if (buildObject.gameObject.SRTryGetComponent(out FloatingRock rock))
-				{
-					rock.initialPosition = buildObject.position;
-					rock.enabled = true;
-				}
-			}
 
 			targetRoots.Clear();
 			targetRootsOrdered.Clear();
@@ -803,7 +766,7 @@ namespace SRLE.RuntimeGizmo
 		{ 
 			if (targetRoots.Remove(targetRoot))
 			{
-				MelonLogger.Msg("Succeed:" + targetRoot.name);
+				EntryPoint.ConsoleInstance.Log("Succeed:" + targetRoot.name);
 				targetRootsOrdered.Remove(targetRoot);
 				RemoveAllChildren(targetRoot);
 			}
@@ -864,8 +827,7 @@ namespace SRLE.RuntimeGizmo
 			pivotPoint += offset;
 			totalCenterPivotPoint += offset;
 		}
-
-
+		
 		IEnumerator ForceUpdatePivotPointAtEndOfFrame()
 		{
 			while(this.enabled)
@@ -980,7 +942,6 @@ namespace SRLE.RuntimeGizmo
 
 			HandleNearest(type, xClosestDistance, yClosestDistance, zClosestDistance, allClosestDistance, minSelectedDistanceCheck);
 		}
-
 		void HandleNearestPlanes(TransformType type, AxisVectors axisVectors, float minSelectedDistanceCheck)
 		{
 			float xClosestDistance = ClosestDistanceFromMouseToPlanes(axisVectors.x);
@@ -999,7 +960,7 @@ namespace SRLE.RuntimeGizmo
 			else if(zClosestDistance <= minSelectedDistanceCheck && zClosestDistance <= xClosestDistance && zClosestDistance <= yClosestDistance) SetTranslatingAxis(type, Axis.Z);
 			else if(type == TransformType.Rotate && mainTargetRoot != null)
 			{
-				Ray mouseRay = myCamera.ScreenPointToRay(InputManager.MousePosition);
+				Ray mouseRay = myCamera.ScreenPointToRay(Input.mousePosition);
 				Vector3 mousePlaneHit = Geometry.LinePlaneIntersect(mouseRay.origin, mouseRay.direction, pivotPoint, (transform.position - pivotPoint).normalized);
 				if((pivotPoint - mousePlaneHit).sqrMagnitude <= (GetHandleLength(TransformType.Rotate)).Squared()) SetTranslatingAxis(type, Axis.Any);
 			}
@@ -1007,7 +968,7 @@ namespace SRLE.RuntimeGizmo
 
 		float ClosestDistanceFromMouseToLines(List<Vector3> lines)
 		{
-			Ray mouseRay = myCamera.ScreenPointToRay(InputManager.MousePosition);
+			Ray mouseRay = myCamera.ScreenPointToRay(Input.mousePosition);
 
 			float closestDistance = float.MaxValue;
 			for(int i = 0; i + 1 < lines.Count; i++)
@@ -1028,7 +989,7 @@ namespace SRLE.RuntimeGizmo
 
 			if(planePoints.Count >= 4)
 			{
-				Ray mouseRay = myCamera.ScreenPointToRay(InputManager.MousePosition);
+				Ray mouseRay = myCamera.ScreenPointToRay(Input.mousePosition);
 
 				for(int i = 0; i < planePoints.Count; i += 4)
 				{
@@ -1200,7 +1161,6 @@ namespace SRLE.RuntimeGizmo
 				AddSquares(pivotPoint - (axisInfo.xDirection * (boxSize * .5f)), axisInfo.xDirection, axisInfo.yDirection, axisInfo.zDirection, boxSize, handleSquares.all);
 			}
 		}
-
 		void AddSquares(Vector3 axisStart, Vector3 axisDirection, Vector3 axisOtherDirection1, Vector3 axisOtherDirection2, float size, List<Vector3> resultsBuffer)
 		{
 			AddQuads(axisStart, axisDirection, axisOtherDirection1, axisOtherDirection2, size, size * .5f, resultsBuffer);
@@ -1233,7 +1193,6 @@ namespace SRLE.RuntimeGizmo
 				resultsBuffer.Add(baseRectangle[i + 1]);
 			}
 		}
-
 		void AddQuad(Vector3 axisStart, Vector3 axisOtherDirection1, Vector3 axisOtherDirection2, float width, List<Vector3> resultsBuffer)
 		{
 			Square baseRectangle = GetBaseSquare(axisStart, axisOtherDirection1, axisOtherDirection2, width);
@@ -1256,7 +1215,6 @@ namespace SRLE.RuntimeGizmo
 			square.topRight = axisEnd - offsetDown;
 			return square;
 		}
-
 		void SetCircles(AxisInfo axisInfo, AxisVectors axisVectors)
 		{
 			axisVectors.Clear();
@@ -1270,7 +1228,6 @@ namespace SRLE.RuntimeGizmo
 				AddCircle(pivotPoint, (pivotPoint - transform.position).normalized, circleLength, axisVectors.all, false);
 			}
 		}
-
 		void AddCircle(Vector3 origin, Vector3 axisDirection, float size, List<Vector3> resultsBuffer, bool depthTest = true)
 		{
 			Vector3 up = axisDirection.normalized * size;
@@ -1316,7 +1273,6 @@ namespace SRLE.RuntimeGizmo
 				lastPoint = nextPoint;
 			}
 		}
-
 		void DrawLines(List<Vector3> lines, Color color)
 		{
 			if(lines.Count == 0) return;
@@ -1332,7 +1288,6 @@ namespace SRLE.RuntimeGizmo
 
 			GL.End();
 		}
-
 		void DrawTriangles(List<Vector3> lines, Color color)
 		{
 			if(lines.Count == 0) return;
@@ -1349,7 +1304,6 @@ namespace SRLE.RuntimeGizmo
 
 			GL.End();
 		}
-
 		void DrawQuads(List<Vector3> lines, Color color)
 		{
 			if(lines.Count == 0) return;
@@ -1366,8 +1320,7 @@ namespace SRLE.RuntimeGizmo
 			}
 
 			GL.End();
-		}
-
+		} 
 		void DrawFilledCircle(List<Vector3> lines, Color color)
 		{
 			if(lines.Count == 0) return;

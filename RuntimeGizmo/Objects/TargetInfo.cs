@@ -1,4 +1,3 @@
-using MelonLoader;
 using UnityEngine;
 
 namespace SRLE.RuntimeGizmo.Objects

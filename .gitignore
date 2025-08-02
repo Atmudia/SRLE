@@ -2,5 +2,6 @@
 /bin/
 /obj/
 /.vs/
+/packages/*
 SRLE.sln.DotSettings.user
 Folder.DotSettings.user

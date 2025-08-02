@@ -1,24 +1,23 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
-using Il2CppMonomiPark.SlimeRancher.SceneManagement;
-using Il2CppTMPro;
-using MelonLoader;
+using MonomiPark.SlimeRancher.Regions;
+using Newtonsoft.Json;
 using SRLE.Models;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace SRLE.Components
 {
-    [RegisterTypeInIl2Cpp]
     public class TeleportUI : MonoBehaviour
     {
         private GameObject m_GameObject;
         private List<TeleportModel> m_TeleportModels;
         private ScrollRect m_CategoryScroll;
-        private TMP_InputField m_NameInput;
+        private InputField m_NameInput;
 
         public bool IsOpen => m_GameObject.activeSelf;
 
@@ -29,13 +28,13 @@ namespace SRLE.Components
             Instance = this;
             m_GameObject = transform.Find("Teleports").gameObject;
             m_CategoryScroll = transform.Find("Teleports/CategoryScroll").GetComponent<ScrollRect>();
-            m_NameInput = transform.Find("Teleports/NameInput").GetComponent<TMP_InputField>();
+            m_NameInput = transform.Find("Teleports/NameInput").GetComponent<InputField>();
             var addButton = transform.Find("Teleports/AddButton").GetComponent<Button>();
 
             LoadTeleportModels();
             InitializeCategoryButtons();
 
-            addButton.onClick.AddListener(new Action(OnAddTeleport));
+            addButton.onClick.AddListener(OnAddTeleport);
             Close();
         }
 
@@ -45,7 +44,7 @@ namespace SRLE.Components
 
             if (File.Exists(filePath))
             {
-                m_TeleportModels = JsonSerializer.Deserialize<List<TeleportModel>>(File.ReadAllText(filePath));
+                m_TeleportModels = JsonConvert.DeserializeObject<List<TeleportModel>>(File.ReadAllText(filePath));
             }
             else
             {
@@ -55,83 +54,67 @@ namespace SRLE.Components
 
         private void InitializeDefaultTeleportModels()
         {
-            // string jsonData = """
-            //                   [
-            //                                   {"Name":"Ranch","PositionX":541.9353,"PositionY":20.62804,"PositionZ":349.61053,"RotationX":2.5,"RotationY":231.5,"RotationZ":0.0,"Region":"SceneGroup.ConservatoryFields"},
-            //                                   {"Name":"Starlight Strand","PositionX":-4.2704897,"PositionY":15.532708,"PositionZ":-122.46755,"RotationX":1.0000001,"RotationY":155.00003,"RotationZ":-2.6684488E-08,"Region":"SceneGroup.LuminousStrand"},
-            //                                   {"Name":"Ember Valley","PositionX":-212.91,"PositionY":19.0,"PositionZ":468.7,"RotationX":0.0,"RotationY":-135.0,"RotationZ":0.0,"Region":"SceneGroup.RumblingGorge"},
-            //                                   {"Name":"Powderfall Bluffs","PositionX":-710.1747,"PositionY":6.5834,"PositionZ":1357.909,"RotationX":342.048,"RotationY":30.624,"RotationZ":0.0,"Region":"SceneGroup.PowderfallBluffs"},
-            //                                   {"Name":"Labyrinth","PositionX":1432.718,"PositionY":79.9886,"PositionZ":-1185.905,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"Region":"SceneGroup.Labyrinth"}
-            //                               ]
-            //                   """;
-            m_TeleportModels =
-            [
+            m_TeleportModels = new List<TeleportModel>
+            {
                 new TeleportModel
                 {
-                    Name = "Ranch",
-                    PositionX = 541.9353f,
-                    PositionY = 20.62804f,
-                    PositionZ = 349.61053f,
-                    RotationX = 2.5f,
-                    RotationY = 231.5f,
-                    RotationZ = 0.0f,
-                    Region = "SceneGroup.ConservatoryFields"
-                },
-
-                new TeleportModel
-                {
-                    Name = "Starlight Strand",
-                    PositionX = -4.2704897f,
-                    PositionY = 15.532708f,
-                    PositionZ = -122.46755f,
-                    RotationX = 1.0000001f,
-                    RotationY = 155.00003f,
-                    RotationZ = -2.6684488E-08f,
-                    Region = "SceneGroup.LuminousStrand"
-                },
-
-                new TeleportModel
-                {
-                    Name = "Ember Valley",
-                    PositionX = -212.91f,
-                    PositionY = 19.0f,
-                    PositionZ = 468.7f,
+                    Name = "Ranch Home",
+                    PositionX = 52.8f,
+                    PositionY = 16.3f,
+                    PositionZ = -132.7f,
                     RotationX = 0.0f,
-                    RotationY = -135.0f,
+                    RotationY = 102.6f,
                     RotationZ = 0.0f,
-                    Region = "SceneGroup.RumblingGorge"
+                    RegionSet = RegionRegistry.RegionSetId.HOME
                 },
-
                 new TeleportModel
                 {
-                    Name = "Powderfall Bluffs",
-                    PositionX = -710.1747f,
-                    PositionY = 6.5834f,
-                    PositionZ = 1357.909f,
-                    RotationX = 342.048f,
-                    RotationY = 30.624f,
-                    RotationZ = 0.0f,
-                    Region = "SceneGroup.PowderfallBluffs"
-                },
-
-                new TeleportModel
-                {
-                    Name = "Labyrinth",
-                    PositionX = 1432.718f,
-                    PositionY = 79.9886f,
-                    PositionZ = -1185.905f,
+                    Name = "Desert Temple",
+                    PositionX = 119.9f,
+                    PositionY = 1077.4f,
+                    PositionZ = 917.5f,
                     RotationX = 0.0f,
                     RotationY = 0.0f,
                     RotationZ = 0.0f,
-                    Region = "SceneGroup.Labyrinth"
+                    RegionSet = RegionRegistry.RegionSetId.DESERT
+                },
+                new TeleportModel
+                {
+                    Name = "Slimulations",
+                    PositionX = 1052.1f,
+                    PositionY = 14.4f,
+                    PositionZ = 824.0f,
+                    RotationX = 0.0f,
+                    RotationY = 315.0f,
+                    RotationZ = 0.0f,
+                    RegionSet = RegionRegistry.RegionSetId.SLIMULATIONS
+                },
+                new TeleportModel
+                {
+                    Name = "Nimble 1",
+                    PositionX = -768.5f,
+                    PositionY = 7.5f,
+                    PositionZ = -841.3f,
+                    RotationX = 0.0f,
+                    RotationY = 44.9f,
+                    RotationZ = 0.0f,
+                    RegionSet = RegionRegistry.RegionSetId.VALLEY
+                },
+                new TeleportModel
+                {
+                    Name = "Nimble 2",
+                    PositionX = -189.8f,
+                    PositionY = 11.1f,
+                    PositionZ = -1008.4f,
+                    RotationX = 0.0f,
+                    RotationY = 273.6f,
+                    RotationZ = 0.0f,
+                    RegionSet = RegionRegistry.RegionSetId.VALLEY
                 }
+            };
 
-            ];
 
-            File.WriteAllText(Path.Combine(SaveManager.DataPath, "tp.txt"), JsonSerializer.Serialize(m_TeleportModels.ToArray(), new JsonSerializerOptions()
-            {
-                WriteIndented = true
-            }));
+            File.WriteAllText(Path.Combine(SaveManager.DataPath, "tp.txt"), JsonConvert.SerializeObject(m_TeleportModels, Formatting.Indented));
         }
 
         private void InitializeCategoryButtons()
@@ -146,28 +129,15 @@ namespace SRLE.Components
         {
             GameObject categoryObj = Instantiate(AssetManager.CategoryButtonPrefab, m_CategoryScroll.content, false);
             string categoryName = model.Name;
-
-
-            var sceneGroups = SRSingleton<SystemContext>.Instance.SceneLoader.SceneGroupList.GameplaySceneGroups.Cast<Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<SceneGroup>>();
-
-            foreach (var group in sceneGroups)
-            {
-                if (group.ReferenceId == model.Region)
-                {
-                    categoryObj.GetComponentInChildren<Button>().onClick.AddListener(new Action(() =>  TeleportTo(group, new Vector3(model.PositionX, model.PositionY, model.PositionZ), new Vector3(model.RotationX, model.RotationY, model.RotationZ))));
-                    categoryObj.GetComponentInChildren<Text>().text = categoryName;
-                    return;
-                }
-            }
-
-            Debug.LogError($"Scene group not found for teleport model {model.Name}");
-            Destroy(categoryObj);
+            categoryObj.GetComponentInChildren<Button>().onClick.AddListener(new UnityAction(() =>  TeleportTo(model.RegionSet, new Vector3(model.PositionX, model.PositionY, model.PositionZ), new Vector3(model.RotationX, model.RotationY, model.RotationZ))));
+            categoryObj.GetComponentInChildren<Text>().text = categoryName;
         }
 
         private void OnAddTeleport()
         {
-            string name = string.IsNullOrEmpty(m_NameInput.text) ? SRSingleton<SceneContext>.Instance.RegionRegistry.CurrentSceneGroup.name + " Teleport" : m_NameInput.text;
+            string name = string.IsNullOrEmpty(m_NameInput.text) ? SRSingleton<SceneContext>.Instance.RegionRegistry.GetCurrentRegionSetId() + " Teleport" : m_NameInput.text;
 
+            EntryPoint.ConsoleInstance.Log(SRLECamera.Instance.transform.position);
             var model = new TeleportModel
             {
                 Name = name,
@@ -177,7 +147,7 @@ namespace SRLE.Components
                 RotationX = SRLECamera.Instance.transform.eulerAngles.x,
                 RotationY = SRLECamera.Instance.transform.eulerAngles.y,
                 RotationZ = SRLECamera.Instance.transform.eulerAngles.z,
-                Region = SRSingleton<SceneContext>.Instance.RegionRegistry.CurrentSceneGroup.ReferenceId
+                RegionSet = SRSingleton<SceneContext>.Instance.RegionRegistry.GetCurrentRegionSetId()
             };
 
             CreateCategoryButton(model);
@@ -185,17 +155,15 @@ namespace SRLE.Components
             m_NameInput.text = "";
 
             m_TeleportModels.Add(model);
-            File.WriteAllText(Path.Combine(SaveManager.DataPath, "tp.txt"), JsonSerializer.Serialize(m_TeleportModels, new JsonSerializerOptions()
-            {
-                WriteIndented = true
-            }));
+            File.WriteAllText(Path.Combine(SaveManager.DataPath, "tp.txt"), JsonConvert.SerializeObject(m_TeleportModels, Formatting.Indented));
         }
 
-        private void TeleportTo(SceneGroup sceneGroup, Vector3 position, Vector3 rotation)
+        private static void TeleportTo(RegionRegistry.RegionSetId regionSetId, Vector3 position, Vector3 rotation)
         {
             SRLECamera.Instance.transform.position = position;
             SRLECamera.Instance.transform.eulerAngles = new Vector3(SRLECamera.Instance.transform.eulerAngles.x, rotation.y, SRLECamera.Instance.transform.eulerAngles.z);
-            SRSingleton<SystemContext>.Instance.SceneLoader.LoadSceneGroup(sceneGroup, new SceneLoadingParameters { TeleportPlayer = false });
+            SRSingleton<SceneContext>.Instance.PlayerState.model.SetCurrRegionSet(regionSetId);
+            
         }
 
         public void Open() => m_GameObject.SetActive(true);

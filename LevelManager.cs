@@ -1,22 +1,22 @@
-﻿using UnityEngine;
+using UnityEngine;
 
-namespace SRLE;
-
-public static class LevelManager
+namespace SRLE
 {
-    public enum Mode
+    public static class LevelManager
     {
-        NONE,
-        TEST,
-        BUILD
-    }
+        public enum Mode
+        {
+            NONE,
+            BUILD
+        }
 
-    public static Mode CurrentMode { get; private set; }
-    public static bool IsLoading = false;
-    public static GameObject SRLEGameObject;
+        public static Mode CurrentMode { get; private set; } = Mode.NONE;
+        public static bool IsLoading = false;
+        public static GameObject SRLEGameObject;
 
-    public static void SetMode(Mode mode)
-    {
-        CurrentMode = mode; 
+        public static void SetMode(Mode mode)
+        {
+            CurrentMode = mode; 
+        }
     }
 }

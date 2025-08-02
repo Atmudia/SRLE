@@ -1,215 +1,204 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Linq;
-using Il2Cpp;
-using Il2CppKinematicCharacterController;
-using Il2CppMonomiPark.SlimeRancher.Input;
-using Il2CppMonomiPark.SlimeRancher.Player.CharacterController;
-using Il2CppMonomiPark.SlimeRancher.UI;
-using Il2CppMonomiPark.SlimeRancher.World.Teleportation;
-using JetBrains.Annotations;
-using MelonLoader;
-using SRLE.Patches;
-// using RuntimeHandle;
-// using SRLE.RuntimeGizmo;
+using SRLE.RuntimeGizmo;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using UnityEngine.Rendering.HighDefinition;
-using UnityEngine.Serialization;
-using InputManager = SRLE.Utils.InputManager;
+using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
-namespace SRLE.Components;
-
-[RegisterTypeInIl2Cpp]
-public class SRLECamera : MonoBehaviour
+namespace SRLE.Components
 {
-    public SRLECamera(IntPtr value) : base(value) { }
-    public static SRLECamera Instance;
-    public Camera camera;
-    public SRCameraController cameraController;
-    public SRCharacterController playerController;
+    public class SRLECamera : MonoBehaviour
+    {
+        public static SRLECamera Instance;
+        public Camera camera;
+        public Camera playerCamera;
+        public Transform vacuumTransform;
+        public vp_FPController playerController;
 
-    public GameObject playerCamera;
-    public CursorLockHandler cursorLockHandler; 
-    public object DestroyDelayedObject;
-    public RuntimeGizmo.TransformGizmo transformGizmo;
-    public InputDirector inputDirector;
+        public vp_FPInput vp_FPInput; 
+        public Coroutine DestroyDelayedObject;
+        public TransformGizmo transformGizmo;
+        public AmbianceDirector ambianceDirector;
+        public vp_FPPlayerEventHandler playerEvents;
 
     
-    public void Awake()
-    {
-        
-        Instance = this;
-        camera = GetComponent<Camera>();
-        cameraController = SRSingleton<SceneContext>.Instance.Camera.GetComponent<SRCameraController>();
-        playerController = SRSingleton<SceneContext>.Instance.Player.GetComponent<SRCharacterController>();
-        
-        playerCamera = GameObject.Find("PlayerCameraKCC");
-        cursorLockHandler = Resources.FindObjectsOfTypeAll<CursorLockHandler>().First();
-        transformGizmo = GetComponent<RuntimeGizmo.TransformGizmo>();
-        inputDirector = SRSingleton<GameContext>.Instance.InputDirector;
-        
-        SRSingleton<SceneContext>.Instance.Player.transform.Find("GadgetModeOverlay").GetComponent<CustomPassVolume>().enabled = false;
-        
-    }
-
-    public void OnEnable()
-    {
-        // return;
-        SRSingleton<HudUI>.Instance.gameObject.SetActive(false);
-
-        transform.position = cameraController.Position;
-        transform.rotation =  cameraController.Rotation;
-        playerController.BypassGravity = true;
-        playerController.ResetVelocity(false);;
-        playerController.enabled = false;
-        playerCamera.SetActive(false);
-        foreach (var o in playerController.transform)
+        public void Awake()
         {
-            o.Cast<Transform>().gameObject.SetActive(false);
+            Instance = this;
+            camera = GetComponent<Camera>();
+            vp_FPInput = Object.FindObjectOfType<vp_FPInput>();
+            var player = SRSingleton<SceneContext>.Instance.Player;
+            playerController = player.GetComponent<vp_FPController>();
+            playerCamera = player.GetComponentInChildren<Camera>();
+            playerEvents = player.GetComponentInChildren<vp_FPPlayerEventHandler>();
+            camera.CopyFrom(playerCamera);
+            vacuumTransform = player.GetComponentInChildren<WeaponVacuum>().transform;
+            transformGizmo = this.GetComponent<TransformGizmo>();
+            ambianceDirector = SRSingleton<SceneContext>.Instance.AmbianceDirector;
+
         }
-        camera.tag = "MainCamera";
-        DestroyDelayedObject = MelonCoroutines.Start(DestroyDelayed());
 
-    }
-
-    public void OnDisable()
-    {
-        if (!SRSingleton<HudUI>.Instance) return;
-        SRSingleton<HudUI>.Instance.gameObject.SetActive(true);
-        playerController.Position = transform.position;
-        playerController.Rotation = transform.rotation;
-        cursorLockHandler.SetEnableCursor(false);
-        playerCamera.SetActive(true);
-        foreach (var o in playerController.transform)
+        public void OnEnable()
         {
-            o.Cast<Transform>().gameObject.SetActive(true);
-        }
-        MelonCoroutines.Stop(DestroyDelayedObject);
-        // inputDirector._mainGame._asset.Enable();
-        // inputDirector._paused._asset.Disable();
-        playerController.BypassGravity = false;
-        playerController.enabled = true;
-
-        /*foreach (var rootGameObjects in SRLEConverterUtils.GetAllScenes().Where(x => !x.name.EndsWith("Core")).SelectMany(x => x.GetRootGameObjects()))
-        {
-            foreach (var directedActorSpawner in rootGameObjects.GetComponentsInChildren<DirectedActorSpawner>())
+            // return;
+            SRSingleton<HudUI>.Instance.gameObject.SetActive(false);
+            playerCamera.enabled = false;
+            transform.position = playerController.transform.position;
+            transform.rotation =  playerController.transform.rotation;
+            playerController.enabled = false;
+            playerController.MotorFreeFly = true;
+            foreach (Transform o in playerController.transform.GetChild(0))
+            {
+                o.gameObject.SetActive(false);
+            }
+            
+            camera.tag = "MainCamera";
+            DestroyDelayedObject = this.StartCoroutine(DestroyDelayed());
+            SRSingleton<SceneContext>.Instance.TimeDirector.EnableCursor(vp_FPInput);
+            foreach (var directedActorSpawner in Object.FindObjectsOfType<DirectedActorSpawner>())
             {
                 directedActorSpawner.enabled = !directedActorSpawner.enabled;
             }
+
+            playerController.GetComponent<UIDetector>().enabled = false;
+            ambianceDirector.ExitAllLiquid();
+            playerEvents.Underwater.TryStop();
+
+
         }
-        */
-    }
 
-    public void SetActive(bool setActive)
-    {
-        gameObject.SetActive(setActive);
-    }
-
-    private IEnumerator DestroyDelayed()
-    {
-        while (gameObject.activeSelf)
+        public void OnDisable()
         {
-            foreach (var identifiable in Resources.FindObjectsOfTypeAll<Identifiable>())
+            if (!SRSingleton<HudUI>.Instance) return;
+            SRSingleton<HudUI>.Instance.gameObject.SetActive(true);
+            playerCamera.enabled = true;
+            playerController.SetPosition(transform.position);
+            playerController.transform.rotation =  transform.rotation;
+            SRSingleton<SceneContext>.Instance.TimeDirector.DisableCursor(vp_FPInput);
+            foreach (Transform o in playerController.transform.GetChild(0))
             {
-                if (identifiable.identType == SRSingleton<SceneContext>.Instance.Player.GetComponent<Identifiable>().identType) continue;
-                try
+                o.gameObject.SetActive(true);
+            }
+            this.StopCoroutine(DestroyDelayedObject);
+            playerController.enabled = true;
+            playerController.MotorFreeFly = false;
+            vacuumTransform.localScale = Vector3.one;
+
+
+            foreach (var directedActorSpawner in Object.FindObjectsOfType<DirectedActorSpawner>())
+            {
+                directedActorSpawner.enabled = !directedActorSpawner.enabled;
+            }
+
+            playerController.GetComponent<UIDetector>().enabled = true;
+            ambianceDirector.ExitAllLiquid();
+            playerEvents.Underwater.TryStop();
+
+
+        }
+
+        public void SetActive(bool setActive)
+        {
+            gameObject.SetActive(setActive);
+        }
+
+        private IEnumerator DestroyDelayed()
+        {
+            while (gameObject.activeSelf)
+            {
+                foreach (var identifiable in Resources.FindObjectsOfTypeAll<Identifiable>())
                 {
-                    Destroyer.DestroyActor(identifiable.gameObject, "CameraActivated");
-                }
-                catch
-                {
+                    if (identifiable.id == Identifiable.Id.PLAYER) continue;
+                    try
+                    {
+                        Destroyer.DestroyActor(identifiable.gameObject, "CameraActivated");
+                    }
+                    catch
+                    {
                     
-                    // 
+                        // 
+                    }
                 }
-            }
 
-            foreach (var directedActorSpawner in Resources.FindObjectsOfTypeAll<DirectedSlimeSpawner>() )
+                foreach (var directedActorSpawner in Resources.FindObjectsOfTypeAll<DirectedSlimeSpawner>() )
+                {
+                    var component = directedActorSpawner.GetComponent<Renderer>();
+                    if (component)
+                        component.enabled = true;
+                }
+            
+                yield return new WaitForSeconds(1);
+            }
+        
+        
+        }
+
+        public void Update()
+        {
+            if (Input.GetAxis("Mouse ScrollWheel") > 0f) // forward
             {
-                var component = directedActorSpawner.GetComponent<Renderer>();
-                if (component)
-                    component.enabled = true;
+                speed = Mathf.Clamp(this.speed + 1f, 0.1f, 50f);
+            }
+            else if (Input.GetAxis("Mouse ScrollWheel") < 0f )
+            {
+                speed = Mathf.Clamp(this.speed - 1f, 0.1f, 50f);
             }
             
-            yield return new WaitForSeconds(1);
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+            {
+                transform.position += -transform.right * (speed * Time.deltaTime);
+            }
+
+            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+            {
+                transform.position += transform.right * (speed * Time.deltaTime);
+            }
+
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+            {
+                transform.position += transform.forward * (speed * Time.deltaTime);
+            }
+
+            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+            {
+                transform.position += -transform.forward * (speed * Time.deltaTime);
+            }
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                this.lastRotation = base.transform.eulerAngles.y;
+
+            }
+
+            if (!Input.GetMouseButton(1))
+            {
+                vp_FPInput.MouseCursorForced = true;
+
+            }
+            else
+            {
+                vp_FPInput.MouseCursorForced = false;
+                this.lastRotation += 2f * Input.GetAxis("Mouse X");
+                this.rotation -= 2f * Input.GetAxis("Mouse Y");
+                this.rotation = Mathf.Clamp(this.rotation, -90f, 90f);
+                base.transform.eulerAngles = new Vector3(this.rotation, this.lastRotation, 0f);
+            }
         }
         
-        
-    }
-
-    public void Update()
-    {
-        if (InputManager.MouseScrollDelta.y > 0f) // forward
-        {
-            speed = Mathf.Clamp(this.speed + 1f, 0.1f, 50f);
-        }
-        else if (InputManager.MouseScrollDelta.y < 0f)
-        {
-            speed = Mathf.Clamp(this.speed - 1f, 0.1f, 50f);
-        }
-
-        if (InputManager.GetKey(Key.A) || InputManager.GetKey(Key.LeftArrow))
-        {
-            transform.position += -transform.right * (speed * Time.deltaTime);
-        }
-
-        if (InputManager.GetKey(Key.D) || InputManager.GetKey(Key.RightArrow))
-        {
-            transform.position += transform.right * (speed * Time.deltaTime);
-        }
-
-        if (InputManager.GetKey(Key.W) || InputManager.GetKey(Key.UpArrow))
-        {
-            transform.position += transform.forward * (speed * Time.deltaTime);
-        }
-
-        if (InputManager.GetKey(Key.S) || InputManager.GetKey(Key.DownArrow))
-        {
-            transform.position += -transform.forward * (speed * Time.deltaTime);
-        }
-
-        if (InputManager.GetMouseButtonDown(0))
-        {
-            // if (HierarchyUI.Instance.SearchInput.isFocused && EventSystem.current.currentSelectedGameObject != HierarchyUI.Instance.SearchInput.gameObject)
-            // {
-            //     HierarchyUI.Instance.SearchInput.DeactivateInputField();
-            // }
-        }
-        if (!InputManager.GetMouseButton(1))
-        {
-            cursorLockHandler.SetEnableCursor(true);
-        }
-        else
-        {
-         
             
-            cursorLockHandler.SetEnableCursor(false);
-            /*pitch = Mathf.Clamp(pitch - Mouse.current.delta.y.ReadValue()  * 30, -90f, 90f);
-            yaw += Mouse.current.delta.x.ReadValue() * 30f;
-            transform.localRotation = Quaternion.Euler(pitch, yaw, 0f);
-            */
-
-            Vector2 mouseInput = Mouse.current.delta.ReadValue();
-            pitch = Math.Clamp(pitch - mouseInput.y * 0.5f, -90f, 90f);
-            yaw += mouseInput.x * 0.5f;
-            transform.localRotation = Quaternion.Euler(pitch, yaw, 0f);
-
-        }
-        lastRotation = InputManager.MousePosition;
-        
-
-    }
     
 
-    private float pitch;
-    private float yaw;
+        private float pitch;
+        private float yaw;
 
-    private float speed = 6;
-    private Vector3 lastRotation;
+        private float speed = 6;
+        private float lastRotation = 0;
+        private float rotation = 0f;
 
-    public static string spawnObject;
-    public static string teleportNode;
+        public static string spawnObject;
+        public static string teleportNode;
 
 
+    }
 }
