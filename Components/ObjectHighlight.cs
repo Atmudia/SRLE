@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using MelonLoader;
 using UnityEngine;
 
 namespace SRLE.Components
@@ -6,6 +7,7 @@ namespace SRLE.Components
     /**
 * Component responsible for rendering the selection highlight/wireframe/bounds.
 */
+    [RegisterTypeInIl2Cpp]
     public class ObjectHighlight : MonoBehaviour
     {
         public enum HighlightType

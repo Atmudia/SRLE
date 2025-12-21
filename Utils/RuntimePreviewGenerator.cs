@@ -1,6 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using MelonLoader;
 using UnityEngine;
+using UnityEngine.Rendering.HighDefinition;
 using Object = UnityEngine.Object;
 
 namespace SRLE.Utils
@@ -106,18 +108,61 @@ namespace SRLE.Utils
         {
             get
             {
-                if (m_internalCamera != null) 
-                    return m_internalCamera;
+                if (m_internalCamera != null) return m_internalCamera;
                 m_internalCamera = new GameObject("ModelPreviewGeneratorCamera").AddComponent<Camera>();
                 m_internalCamera.enabled = false;
                 m_internalCamera.nearClipPlane = 0.01f;
                 m_internalCamera.cullingMask = 1 << PREVIEW_LAYER;
                 m_internalCamera.gameObject.hideFlags = HideFlags.HideAndDontSave;
+                m_internalCamera.gameObject.AddComponent<HDAdditionalCameraData>();
 
                 return m_internalCamera;
             }
         }
-        
+
+        private static Light m_renderLight = null;
+        private static Light RenderLight
+        {
+            get
+            {
+                if (m_renderLight != null) return m_renderLight;
+
+                m_renderLight = new GameObject("ModelPreviewGeneratorLight").AddComponent<Light>();
+                m_renderLight.cullingMask = 1 << PREVIEW_LAYER;
+                m_renderLight.type = LightType.Directional;
+                m_renderLight.lightShadowCasterMode = LightShadowCasterMode.Everything;
+                m_renderLight.shadows = LightShadows.Soft;
+
+                m_renderLight.bounceIntensity = 16;
+                m_renderLight.color = new Color(1, 1, 1, 1);
+                m_renderLight.useColorTemperature = false;
+                m_renderLight.colorTemperature = 4600;
+                m_renderLight.intensity = 500;
+                m_renderLight.shadowNormalBias = 0;
+                m_renderLight.shadowBias = 0.15f;
+
+                HDAdditionalLightData hddData = m_renderLight.gameObject.AddComponent<HDAdditionalLightData>();
+                hddData.lightUnit = LightUnit.Lux;
+                hddData.m_Version = HDAdditionalLightData.Version.MoveEmissionMesh;
+                hddData.angularDiameter = 0;
+                hddData.enableSpotReflector = false;
+                hddData.flareFalloff = 0.75f;
+                hddData.flareSize = 4;
+                hddData.flareTint = new Color(1, 0.8353f, 0.4588f, 1);
+                hddData.intensity = 300;
+                hddData.interactsWithSky = false;
+                hddData.normalBias = 1;
+                hddData.shadowTint = new Color(0.3302f, 0.3302f, 0.3302f, 1);
+                hddData.surfaceTint = new Color(1, 0.8196f, 0.5804f, 1);
+                hddData.useColorTemperature = false;
+
+                m_renderLight.transform.rotation = Quaternion.Euler(90, 0, 0);
+                m_renderLight.enabled = false;
+
+                return m_renderLight;
+            }
+        }
+
         private static Camera m_previewRenderCamera;
         public static Camera PreviewRenderCamera
         {
@@ -187,7 +232,7 @@ namespace SRLE.Utils
             }
             catch (Exception e)
             {
-                EntryPoint.ConsoleInstance.LogError(e);
+                MelonLogger.Error(e);
                 //Debug.LogException(e);
             }
             finally
@@ -210,6 +255,7 @@ namespace SRLE.Utils
 
             foreach (Light l in UnityEngine.Object.FindObjectsOfType<Light>())
             {
+                if (l != RenderLight)
                     l.cullingMask &= ~(1 << PREVIEW_LAYER);
             }
 
@@ -221,7 +267,7 @@ namespace SRLE.Utils
             Transform previewObject;
             if (shouldCloneModel)
             {
-                previewObject = Object.Instantiate(model, null, false);
+                previewObject = Object.Instantiate(model, null, false).Cast<Transform>();
                 previewObject.gameObject.hideFlags = HideFlags.HideAndDontSave;
             }
             else
@@ -343,7 +389,9 @@ namespace SRLE.Utils
 
                 renderCamera.transform.position = boundsCenter - previewDir * distance;
                 renderCamera.farClipPlane = distance * 4f;
-                
+
+                RenderLight.transform.rotation = renderCamera.transform.rotation;
+                RenderLight.enabled = true;
 
                 RenderTexture temp = RenderTexture.active;
                 RenderTexture renderTex = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Default);
@@ -364,13 +412,14 @@ namespace SRLE.Utils
                 result.ReadPixels(new Rect(0, 0, width, height), 0, 0, false);
                 result.Apply(false, false);
 
+                RenderLight.enabled = false;
 
                 RenderTexture.active = temp;
                 RenderTexture.ReleaseTemporary(renderTex);
             }
             catch (Exception e)
             {
-                EntryPoint.ConsoleInstance.LogError(e);
+                MelonLogger.Error(e);
             }
             finally
             {

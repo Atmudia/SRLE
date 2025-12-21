@@ -1,11 +1,12 @@
-using System;
+﻿using System;
 using System.Globalization;
-using UnityEngine.Events;
+using MelonLoader;
 using UnityEngine.UI;
 
 
 namespace SRLE.Components
 {
+    [RegisterTypeInIl2Cpp]
     public class InspectorInput : InspectorBase
     {
         private Text m_Label;
@@ -23,7 +24,7 @@ namespace SRLE.Components
             m_Label = transform.Find("Label").GetComponent<Text>();
             Input = transform.Find("Input").GetComponent<InputField>();
 
-            Input.onEndEdit.AddListener(OnEndEdit);
+            Input.onEndEdit.AddListener(new System.Action<string>(OnEndEdit));
         }
 
         private void Start()
