@@ -1,211 +1,198 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
+using MelonLoader;
+using SR2E.Utils;
 using SRLE.Components;
-// using System.Text.Json;
 using SRLE.Models;
 using Unity.Collections;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SRLE
+namespace SRLE;
+
+
+
+public static class ObjectManager
 {
-    public static class ObjectManager
+    public static Dictionary<uint, IdClass> BuildObjectsData = new Dictionary<uint, IdClass>();
+    public static Dictionary<string, List<uint>> BuildCategories = new Dictionary<string, List<uint>>();
+    public static GameObject CachedGameObjects;
+    static Dictionary<uint, List<Action<GameObject>>> ObjectRequests = new Dictionary<uint, List<Action<GameObject>>>();
+    public static GameObject World;
+
+
+    internal static string[] ListedAssetBundles;
+    public static Dictionary<uint, Il2CppSystem.Collections.Generic.List<GameObject>> BuildObjects = new Dictionary<uint, Il2CppSystem.Collections.Generic.List<GameObject>>();
+
+    public static void LoadObjectManager()
     {
-        public static Dictionary<uint, IdClass> BuildObjectsData = new Dictionary<uint, IdClass>();
-        public static Dictionary<string, List<uint>> BuildCategories = new Dictionary<string, List<uint>>();
-        public static GameObject CachedGameObjects;
-        private static Dictionary<uint, List<Action<IdClass>>> ObjectRequests = new Dictionary<uint, List<Action<IdClass>>>();
-        public static GameObject World;
-    
+        MelonLogger.Msg("Loading Build Objects");
+        LoadBuildObjects();
+        ListedAssetBundles = Directory.GetFiles(
+            Path.Combine(Application.streamingAssetsPath, "aa", "StandaloneWindows64"), "*.bundle",
+            SearchOption.AllDirectories).Select(Path.GetFileName).ToArray();
+    }
 
-        public static Dictionary<uint, List<GameObject>> BuildObjects = new Dictionary<uint, List<GameObject>>();
-
-        static ObjectManager()
+    public static void ReconnectPrefabs()
+    {
+        foreach (var child in CachedGameObjects.GetChildren())
         {
-            EntryPoint.ConsoleInstance.Log("Loading Build Objects");
-            LoadBuildObjects();
-        }
-        public static void LoadBuildObjects()
-        {
-            // return;
-            string json;
-            json = File.ReadAllText("BuildObjects.json");
-        
-            // using (StreamReader streamReader = new StreamReader(Melon<EntryPoint>.Instance.MelonAssembly.Assembly.GetManifestResourceStream("SRLE.BuildObjects.json") ?? throw new NullReferenceException("Build Objects are null. Please report this bug")))
-            // {
-            //     json = streamReader.ReadToEnd();
-            // }
-            List<SRLE.Models.IdCategoryData> buildCategories = JsonConvert.DeserializeObject<List<IdCategoryData>>(json);
-            foreach (var category in buildCategories)
+            try
             {
-                List<uint> objectIDs = new List<uint>();
-                foreach (var buildObject in category.Objects)
-                {
-                    objectIDs.Add(buildObject.Id);
-                    BuildObjectsData.Add(buildObject.Id, buildObject);
-                }
-                BuildCategories.Add(category.CategoryName, objectIDs);
+                var id = uint.Parse(child.name.Split(" ")[0]);
+                BuildObjectsData[id].GameObject = child.gameObject;
             }
-
-            BuildCategories["Favorites"] = JsonConvert.DeserializeObject<List<uint>>(File.ReadAllText(Path.Combine(SaveManager.DataPath, "favorites.txt")));
-        }
-        public static void RequestObject(uint id, Action<IdClass> callback)
-        {
-            if (BuildObjectsData.TryGetValue(id, out var obj))
+            catch (Exception e)
             {
-                callback(obj.GameObject == null ? null : obj);
+                MelonLogger.Error(e);
             }
-            else
-            {
-                if (ObjectRequests.ContainsKey(id))
-                {
-                    ObjectRequests[id].Add(callback);
-                }
-                else
-                {
-                    ObjectRequests.Add(id, new List<Action<IdClass>>() { callback });
-                }
-            }
-        }
-
-        public static bool TryGetObject(int objectHash, string name, string path, out IdClass idClass)
-        {
-            if (GetObjectByHashCode(objectHash, out idClass))
-            {
-                return true;
-            }
-            if (GetObjectByName(name, out idClass))
-            {
-                return true;
-            }
-            if (GetObjectByPath(path, out idClass))
-            {
-                return true;
-            }
-            EntryPoint.ConsoleInstance.Log($"Can't find object via all methods: {objectHash}, {name}, {path}");
-            return false;
             
         }
         
-
-        public static bool GetObjectByHashCode(int objectHash, out IdClass objectClass)
-        {
-            objectClass = BuildObjectsData.Values.FirstOrDefault(x => x.HashCode == objectHash);
-            return objectClass != null;
-        }
-        public static bool GetObjectByName(string name, out IdClass objectClass)
-        {
-            objectClass = BuildObjectsData.Values.FirstOrDefault(x => x.Name == name);
-            return objectClass != null;
-        }
-        public static bool GetObjectByPath(string path, out IdClass objectClass)
-        {
-            objectClass = BuildObjectsData.Values.FirstOrDefault(x => x.Path == path);
-            return objectClass != null;
-        }
+    }
+    public static void LoadBuildObjects()
+    {
+        if (!File.Exists(SaveManager.BuildObjectsPath)) return;
+        // return;
+        string json;
+        json = File.ReadAllText(SaveManager.BuildObjectsPath);
         
-        
-        public static void UpdateRequests()
+        // using (StreamReader streamReader = new StreamReader(Melon<EntryPoint>.Instance.MelonAssembly.Assembly.GetManifestResourceStream("SRLE.BuildObjects.json") ?? throw new NullReferenceException("Build Objects are null. Please report this bug")))
+        // {
+        //     json = streamReader.ReadToEnd();
+        // }
+        List<SRLE.Models.IdCategoryData> buildCategories = JsonSerializer.Deserialize<List<IdCategoryData>>(json);
+        foreach (var category in buildCategories)
         {
-            if (ObjectRequests.Count <= 0) return;
-
-            var request = ObjectRequests.First();
-
-            if (BuildObjectsData.TryGetValue(request.Key, out IdClass data))
+            List<uint> objectIDs = [];
+            foreach (var buildObject in category.Objects)
             {
-                GameObject worldObject = data.GameObject;
-                if (worldObject != null)
-                {
-                    // var buildObject = LoadWorldObject(data, worldObject);
+                objectIDs.Add(buildObject.Id);
+                BuildObjectsData.Add(buildObject.Id, buildObject);
+            }
+            BuildCategories.Add(category.CategoryName, objectIDs);
+        }
 
-                    foreach (var callback in request.Value)
-                    {
-                        callback(data);
-                    }
-                }
-                else
+        BuildCategories["Favorites"] = JsonSerializer.Deserialize<List<uint>>(File.ReadAllText(Path.Combine(SaveManager.DataPath, "favorites.txt")));
+    }
+    public static void RequestObject(uint id, Action<GameObject> callback)
+    {
+        if (BuildObjectsData.TryGetValue(id, out var obj))
+        {
+            callback(obj.GameObject);
+        }
+        else
+        {
+            if (ObjectRequests.ContainsKey(id))
+            {
+                ObjectRequests[id].Add(callback);
+            }
+            else
+            {
+                ObjectRequests.Add(id, new List<Action<GameObject>>() { callback });
+            }
+        }
+    }
+    public static void UpdateRequests()
+    {
+        if (ObjectRequests.Count <= 0) return;
+
+        var request = ObjectRequests.First();
+
+        if (BuildObjectsData.TryGetValue(request.Key, out IdClass data))
+        {
+            GameObject worldObject = data.GameObject;
+            if (worldObject != null)
+            {
+                // var buildObject = LoadWorldObject(data, worldObject);
+
+                foreach (var callback in request.Value)
                 {
-                    UnityEngine.Debug.Log($"[SRLE] Could not load {data.Id} because path {data.Path} does not exist");
-                    foreach (var callback in request.Value)
-                    {
-                        callback(null);
-                    }
+                    callback(worldObject);
                 }
             }
             else
             {
-                Debug.Log("[SRLE] Failed to load object ID " + request.Key);
+                MelonLogger.Msg($"Could not load {data.Id} because path {data.Path} does not exist");
                 foreach (var callback in request.Value)
                 {
                     callback(null);
                 }
             }
-
-            ObjectRequests.Remove(request.Key);
+        }
+        else
+        {
+            MelonLogger.Msg("Failed to load object ID " + request.Key);
+            foreach (var callback in request.Value)
+            {
+                callback(null);
+            }
         }
 
-        internal static void AddObject(uint id, GameObject obj)
+        ObjectRequests.Remove(request.Key);
+    }
+
+    internal static void AddObject(uint id, GameObject obj)
+    {
+        if (BuildObjects.ContainsKey(id))
         {
-            if (BuildObjects.ContainsKey(id))
-            {
-                BuildObjects[id].Add(obj);
-            }
-            else
-            {
-                var value = new System.Collections.Generic.List<GameObject>();
-                value.Add(obj);
-                BuildObjects.Add(id, value);
-            }
-            if (LevelManager.CurrentMode == LevelManager.Mode.BUILD)
-            {
-                ToolbarUI.Instance.UpdateStatus();
-            }
+            BuildObjects[id].Add(obj);
         }
-        public static void  RemoveObject(GameObject obj)
+        else
         {
-            //TODO Add Undo and Redo Here
-            if (ObjectManager.GetBuildObject(obj, out var buildObj))
-            {
-                if (BuildObjects.ContainsKey(buildObj.ID.Id))
-                {
-                    BuildObjects[buildObj.ID.Id].Remove(obj);
-                }
-                SRLECamera.Instance.transformGizmo.ClearTargets();
-                Object.DestroyImmediate(obj);
-                InspectorUI.Instance.SetActive(false);
-            }
+            var value = new Il2CppSystem.Collections.Generic.List<GameObject>();
+            value.Add(obj);
+            BuildObjects.Add(id, value);
+        }
+        if (LevelManager.CurrentMode == LevelManager.Mode.BUILD)
+        {
             ToolbarUI.Instance.UpdateStatus();
         }
-        public static void RemoveObject(uint id, GameObject obj)
+    }
+    public static void  RemoveObject(GameObject obj)
+    {
+        //TODO Add Undo and Redo Here
+        if (ObjectManager.GetBuildObject(obj, out var buildObj))
         {
-            if (BuildObjects.ContainsKey(id))
+            if (BuildObjects.ContainsKey(buildObj.ID.Id))
             {
-                BuildObjects[id].Remove(obj);
+                BuildObjects[buildObj.ID.Id].Remove(obj);
             }
-            // ToolbarUI.Instance.UpdateStatus();
+            SRLECamera.Instance.transformGizmo.ClearTargets();
+            Object.Destroy(obj);
+            InspectorUI.Instance.SetActive(false);
         }
+        ToolbarUI.Instance.UpdateStatus();
+    }
+    public static void RemoveObject(uint id, GameObject obj)
+    {
+        if (BuildObjects.ContainsKey(id))
+        {
+            BuildObjects[id].Remove(obj);
+        }
+        ToolbarUI.Instance.UpdateStatus();
+    }
     
 
-        public static GameObject GetObjectById(uint id)
+    public static GameObject GetObjectById(uint id)
+    {
+        if (BuildObjectsData.TryGetValue(id, out var data))
         {
-            if (BuildObjectsData.TryGetValue(id, out var data))
-            {
-                return data.GameObject;
-            }
-            EntryPoint.ConsoleInstance.LogWarning($"[SRLE] Can't load object by id: {id}");
-            return null;
+            return data.GameObject;
         }
-        public static bool GetBuildObject(GameObject obj, out BuildObject buildObject)
-        {
-            buildObject = obj.GetComponent<BuildObject>() 
-                          ?? obj.GetComponentInParent<BuildObject>() 
-                          ?? obj.GetComponentInChildren<BuildObject>();
-            return buildObject;
-        }
-
-
+        MelonLogger.Warning($"Can't load object by id: {id}");
+        return null;
     }
+    public static bool GetBuildObject(GameObject obj, out BuildObject buildObject)
+    {
+        buildObject = obj.GetComponent<BuildObject>() 
+                      ?? obj.GetComponentInParent<BuildObject>() 
+                      ?? obj.GetComponentInChildren<BuildObject>();
+        return buildObject;
+    }
+
+
 }
