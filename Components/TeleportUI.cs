@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MonomiPark.SlimeRancher.Regions;
 using Newtonsoft.Json;
 using SRLE.Models;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -45,6 +43,10 @@ namespace SRLE.Components
             if (File.Exists(filePath))
             {
                 m_TeleportModels = JsonConvert.DeserializeObject<List<TeleportModel>>(File.ReadAllText(filePath));
+                if (m_TeleportModels.Any(x => x.Position == null))
+                {
+                    InitializeDefaultTeleportModels();
+                }
             }
             else
             {
@@ -56,64 +58,43 @@ namespace SRLE.Components
         {
             m_TeleportModels = new List<TeleportModel>
             {
-                new TeleportModel
+                new()
                 {
                     Name = "Ranch Home",
-                    PositionX = 52.8f,
-                    PositionY = 16.3f,
-                    PositionZ = -132.7f,
-                    RotationX = 0.0f,
-                    RotationY = 102.6f,
-                    RotationZ = 0.0f,
+                    Position = new Vector3(52.8f, 16.3f, 132.7f),
+                    Rotation = new Vector3(0.0f, 102.6f, 0.0f),
                     RegionSet = RegionRegistry.RegionSetId.HOME
                 },
-                new TeleportModel
+                new()
                 {
                     Name = "Desert Temple",
-                    PositionX = 119.9f,
-                    PositionY = 1077.4f,
-                    PositionZ = 917.5f,
-                    RotationX = 0.0f,
-                    RotationY = 0.0f,
-                    RotationZ = 0.0f,
+                    Position = new Vector3(119.9f, 1077.4f, 917.5f),
+                    Rotation = new Vector3(0.0f, 0.0f, 0.0f),
                     RegionSet = RegionRegistry.RegionSetId.DESERT
                 },
-                new TeleportModel
+                new()
                 {
                     Name = "Slimulations",
-                    PositionX = 1052.1f,
-                    PositionY = 14.4f,
-                    PositionZ = 824.0f,
-                    RotationX = 0.0f,
-                    RotationY = 315.0f,
-                    RotationZ = 0.0f,
+                    Position = new Vector3(1052.1f, 14.4f, 824.0f),
+                    Rotation = new Vector3(0.0f, 315.0f, 0.0f),
                     RegionSet = RegionRegistry.RegionSetId.SLIMULATIONS
                 },
-                new TeleportModel
+                new()
                 {
                     Name = "Nimble 1",
-                    PositionX = -768.5f,
-                    PositionY = 7.5f,
-                    PositionZ = -841.3f,
-                    RotationX = 0.0f,
-                    RotationY = 44.9f,
-                    RotationZ = 0.0f,
+                    Position = new Vector3(-768.5f, 7.5f, -841.3f),
+                    Rotation = new Vector3(0.0f, 44.9f, 0.0f),
                     RegionSet = RegionRegistry.RegionSetId.VALLEY
                 },
-                new TeleportModel
+                new()
                 {
                     Name = "Nimble 2",
-                    PositionX = -189.8f,
-                    PositionY = 11.1f,
-                    PositionZ = -1008.4f,
-                    RotationX = 0.0f,
-                    RotationY = 273.6f,
-                    RotationZ = 0.0f,
+                    Position = new Vector3(-189.8f, 11.1f, -1008.4f),
+                    Rotation = new Vector3(0.0f, 273.6f, 0.0f),
                     RegionSet = RegionRegistry.RegionSetId.VALLEY
                 }
             };
-
-
+            
             File.WriteAllText(Path.Combine(SaveManager.DataPath, "tp.txt"), JsonConvert.SerializeObject(m_TeleportModels, Formatting.Indented));
         }
 
@@ -129,7 +110,7 @@ namespace SRLE.Components
         {
             GameObject categoryObj = Instantiate(AssetManager.CategoryButtonPrefab, m_CategoryScroll.content, false);
             string categoryName = model.Name;
-            categoryObj.GetComponentInChildren<Button>().onClick.AddListener(new UnityAction(() =>  TeleportTo(model.RegionSet, new Vector3(model.PositionX, model.PositionY, model.PositionZ), new Vector3(model.RotationX, model.RotationY, model.RotationZ))));
+            categoryObj.GetComponentInChildren<Button>().onClick.AddListener(new UnityAction(() =>  TeleportTo(model.RegionSet, (Vector3)model.Position, (Vector3)model.Rotation)));
             categoryObj.GetComponentInChildren<Text>().text = categoryName;
         }
 
@@ -137,16 +118,11 @@ namespace SRLE.Components
         {
             string name = string.IsNullOrEmpty(m_NameInput.text) ? SRSingleton<SceneContext>.Instance.RegionRegistry.GetCurrentRegionSetId() + " Teleport" : m_NameInput.text;
 
-            EntryPoint.ConsoleInstance.Log(SRLECamera.Instance.transform.position);
             var model = new TeleportModel
             {
                 Name = name,
-                PositionX = SRLECamera.Instance.transform.position.x,
-                PositionY = SRLECamera.Instance.transform.position.y,
-                PositionZ = SRLECamera.Instance.transform.position.z,
-                RotationX = SRLECamera.Instance.transform.eulerAngles.x,
-                RotationY = SRLECamera.Instance.transform.eulerAngles.y,
-                RotationZ = SRLECamera.Instance.transform.eulerAngles.z,
+                Position = SRLECamera.Instance.transform.position,
+                Rotation =  SRLECamera.Instance.transform.eulerAngles,
                 RegionSet = SRSingleton<SceneContext>.Instance.RegionRegistry.GetCurrentRegionSetId()
             };
 

@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Assets.Script.Util.Extensions;
-using SRML.Console;
 // using Il2CppInterop.Runtime;
 // using Il2CppInterop.Runtime.InteropTypes;
 // using MelonLoader;
@@ -36,22 +34,15 @@ namespace SRLE
         public static Mesh ConeMesh;   // Used as translation handle cone caps.
         public static Mesh CubeMesh;    // Used for scale handle
         public static Shader HandleShader;
-        public static Shader AdvancedHandleShader;
-
-        public static Material SuperRaycastMaterial;
-
-        public static Dictionary<string, Mesh> SeperatedMeshes = new Dictionary<string, Mesh>();
+        
 
     
 
         static AssetManager()
         {
             Object.FindObjectOfType<MonoBehaviour>().StartCoroutine(LoadAssetBundleData());
-            // MelonCoroutines.Start(LoadAssetBundleData());
         }
-
-        // public static T LoadAsset<T>(this AssetBundle @this, string name) where T : Il2CppObjectBase => @this.LoadAsset(name).Cast<T>();
-    
+        
 
         private static IEnumerator LoadAssetBundleData()
         {
@@ -104,30 +95,10 @@ namespace SRLE
        
             HandleShader = assetBundle.LoadAsset<Shader>("assets/betterbuild/anothergizmo/handleshader.shader");
             HandleShader.hideFlags |= HideFlags.HideAndDontSave;
-            AdvancedHandleShader = assetBundle.LoadAsset<Shader>("assets/betterbuild/anothergizmo/handleshader.shader");
-            AdvancedHandleShader.hideFlags |= HideFlags.HideAndDontSave;
-
-            // SuperRaycastMaterial = assetBundle.LoadAsset<Material>("Super Raycast");
-            // SuperRaycastMaterial.hideFlags |= HideFlags.HideAndDontSave;
-        
-            // using (Stream bundleStream = Melon<EntryPoint>.Instance.MelonAssembly.Assembly.GetManifestResourceStream("SRLE.modded_all_meshes.mod"))
-            // {
-            //     byte[] bundleBytes = new byte[bundleStream.Length];
-            //     _ = bundleStream.Read(bundleBytes, 0, bundleBytes.Length);
-            //     var srlemeshes = AssetBundle.LoadFromMemory(bundleBytes);
-            //     foreach (var loadAllAsset in srlemeshes.LoadAllAssets(Il2CppType.Of<Mesh>()))
-            //     {
-            //         loadAllAsset.hideFlags |= HideFlags.HideAndDontSave;
-            //         if (!SeperatedMeshes.ContainsKey(loadAllAsset.name.Replace("m_", string.Empty)))
-            //         {
-            //             SeperatedMeshes.Add(loadAllAsset.name.Replace("m_", string.Empty), loadAllAsset.Cast<Mesh>());
-            //
-            //         }
-            //     }
-            // }
+            
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
-            if (ToolbarUI == null)
+            if (!ToolbarUI)
             {
                 EntryPoint.ConsoleInstance.LogWarning("AssetBundle failed to load.");
             }

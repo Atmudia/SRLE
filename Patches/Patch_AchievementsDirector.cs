@@ -5,22 +5,15 @@ namespace SRLE.Patches
     [HarmonyPatch(typeof(AchievementsDirector))]
     public class Patch_AchievementsDirector
     {
-        [HarmonyPatch(nameof(AchievementsDirector.Update))]
+        [HarmonyPatch(nameof(AchievementsDirector.Update)), HarmonyPrefix]
         public static bool Update()
         {
-            if (SaveManager.CurrentLevel != null)
-            {
-                return false;
-            }
-            EntryPoint.ConsoleInstance.Log("testing");
-            return true;
+            return !LevelManager.IsActive;
         }
-        [HarmonyPatch(nameof(AchievementsDirector.LateUpdate))]
+        [HarmonyPatch(nameof(AchievementsDirector.LateUpdate)),  HarmonyPrefix]
         public static bool LateUpdate()
         {
-            if (SaveManager.CurrentLevel != null)
-                return false;
-            return true;
+            return !LevelManager.IsActive;
         }
     }
 }

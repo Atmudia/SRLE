@@ -13,7 +13,7 @@ namespace SRLE.Models
         public string Path{ get; set; }
         public string Zone { get; set; }
         public int HashCode { get; set; }
-        [JsonIgnore] public GameObject GameObject;
+        [JsonIgnore] public GameObject gameObject;
     }
     public class ModdedIdClass : IdClass
     {

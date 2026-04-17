@@ -62,12 +62,12 @@ namespace SRLE.RuntimeGizmo.Helpers
 				float s = (b*f - c*e) / d;
 				float t = (a*f - c*b) / d;
  
-				intersections.first = point1 + point1Direction * s;
-				intersections.second = point2 + point2Direction * t;
+				intersections.First = point1 + point1Direction * s;
+				intersections.Second = point2 + point2Direction * t;
 			}else{
 				//Lines are parallel, select any points next to eachother
-				intersections.first = point1;
-				intersections.second = point2 + Vector3.Project(point1 - point2, point2Direction);
+				intersections.First = point1;
+				intersections.Second = point2 + Vector3.Project(point1 - point2, point2Direction);
 			}
 
 			return intersections;
@@ -76,7 +76,7 @@ namespace SRLE.RuntimeGizmo.Helpers
 		public static IntersectPoints ClosestPointsOnSegmentToLine(Vector3 segment0, Vector3 segment1, Vector3 linePoint, Vector3 lineDirection)
 		{
 			IntersectPoints closests = ClosestPointsOnTwoLines(segment0, segment1 - segment0, linePoint, lineDirection);
-			closests.first = ClampToSegment(closests.first, segment0, segment1);
+			closests.First = ClampToSegment(closests.First, segment0, segment1);
 
 			return closests;
 		}

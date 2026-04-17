@@ -11,6 +11,7 @@ namespace SRLE
         }
 
         public static Mode CurrentMode { get; private set; } = Mode.NONE;
+        public static bool IsActive => SaveManager.CurrentLevel != null;
         public static bool IsLoading = false;
         public static GameObject SRLEGameObject;
 

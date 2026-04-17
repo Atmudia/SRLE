@@ -8,10 +8,8 @@ namespace SRLE.Commands
         public override bool Execute(string[] args)
         {
             foreach (var renderer in Camera.allCameras)
-            {
                 renderer.useOcclusionCulling = false;
-            }
-
+            
             return true;
         }
 

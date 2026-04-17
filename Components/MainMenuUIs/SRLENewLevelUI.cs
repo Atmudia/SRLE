@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SRLE.Models;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace SRLE.Components.MainMenuUIs
@@ -167,47 +165,20 @@ namespace SRLE.Components.MainMenuUIs
 
         #endregion
 
-        // Uncomment this method when you're ready to enable level creation
-        /*
-        internal void CreateNewLevel(Button createButton)
+        internal void CreateNewLevel()
         {
-            string levelFileName = $"{levelNameField.text}.srle";
-            string fullPath = Path.Combine(SRLEManager.Worlds.FullName, levelFileName);
-            FileInfo fileInfo = new FileInfo(fullPath);
+            string levelName = levelNameField.text;
+            if (string.IsNullOrEmpty(levelName)) return;
 
-            if (fileInfo.Exists)
+            string fullPath = Path.Combine(SaveManager.LevelsPath, $"{levelName}.srle");
+            if (File.Exists(fullPath))
             {
-                SRSingleton<GameContext>.Instance.UITemplates.CreateErrorDialog("e.srsle.level_name_exists");
+                EntryPoint.ConsoleInstance.LogWarning($"[SRLE] Level '{levelName}' already exists.");
                 return;
             }
 
-            var newLevel = SRLEName.Create(levelNameField.text, SelectedWorldType);
-            newLevel.spriteType = selectedIconIndex;
-
-            using var fileStream = fileInfo.Create();
-            newLevel.Write(fileStream);
-
-            SRLEManager.currentData = newLevel;
-            SRLEManager.isSRLELevel = true;
-
-            createButton.interactable = false;
-            gameObject.SetActive(false);
-
-            SRCallbacksUtils.AddSRCallbacksAndDeleteAfterLoading(_ =>
-            {
-                GameObject cam = new GameObject("SRLECamera", typeof(Camera));
-                cam.AddComponent<SRLECamera>().controller = cam.AddComponent<RuntimeGizmos.TransformGizmo>();
-
-                Instantiate(EntryPoint.srle.LoadAsset<GameObject>("CreatorUI"))
-                    .AddComponent<SRLECreatorUI>();
-            });
-
-            SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("", Identifiable.Id.HEN, PlayerState.GameMode.CASUAL, () =>
-            {
-                createButton.interactable = true;
-                gameObject.SetActive(true);
-            });
+            LevelManager.IsLoading = true;
+            SaveManager.CreateLevel(levelName, SelectedWorldType);
         }
-        */
     }
 }

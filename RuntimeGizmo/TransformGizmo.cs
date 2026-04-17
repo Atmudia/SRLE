@@ -9,7 +9,6 @@ using SRLE.RuntimeGizmo.Objects.Commands;
 using SRLE.RuntimeGizmo.UndoRedo;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
 namespace SRLE.RuntimeGizmo
@@ -214,27 +213,27 @@ namespace SRLE.RuntimeGizmo
 			//Note: The order of drawing the axis decides what gets drawn over what.
 
 			TransformType moveOrScaleType = (transformType == TransformType.Scale || (isTransforming && translatingType == TransformType.Scale)) ? TransformType.Scale : TransformType.Move;
-			DrawQuads(handleLines.z, GetColor(moveOrScaleType, this.zColor, zColor, hasTranslatingAxisPlane));
-			DrawQuads(handleLines.x, GetColor(moveOrScaleType, this.xColor, xColor, hasTranslatingAxisPlane));
-			DrawQuads(handleLines.y, GetColor(moveOrScaleType, this.yColor, yColor, hasTranslatingAxisPlane));
+			DrawQuads(handleLines.Z, GetColor(moveOrScaleType, this.zColor, zColor, hasTranslatingAxisPlane));
+			DrawQuads(handleLines.X, GetColor(moveOrScaleType, this.xColor, xColor, hasTranslatingAxisPlane));
+			DrawQuads(handleLines.Y, GetColor(moveOrScaleType, this.yColor, yColor, hasTranslatingAxisPlane));
 
-			DrawTriangles(handleTriangles.x, GetColor(TransformType.Move, this.xColor, xColor, hasTranslatingAxisPlane));
-			DrawTriangles(handleTriangles.y, GetColor(TransformType.Move, this.yColor, yColor, hasTranslatingAxisPlane));
-			DrawTriangles(handleTriangles.z, GetColor(TransformType.Move, this.zColor, zColor, hasTranslatingAxisPlane));
+			DrawTriangles(handleTriangles.X, GetColor(TransformType.Move, this.xColor, xColor, hasTranslatingAxisPlane));
+			DrawTriangles(handleTriangles.Y, GetColor(TransformType.Move, this.yColor, yColor, hasTranslatingAxisPlane));
+			DrawTriangles(handleTriangles.Z, GetColor(TransformType.Move, this.zColor, zColor, hasTranslatingAxisPlane));
 
-			DrawQuads(handlePlanes.z, GetColor(TransformType.Move, this.zColor, zColor, planesOpacity, !hasTranslatingAxisPlane));
-			DrawQuads(handlePlanes.x, GetColor(TransformType.Move, this.xColor, xColor, planesOpacity, !hasTranslatingAxisPlane));
-			DrawQuads(handlePlanes.y, GetColor(TransformType.Move, this.yColor, yColor, planesOpacity, !hasTranslatingAxisPlane));
+			DrawQuads(handlePlanes.Z, GetColor(TransformType.Move, this.zColor, zColor, planesOpacity, !hasTranslatingAxisPlane));
+			DrawQuads(handlePlanes.X, GetColor(TransformType.Move, this.xColor, xColor, planesOpacity, !hasTranslatingAxisPlane));
+			DrawQuads(handlePlanes.Y, GetColor(TransformType.Move, this.yColor, yColor, planesOpacity, !hasTranslatingAxisPlane));
 
-			DrawQuads(handleSquares.x, GetColor(TransformType.Scale, this.xColor, xColor));
-			DrawQuads(handleSquares.y, GetColor(TransformType.Scale, this.yColor, yColor));
-			DrawQuads(handleSquares.z, GetColor(TransformType.Scale, this.zColor, zColor));
-			DrawQuads(handleSquares.all, GetColor(TransformType.Scale, this.allColor, allColor));
+			DrawQuads(handleSquares.X, GetColor(TransformType.Scale, this.xColor, xColor));
+			DrawQuads(handleSquares.Y, GetColor(TransformType.Scale, this.yColor, yColor));
+			DrawQuads(handleSquares.Z, GetColor(TransformType.Scale, this.zColor, zColor));
+			DrawQuads(handleSquares.All, GetColor(TransformType.Scale, this.allColor, allColor));
 
-			DrawQuads(circlesLines.all, GetColor(TransformType.Rotate, this.allColor, allColor));
-			DrawQuads(circlesLines.x, GetColor(TransformType.Rotate, this.xColor, xColor));
-			DrawQuads(circlesLines.y, GetColor(TransformType.Rotate, this.yColor, yColor));
-			DrawQuads(circlesLines.z, GetColor(TransformType.Rotate, this.zColor, zColor));
+			DrawQuads(circlesLines.All, GetColor(TransformType.Rotate, this.allColor, allColor));
+			DrawQuads(circlesLines.X, GetColor(TransformType.Rotate, this.xColor, xColor));
+			DrawQuads(circlesLines.Y, GetColor(TransformType.Rotate, this.yColor, yColor));
+			DrawQuads(circlesLines.Z, GetColor(TransformType.Rotate, this.zColor, zColor));
 		}
 
 		Color GetColor(TransformType type, Color normalColor, Color nearColor, bool forceUseNormal = false)
@@ -667,7 +666,7 @@ namespace SRLE.RuntimeGizmo
 
 		public void AddTarget(Transform target, bool addCommand = true)
 		{
-			if(target != null)
+			if(target)
 			{
 				if(targetRoots.ContainsKey(target)) return;
 				if(children.Contains(target)) return;
@@ -684,7 +683,7 @@ namespace SRLE.RuntimeGizmo
 
 		public void RemoveTarget(Transform target, bool addCommand = true)
 		{
-			if(target != null)
+			if(target)
 			{
 
 				if (!targetRoots.ContainsKey(target))
@@ -727,7 +726,7 @@ namespace SRLE.RuntimeGizmo
 
 		void AddTargetHighlightedRenderers(Transform target)
 		{
-			if(target != null)
+			if(target)
 			{
 				foreach (MeshFilter meshFilter in target.GetComponentsInChildren<MeshFilter>(true))
 				{
@@ -811,12 +810,12 @@ namespace SRLE.RuntimeGizmo
 				{
 					Transform target = targetsEnumerator.Key;
 					TargetInfo info = targetsEnumerator.Value;
-					info.centerPivotPoint = target.GetCenter();
+					info.CenterPivotPoint = target.GetCenter();
 
-					totalCenterPivotPoint += info.centerPivotPoint;
+					totalCenterPivotPoint += info.CenterPivotPoint;
 				}
 				totalCenterPivotPoint /= targetRoots.Count;
-				pivotPoint = targetRoots[mainTargetRoot].centerPivotPoint;
+				pivotPoint = targetRoots[mainTargetRoot].CenterPivotPoint;
 
 
 
@@ -849,13 +848,13 @@ namespace SRLE.RuntimeGizmo
 					{
 						if(!hasSet)
 						{
-							if(targets.Value.previousPosition != Vector3.zero && targets.Key.position != targets.Value.previousPosition)
+							if(targets.Value.PreviousPosition != Vector3.zero && targets.Key.position != targets.Value.PreviousPosition)
 							{
 								SetPivotPoint();
 								hasSet = true;
 							}
 						}
-						targets.Value.previousPosition = targets.Key.position;
+						targets.Value.PreviousPosition = targets.Key.position;
 					}
 				}
 			}
@@ -935,19 +934,19 @@ namespace SRLE.RuntimeGizmo
 
 		void HandleNearestLines(TransformType type, AxisVectors axisVectors, float minSelectedDistanceCheck)
 		{
-			float xClosestDistance = ClosestDistanceFromMouseToLines(axisVectors.x);
-			float yClosestDistance = ClosestDistanceFromMouseToLines(axisVectors.y);
-			float zClosestDistance = ClosestDistanceFromMouseToLines(axisVectors.z);
-			float allClosestDistance = ClosestDistanceFromMouseToLines(axisVectors.all);
+			float xClosestDistance = ClosestDistanceFromMouseToLines(axisVectors.X);
+			float yClosestDistance = ClosestDistanceFromMouseToLines(axisVectors.Y);
+			float zClosestDistance = ClosestDistanceFromMouseToLines(axisVectors.Z);
+			float allClosestDistance = ClosestDistanceFromMouseToLines(axisVectors.All);
 
 			HandleNearest(type, xClosestDistance, yClosestDistance, zClosestDistance, allClosestDistance, minSelectedDistanceCheck);
 		}
 		void HandleNearestPlanes(TransformType type, AxisVectors axisVectors, float minSelectedDistanceCheck)
 		{
-			float xClosestDistance = ClosestDistanceFromMouseToPlanes(axisVectors.x);
-			float yClosestDistance = ClosestDistanceFromMouseToPlanes(axisVectors.y);
-			float zClosestDistance = ClosestDistanceFromMouseToPlanes(axisVectors.z);
-			float allClosestDistance = ClosestDistanceFromMouseToPlanes(axisVectors.all);
+			float xClosestDistance = ClosestDistanceFromMouseToPlanes(axisVectors.X);
+			float yClosestDistance = ClosestDistanceFromMouseToPlanes(axisVectors.Y);
+			float zClosestDistance = ClosestDistanceFromMouseToPlanes(axisVectors.Z);
+			float allClosestDistance = ClosestDistanceFromMouseToPlanes(axisVectors.All);
 
 			HandleNearest(type, xClosestDistance, yClosestDistance, zClosestDistance, allClosestDistance, minSelectedDistanceCheck);
 		}
@@ -974,7 +973,7 @@ namespace SRLE.RuntimeGizmo
 			for(int i = 0; i + 1 < lines.Count; i++)
 			{
 				IntersectPoints points = Geometry.ClosestPointsOnSegmentToLine(lines[i], lines[i + 1], mouseRay.origin, mouseRay.direction);
-				float distance = Vector3.Distance(points.first, points.second);
+				float distance = Vector3.Distance(points.First, points.Second);
 				if(distance < closestDistance)
 				{
 					closestDistance = distance;
@@ -1080,9 +1079,9 @@ namespace SRLE.RuntimeGizmo
 					zLineLength = GetHandleLength(TransformType.Scale, Axis.Z);
 				}
 
-				AddQuads(pivotPoint, axisInfo.xDirection, axisInfo.yDirection, axisInfo.zDirection, xLineLength, lineWidth, handleLines.x);
-				AddQuads(pivotPoint, axisInfo.yDirection, axisInfo.xDirection, axisInfo.zDirection, yLineLength, lineWidth, handleLines.y);
-				AddQuads(pivotPoint, axisInfo.zDirection, axisInfo.xDirection, axisInfo.yDirection, zLineLength, lineWidth, handleLines.z);
+				AddQuads(pivotPoint, axisInfo.xDirection, axisInfo.yDirection, axisInfo.zDirection, xLineLength, lineWidth, handleLines.X);
+				AddQuads(pivotPoint, axisInfo.yDirection, axisInfo.xDirection, axisInfo.zDirection, yLineLength, lineWidth, handleLines.Y);
+				AddQuads(pivotPoint, axisInfo.zDirection, axisInfo.xDirection, axisInfo.yDirection, zLineLength, lineWidth, handleLines.Z);
 			}
 		}
 
@@ -1109,9 +1108,9 @@ namespace SRLE.RuntimeGizmo
 				Vector3 yPlaneCenter = pivotPoint + (xDirection + zDirection);
 				Vector3 zPlaneCenter = pivotPoint + (xDirection + yDirection);
 
-				AddQuad(xPlaneCenter, axisInfo.yDirection, axisInfo.zDirection, planeSize, handlePlanes.x);
-				AddQuad(yPlaneCenter, axisInfo.xDirection, axisInfo.zDirection, planeSize, handlePlanes.y);
-				AddQuad(zPlaneCenter, axisInfo.xDirection, axisInfo.yDirection, planeSize, handlePlanes.z);
+				AddQuad(xPlaneCenter, axisInfo.yDirection, axisInfo.zDirection, planeSize, handlePlanes.X);
+				AddQuad(yPlaneCenter, axisInfo.xDirection, axisInfo.zDirection, planeSize, handlePlanes.Y);
+				AddQuad(zPlaneCenter, axisInfo.xDirection, axisInfo.yDirection, planeSize, handlePlanes.Z);
 			}
 		}
 
@@ -1122,9 +1121,9 @@ namespace SRLE.RuntimeGizmo
 			if(TranslatingTypeContains(TransformType.Move))
 			{
 				float triangleLength = triangleSize * GetDistanceMultiplier();
-				AddTriangles(axisInfo.GetXAxisEnd(GetHandleLength(TransformType.Move)), axisInfo.xDirection, axisInfo.yDirection, axisInfo.zDirection, triangleLength, handleTriangles.x);
-				AddTriangles(axisInfo.GetYAxisEnd(GetHandleLength(TransformType.Move)), axisInfo.yDirection, axisInfo.xDirection, axisInfo.zDirection, triangleLength, handleTriangles.y);
-				AddTriangles(axisInfo.GetZAxisEnd(GetHandleLength(TransformType.Move)), axisInfo.zDirection, axisInfo.yDirection, axisInfo.xDirection, triangleLength, handleTriangles.z);
+				AddTriangles(axisInfo.GetXAxisEnd(GetHandleLength(TransformType.Move)), axisInfo.xDirection, axisInfo.yDirection, axisInfo.zDirection, triangleLength, handleTriangles.X);
+				AddTriangles(axisInfo.GetYAxisEnd(GetHandleLength(TransformType.Move)), axisInfo.yDirection, axisInfo.xDirection, axisInfo.zDirection, triangleLength, handleTriangles.Y);
+				AddTriangles(axisInfo.GetZAxisEnd(GetHandleLength(TransformType.Move)), axisInfo.zDirection, axisInfo.yDirection, axisInfo.xDirection, triangleLength, handleTriangles.Z);
 			}
 		}
 
@@ -1133,12 +1132,12 @@ namespace SRLE.RuntimeGizmo
 			Vector3 endPoint = axisEnd + (axisDirection * (size * 2f));
 			Square baseSquare = GetBaseSquare(axisEnd, axisOtherDirection1, axisOtherDirection2, size / 2f);
 
-			resultsBuffer.Add(baseSquare.bottomLeft);
-			resultsBuffer.Add(baseSquare.topLeft);
-			resultsBuffer.Add(baseSquare.topRight);
-			resultsBuffer.Add(baseSquare.topLeft);
-			resultsBuffer.Add(baseSquare.bottomRight);
-			resultsBuffer.Add(baseSquare.topRight);
+			resultsBuffer.Add(baseSquare.BottomLeft);
+			resultsBuffer.Add(baseSquare.TopLeft);
+			resultsBuffer.Add(baseSquare.TopRight);
+			resultsBuffer.Add(baseSquare.TopLeft);
+			resultsBuffer.Add(baseSquare.BottomRight);
+			resultsBuffer.Add(baseSquare.TopRight);
 
 			for(int i = 0; i < 4; i++)
 			{
@@ -1155,10 +1154,10 @@ namespace SRLE.RuntimeGizmo
 			if(TranslatingTypeContains(TransformType.Scale))
 			{
 				float boxSize = this.boxSize * GetDistanceMultiplier();
-				AddSquares(axisInfo.GetXAxisEnd(GetHandleLength(TransformType.Scale, Axis.X)), axisInfo.xDirection, axisInfo.yDirection, axisInfo.zDirection, boxSize, handleSquares.x);
-				AddSquares(axisInfo.GetYAxisEnd(GetHandleLength(TransformType.Scale, Axis.Y)), axisInfo.yDirection, axisInfo.xDirection, axisInfo.zDirection, boxSize, handleSquares.y);
-				AddSquares(axisInfo.GetZAxisEnd(GetHandleLength(TransformType.Scale, Axis.Z)), axisInfo.zDirection, axisInfo.xDirection, axisInfo.yDirection, boxSize, handleSquares.z);
-				AddSquares(pivotPoint - (axisInfo.xDirection * (boxSize * .5f)), axisInfo.xDirection, axisInfo.yDirection, axisInfo.zDirection, boxSize, handleSquares.all);
+				AddSquares(axisInfo.GetXAxisEnd(GetHandleLength(TransformType.Scale, Axis.X)), axisInfo.xDirection, axisInfo.yDirection, axisInfo.zDirection, boxSize, handleSquares.X);
+				AddSquares(axisInfo.GetYAxisEnd(GetHandleLength(TransformType.Scale, Axis.Y)), axisInfo.yDirection, axisInfo.xDirection, axisInfo.zDirection, boxSize, handleSquares.Y);
+				AddSquares(axisInfo.GetZAxisEnd(GetHandleLength(TransformType.Scale, Axis.Z)), axisInfo.zDirection, axisInfo.xDirection, axisInfo.yDirection, boxSize, handleSquares.Z);
+				AddSquares(pivotPoint - (axisInfo.xDirection * (boxSize * .5f)), axisInfo.xDirection, axisInfo.yDirection, axisInfo.zDirection, boxSize, handleSquares.All);
 			}
 		}
 		void AddSquares(Vector3 axisStart, Vector3 axisDirection, Vector3 axisOtherDirection1, Vector3 axisOtherDirection2, float size, List<Vector3> resultsBuffer)
@@ -1175,15 +1174,15 @@ namespace SRLE.RuntimeGizmo
 			Square baseRectangle = GetBaseSquare(axisStart, axisOtherDirection1, axisOtherDirection2, width);
 			Square baseRectangleEnd = GetBaseSquare(axisEnd, axisOtherDirection1, axisOtherDirection2, width);
 
-			resultsBuffer.Add(baseRectangle.bottomLeft);
-			resultsBuffer.Add(baseRectangle.topLeft);
-			resultsBuffer.Add(baseRectangle.topRight);
-			resultsBuffer.Add(baseRectangle.bottomRight);
+			resultsBuffer.Add(baseRectangle.BottomLeft);
+			resultsBuffer.Add(baseRectangle.TopLeft);
+			resultsBuffer.Add(baseRectangle.TopRight);
+			resultsBuffer.Add(baseRectangle.BottomRight);
 
-			resultsBuffer.Add(baseRectangleEnd.bottomLeft);
-			resultsBuffer.Add(baseRectangleEnd.topLeft);
-			resultsBuffer.Add(baseRectangleEnd.topRight);
-			resultsBuffer.Add(baseRectangleEnd.bottomRight);
+			resultsBuffer.Add(baseRectangleEnd.BottomLeft);
+			resultsBuffer.Add(baseRectangleEnd.TopLeft);
+			resultsBuffer.Add(baseRectangleEnd.TopRight);
+			resultsBuffer.Add(baseRectangleEnd.BottomRight);
 
 			for(int i = 0; i < 4; i++)
 			{
@@ -1197,10 +1196,10 @@ namespace SRLE.RuntimeGizmo
 		{
 			Square baseRectangle = GetBaseSquare(axisStart, axisOtherDirection1, axisOtherDirection2, width);
 
-			resultsBuffer.Add(baseRectangle.bottomLeft);
-			resultsBuffer.Add(baseRectangle.topLeft);
-			resultsBuffer.Add(baseRectangle.topRight);
-			resultsBuffer.Add(baseRectangle.bottomRight);
+			resultsBuffer.Add(baseRectangle.BottomLeft);
+			resultsBuffer.Add(baseRectangle.TopLeft);
+			resultsBuffer.Add(baseRectangle.TopRight);
+			resultsBuffer.Add(baseRectangle.BottomRight);
 		}
 
 		Square GetBaseSquare(Vector3 axisEnd, Vector3 axisOtherDirection1, Vector3 axisOtherDirection2, float size)
@@ -1209,10 +1208,10 @@ namespace SRLE.RuntimeGizmo
 			Vector3 offsetUp = ((axisOtherDirection1 * size) + (axisOtherDirection2 * size));
 			Vector3 offsetDown = ((axisOtherDirection1 * size) - (axisOtherDirection2 * size));
 			//These might not really be the proper directions, as in the bottomLeft might not really be at the bottom left...
-			square.bottomLeft = axisEnd + offsetDown;
-			square.topLeft = axisEnd + offsetUp;
-			square.bottomRight = axisEnd - offsetUp;
-			square.topRight = axisEnd - offsetDown;
+			square.BottomLeft = axisEnd + offsetDown;
+			square.TopLeft = axisEnd + offsetUp;
+			square.BottomRight = axisEnd - offsetUp;
+			square.TopRight = axisEnd - offsetDown;
 			return square;
 		}
 		void SetCircles(AxisInfo axisInfo, AxisVectors axisVectors)
@@ -1222,10 +1221,10 @@ namespace SRLE.RuntimeGizmo
 			if(TranslatingTypeContains(TransformType.Rotate))
 			{
 				float circleLength = GetHandleLength(TransformType.Rotate);
-				AddCircle(pivotPoint, axisInfo.xDirection, circleLength, axisVectors.x);
-				AddCircle(pivotPoint, axisInfo.yDirection, circleLength, axisVectors.y);
-				AddCircle(pivotPoint, axisInfo.zDirection, circleLength, axisVectors.z);
-				AddCircle(pivotPoint, (pivotPoint - transform.position).normalized, circleLength, axisVectors.all, false);
+				AddCircle(pivotPoint, axisInfo.xDirection, circleLength, axisVectors.X);
+				AddCircle(pivotPoint, axisInfo.yDirection, circleLength, axisVectors.Y);
+				AddCircle(pivotPoint, axisInfo.zDirection, circleLength, axisVectors.Z);
+				AddCircle(pivotPoint, (pivotPoint - transform.position).normalized, circleLength, axisVectors.All, false);
 			}
 		}
 		void AddCircle(Vector3 origin, Vector3 axisDirection, float size, List<Vector3> resultsBuffer, bool depthTest = true)

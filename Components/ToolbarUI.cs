@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
+using SRLE.RuntimeGizmo;
 using SRLE.RuntimeGizmo.Objects;
 using SRLE.RuntimeGizmo.UndoRedo;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
 
 namespace SRLE.Components
 {
@@ -30,18 +30,14 @@ namespace SRLE.Components
             var transformGizmo = SRLECamera.Instance.transformGizmo;
             copyButton.onClick.AddListener(new UnityAction(() =>
             {
-                // if (transformGizmo.mainTargetRoot != null)
-                // {
-                //     CopyPasteManager.Paste();
-                //     Instance.UpdateStatus();
-                // }
+                CopyPasteManager.Duplicate();
+                Instance.UpdateStatus();
             }));
             var deleteButton = GetToolbarButton("Delete");
             deleteButton.onClick.AddListener(new UnityAction(() =>
             {
-                if (transformGizmo.mainTargetRoot != null)
+                if (transformGizmo.mainTargetRoot)
                 {
-                
                     ObjectManager.RemoveObject(transformGizmo.mainTargetRoot.gameObject);
                     Instance.UpdateStatus();
                 }
@@ -50,14 +46,12 @@ namespace SRLE.Components
             moveButton.onClick.AddListener(new UnityAction(() =>
             {
                 transformGizmo.transformType = TransformType.Move;
-                EntryPoint.ConsoleInstance.Log("Move tool");
             }));
             //TODO add move tool
             var rotateButton = GetToolbarButton("Rotate");
             rotateButton.onClick.AddListener(new UnityAction(() =>
             {
                 transformGizmo.transformType = TransformType.Rotate;
-                EntryPoint.ConsoleInstance.Log("Rotate tool");
             }));
             //TODO add rotate tool
             var scaleButton = GetToolbarButton("Scale");
@@ -88,7 +82,6 @@ namespace SRLE.Components
             var exitButton = GetToolbarButton("Exit");
             exitButton.onClick.AddListener(new UnityAction(() =>
             {
-                //SRLESaveManager.SaveLevel();
                 PauseMenu.Instance.Quit();
                 LevelManager.SetMode(LevelManager.Mode.NONE);
             }));

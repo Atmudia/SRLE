@@ -9,8 +9,21 @@ namespace SRLE.Patches
         [HarmonyPatch(typeof(DirectedAnimalSpawner), nameof(DirectedAnimalSpawner.Register)), HarmonyPrefix]
         public static bool RegisterAnimals(DirectedAnimalSpawner __instance)
         {
-            if (ObjectManager.GetBuildObject(__instance.gameObject, out _))
-                return false;
+            if (LevelManager.IsActive)
+                return !ObjectManager.GetBuildObject(__instance.gameObject, out _);
+            return true;
+        }
+
+        [HarmonyPatch(typeof(DirectedActorSpawner), nameof(DirectedActorSpawner.CanSpawn)), HarmonyPrefix]
+        public static bool CanSpawn(ref bool __result)
+        {
+            if (LevelManager.IsActive)
+                if (SRLECamera.Instance && SRLECamera.Instance.gameObject.activeSelf)
+                {
+                    __result = false;
+                    return false;
+                }
+
             return true;
         }
     }

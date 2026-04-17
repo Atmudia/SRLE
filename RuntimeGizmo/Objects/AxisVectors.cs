@@ -5,25 +5,25 @@ namespace SRLE.RuntimeGizmo.Objects
 {
 	public class AxisVectors
 	{
-		public List<Vector3> x = new List<Vector3>();
-		public List<Vector3> y = new List<Vector3>();
-		public List<Vector3> z = new List<Vector3>();
-		public List<Vector3> all = new List<Vector3>();
+		public readonly List<Vector3> X = new List<Vector3>();
+		public readonly List<Vector3> Y = new List<Vector3>();
+		public readonly List<Vector3> Z = new List<Vector3>();
+		public readonly List<Vector3> All = new List<Vector3>();
 
 		public void Add(AxisVectors axisVectors)
 		{
-			x.AddRange(axisVectors.x);
-			y.AddRange(axisVectors.y);
-			z.AddRange(axisVectors.z);
-			all.AddRange(axisVectors.all);
+			X.AddRange(axisVectors.X);
+			Y.AddRange(axisVectors.Y);
+			Z.AddRange(axisVectors.Z);
+			All.AddRange(axisVectors.All);
 		}
 
 		public void Clear()
 		{
-			x.Clear();
-			y.Clear();
-			z.Clear();
-			all.Clear();
+			X.Clear();
+			Y.Clear();
+			Z.Clear();
+			All.Clear();
 		}
 	}
 }

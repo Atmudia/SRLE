@@ -1,9 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SRLE.Models;
 using SRLE.Utils;
@@ -20,7 +18,7 @@ namespace SRLE.Components
         private GameObject Hierarchy;
         private ScrollRect CategoryScroll;
         private ScrollRect ObjectsScroll;
-        internal InputField SearchInput;
+        private InputField SearchInput;
         private Dictionary<uint, Texture2D> BuildObjectsPreview;
 
         private bool currentlyProcessingPreviews = false;
@@ -171,11 +169,11 @@ namespace SRLE.Components
             ObjectManager.RequestObject(objectID, (previewObj) =>
             {
                 if (previewObj == null) return;
-                if (buildObj == null) return;
+                if (!buildObj) return;
 
                 
                 
-                Texture2D texture = RuntimePreviewGenerator.GenerateModelPreview(previewObj.GameObject.transform);
+                Texture2D texture = RuntimePreviewGenerator.GenerateModelPreview(previewObj.gameObject.transform);
                 byte[] bytes = texture.EncodeToPNG();
                 File.WriteAllBytes(Path.Combine(SaveManager.DataPath, "Textures", objectID + ".jpg"), bytes);
 
@@ -190,7 +188,7 @@ namespace SRLE.Components
             {
                 if (buildObject == null) return;
 
-                GameObject obj = Instantiate(buildObject.GameObject, SRLECamera.Instance.transform.position + (SRLECamera.Instance.transform.forward * 10), Quaternion.identity, ObjectManager.World.transform);
+                GameObject obj = Instantiate(buildObject.gameObject, SRLECamera.Instance.transform.position + (SRLECamera.Instance.transform.forward * 10), Quaternion.identity, ObjectManager.World.transform);
                 var addComponent = obj.AddComponent<BuildObject>();
                 addComponent.ID = ObjectManager.BuildObjectsData[id];
                 addComponent.Region = SRSingleton<SceneContext>.Instance.RegionRegistry.GetCurrentRegionSetId();
@@ -246,9 +244,9 @@ namespace SRLE.Components
 
                     ObjectManager.RequestObject(objectID, previewObj =>
                     {
-                        if (previewObj?.GameObject != null)
+                        if (previewObj?.gameObject != null)
                         {
-                            Texture2D texture = RuntimePreviewGenerator.GenerateModelPreview(previewObj.GameObject.transform);
+                            Texture2D texture = RuntimePreviewGenerator.GenerateModelPreview(previewObj.gameObject.transform);
                             if (texture != null)
                             {
                                 byte[] bytes = texture.EncodeToPNG();

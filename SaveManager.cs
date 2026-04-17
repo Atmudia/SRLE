@@ -1,8 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using MonomiPark.SlimeRancher;
-using MonomiPark.SlimeRancher.DataModel;
 using Newtonsoft.Json;
 using SRLE.Components;
 using SRLE.Models;
@@ -12,12 +10,12 @@ namespace SRLE
 {
     public static class SaveManager
     {
-        public static string DataPath => Path.Combine(new DirectoryInfo(Application.dataPath).Parent.FullName, "SRLE");
+        public static string DataPath => Path.Combine(new DirectoryInfo(Application.dataPath).Parent!.FullName, "SRLE");
         public static string LevelsPath => Path.Combine(DataPath, "Levels");
         public static string TexturesDataPath => Path.Combine(DataPath, "Textures");
         public static LevelData CurrentLevel;
         public static SettingsUI.Settings Settings;
-        
+
         static SaveManager()
         {
             EnsureFoldersExist();
@@ -26,80 +24,109 @@ namespace SRLE
 
         private static void EnsureFoldersExist()
         {
-            if (!Directory.Exists(DataPath))
+            Directory.CreateDirectory(DataPath);
+            Directory.CreateDirectory(LevelsPath);
+            Directory.CreateDirectory(TexturesDataPath);
+
+            string favoritesPath = Path.Combine(DataPath, "favorites.txt");
+            if (!File.Exists(favoritesPath))
+                File.WriteAllText(favoritesPath, JsonConvert.SerializeObject(new List<uint>()));
+
+            string settingsPath = Path.Combine(DataPath, "settings.txt");
+            if (!File.Exists(settingsPath))
             {
-                Directory.CreateDirectory(DataPath);
-            }
-            if (!Directory.Exists(LevelsPath))
-            {
-                Directory.CreateDirectory(LevelsPath);
-            }    
-            if (!Directory.Exists(TexturesDataPath))
-            {
-                Directory.CreateDirectory(TexturesDataPath);
-            } 
-            if (!File.Exists(Path.Combine(DataPath, "favorites.txt")))
-                File.WriteAllText(
-                    Path.Combine(DataPath, "favorites.txt"),
-                    JsonConvert.SerializeObject(new List<uint>())
-                );    
-            if(!File.Exists(Path.Combine(SaveManager.DataPath, "settings.txt")))
-            {
-                SaveManager.Settings = new SettingsUI.Settings()
+                Settings = new SettingsUI.Settings
                 {
                     EnableFog = true,
                     HighlightMethod = ObjectHighlight.HighlightType.Wireframe,
                     HighlightStrength = 10,
                     RenderDistance = 1000
                 };
+                File.WriteAllText(settingsPath, JsonConvert.SerializeObject(Settings));
             }
-            else SaveManager.Settings = JsonConvert.DeserializeObject<SettingsUI.Settings>(File.ReadAllText(Path.Combine(SaveManager.DataPath, "settings.txt")));
-
+            else
+            {
+                Settings = JsonConvert.DeserializeObject<SettingsUI.Settings>(File.ReadAllText(settingsPath));
+            }
         }
+
         public static void LoadLevel(string levelPath)
         {
-            LevelManager.SetMode(LevelManager.Mode.BUILD);
-            CurrentLevel = JsonConvert.DeserializeObject<LevelData>(File.ReadAllText(levelPath));
-            CurrentLevel.Path = levelPath;
-            SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("srle", Identifiable.Id.HEN, PlayerState.GameMode.CLASSIC, () => {});
+            try
+            {
+                ChunkManager.Clear();
+                var levelData = LevelFileHandle.Deserialize(File.ReadAllText(levelPath), levelPath);
+                levelData.Path = levelPath;
+                CurrentLevel = levelData;
+                LevelManager.SetMode(LevelManager.Mode.BUILD);
+                SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("srle", Identifiable.Id.HEN, PlayerState.GameMode.CLASSIC, () => { });
+            }
+            catch (Exception e)
+            {
+                CurrentLevel = null;
+                LevelManager.SetMode(LevelManager.Mode.NONE);
+                EntryPoint.ConsoleInstance.Log($"[SRLE] Failed to load level '{levelPath}': {e.Message}");
+            }
         }
-        public static void CreateLevel(string levelName)
+
+        public static void CreateLevel(string levelName, WorldType worldType = WorldType.STANDARD)
         {
+            ChunkManager.Clear();
             LevelManager.SetMode(LevelManager.Mode.BUILD);
-            CurrentLevel = new LevelData()
+            CurrentLevel = new LevelData
             {
                 LevelName = levelName,
+                WorldType = worldType,
                 BuildObjects = new Dictionary<uint, List<BuildObjectData>>(),
-                Dependencies = new Dictionary<string, string>(), 
+                Dependencies = new Dictionary<string, string>(),
                 Path = Path.Combine(LevelsPath, $"{levelName}.srle")
             };
-        
-            SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("srle", Identifiable.Id.HEN, PlayerState.GameMode.CLASSIC, () => {});
-
-    
+            SRSingleton<GameContext>.Instance.AutoSaveDirector.LoadNewGame("srle", Identifiable.Id.HEN, PlayerState.GameMode.CLASSIC, () => { });
         }
+
         public static void SaveLevel()
         {
-            CurrentLevel.BuildObjects.Clear();
-            foreach (KeyValuePair<uint, System.Collections.Generic.List<GameObject>> data in ObjectManager.BuildObjects)
+            // Build the new data first — don't touch CurrentLevel until we're ready to commit
+            var newBuildObjects = new Dictionary<uint, List<BuildObjectData>>();
+            foreach (var kvp in ObjectManager.BuildObjects)
             {
-                EntryPoint.ConsoleInstance.Log(data.Key);
-                CurrentLevel.BuildObjects.Add(data.Key, new List<BuildObjectData>());
-                foreach (var obj in data.Value)
+                var list = new List<BuildObjectData>();
+                foreach (var obj in kvp.Value)
                 {
-                    ObjectManager.GetBuildObject(obj, out var buildObject);
-                    CurrentLevel.BuildObjects[data.Key].Add(new BuildObjectData()
+                    if (!ObjectManager.GetBuildObject(obj, out var buildObject))
                     {
-                        Pos = BuildObjectData.Vector3Save.ToVector3Save(obj.transform.localPosition),
-                        Rot = BuildObjectData.Vector3Save.ToVector3Save(obj.transform.localEulerAngles),
-                        Scale = BuildObjectData.Vector3Save.ToVector3Save(obj.transform.localScale),
+                        EntryPoint.ConsoleInstance.Log($"[SRLE] Skipping object '{obj.name}' during save — no BuildObject component.");
+                        continue;
+                    }
+                    list.Add(new BuildObjectData
+                    {
+                        Pos = obj.transform.position,
+                        Rot = obj.transform.eulerAngles,
+                        Scale = obj.transform.localScale,
                         Properties = buildObject.GetData()
-
                     });
-
                 }
-           
+                newBuildObjects.Add(kvp.Key, list);
             }
-            File.WriteAllText(CurrentLevel.Path, JsonConvert.SerializeObject(CurrentLevel)); }
+
+            CurrentLevel.BuildObjects = newBuildObjects;
+
+            // Write to a temp file first; only replace the real file once the write succeeds
+            string tempPath = CurrentLevel.Path + ".tmp";
+            try
+            {
+                File.WriteAllText(tempPath, LevelFileHandle.Serialize(CurrentLevel, CurrentLevel.Path));
+                if (File.Exists(CurrentLevel.Path))
+                    File.Replace(tempPath, CurrentLevel.Path, null);
+                else
+                    File.Move(tempPath, CurrentLevel.Path);
+            }
+            catch (Exception e)
+            {
+                EntryPoint.ConsoleInstance.Log($"[SRLE] Failed to write save file: {e.Message}");
+                if (File.Exists(tempPath))
+                    File.Delete(tempPath);
+            }
+        }
     }
 }

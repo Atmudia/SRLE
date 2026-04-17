@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
@@ -10,7 +7,6 @@ using SRLE.Components;
 using SRLE.Components.MainMenuUIs;
 using SRLE.Models;
 using SRML;
-using SRML.Console;
 using SRML.SR;
 using SRML.SR.UI.Utils;
 using SRML.Utils;
@@ -25,13 +21,6 @@ namespace SRLE
     {
         public new static Console.ConsoleInstance ConsoleInstance = new Console.ConsoleInstance("SRLE");
         public const string Version = "1.0.0";
-        private static string[] m_DefaultRemovedScripts = new string[]
-        {
-            "ActivateOnProgressRange",
-            "DeactivateOnGameMode",
-            "DeactivateOnDLCDisabled",
-            "PuzzleTeleportLock"
-        };
         
         public override void PreLoad()
         {
@@ -42,26 +31,21 @@ namespace SRLE
             HarmonyInstance.PatchAll();
             Console.RegisterCommand(new ConvertBetterBuildCommand());
             Console.RegisterCommand(new DisableOcclusionCommand());
-            
+
             TranslationPatcher.AddUITranslation("l.srle.window_title", "SRLE - Slime Rancher Level Editor");
             TranslationPatcher.AddUITranslation("l.srle.load_a_level", "Load a Level");
             TranslationPatcher.AddUITranslation("l.srle.create_a_level", "Create a Level");
             TranslationPatcher.AddUITranslation("b.srle", "SRLE");
-            
             TranslationPatcher.AddUITranslation("l.srle.level_name", "Level Name");
             TranslationPatcher.AddUITranslation("m.srle.default_level_name", "Level {0}");
             TranslationPatcher.AddUITranslation("l.srle.object_count", "Objects: {0}");
             TranslationPatcher.AddUITranslation("l.srle.filesize", "Size: {0}");
-			
-
             TranslationPatcher.AddUITranslation("l.srle.choose_level_icon", "Choose a Level Icon");
             TranslationPatcher.AddUITranslation("l.srle.select_world_type", "Select a World Type");
-
             TranslationPatcher.AddUITranslation("l.srle.world_type.sea", "Slime Sea");
             TranslationPatcher.AddUITranslation("l.srle.world_type.desert", "Glass Desert Sea");
             TranslationPatcher.AddUITranslation("l.srle.world_type.void", "Complete Void");
             TranslationPatcher.AddUITranslation("l.srle.world_type.standard", "Standard World");
-
             TranslationPatcher.AddUITranslation("m.srle.desc.worldType.sea",
                 "A blank world with the slime sea for you to build your own ranch.");
             TranslationPatcher.AddUITranslation("m.srle.desc.worldType.desert",
@@ -70,300 +54,305 @@ namespace SRLE
                 "The normal slime rancher map, prebuilt with everything the normal map has.");
             TranslationPatcher.AddUITranslation("m.srle.desc.worldType.void",
                 "A completely blank world, no slime sea, no sea bed, no objects, build whatever you want here.");
-
             TranslationPatcher.AddUITranslation("m.srle.no_saved_levels", "No Saved Levels Available");
             TranslationPatcher.AddUITranslation("m.srle.confirm_delete", "Are you sure you wish to permanently delete this level?");
-            
-            SRCallbacks.PreSaveGameLoad += context =>
-            {
-                SRLEConverter.ConvertToBuildObjects();
-            };
+
+            SRCallbacks.PreSaveGameLoad += context => SRLEConverter.ConvertToBuildObjects();
+
             GameObject manager = new GameObject("SRLE");
             manager.AddComponent<SRLEMod>();
             manager.hideFlags |= HideFlags.HideAndDontSave;
 
-            SRCallbacks.PreSaveGameLoaded += context =>
-            {
-                if (LevelManager.CurrentMode == LevelManager.Mode.NONE)
-                    return;
-                
-                ObjectManager.CachedGameObjects = new GameObject(nameof(ObjectManager.CachedGameObjects))
-                {
-                    hideFlags = HideFlags.HideAndDontSave
-                };
-                ObjectManager.World = new GameObject("SRLEWorld");
-                ObjectManager.World.hideFlags |= HideFlags.HideAndDontSave;
-                Object.DontDestroyOnLoad(ObjectManager.World);
-                UIInitializer.Initialize();
+            SRCallbacks.PreSaveGameLoaded += OnSaveGamePreLoaded;
+            SRCallbacks.OnMainMenuLoaded += SetupMainMenu;
 
-                var idClasses = ObjectManager.BuildObjectsData;
-                foreach (var idClass in idClasses)
-                {
-                    var gameObjectPath = GameObject.Find(idClass.Value.Path);
-                    if (!gameObjectPath)
-                    {
-                        ConsoleInstance.Log($"Object with ID {idClass.Value.Id} could not be found");
-                        continue;
-                    }
-                    var beforeState = gameObjectPath.activeInHierarchy;
-                    gameObjectPath.SetActive(false);
-                    var buildObject = Object.Instantiate(gameObjectPath, new Vector3(0,0,0), gameObjectPath.transform.rotation, ObjectManager.CachedGameObjects.transform);
-                    buildObject.name = $"{idClass.Value.Id} {gameObjectPath.name}";
-                    foreach (MonoBehaviour script in buildObject.GetComponentsInChildren<MonoBehaviour>(true))
-                    {
-                        foreach (var defaultRemove in m_DefaultRemovedScripts)
-                        {
-                            if (script.GetType().ToString().Equals(defaultRemove, StringComparison.CurrentCultureIgnoreCase))
-                            {
-                                UnityEngine.Object.Destroy(script);
-                            }
-                        }
-                    }
-
-                    TeleportDestination destination = buildObject.GetComponentInChildren<TeleportDestination>(true);
-                    TeleportSource source = buildObject.GetComponentInChildren<TeleportSource>(true);
-                    if (destination != null)
-                    {
-                        destination.teleportDestinationName = "NotSet";
-                    }
-                    if (source != null)
-                    {
-                        source.activated = false;
-                        source.activationBlocker = null;
-                        source.waitForExternalActivation = false;
-                        source.activationProgress = ProgressDirector.ProgressType.NONE;
-                        source.blockingGenerator = null;
-                        source.destinationSetName = "NotSet";
-                    }
-
-                    JournalEntry journal = buildObject.GetComponentInChildren<JournalEntry>();
-                    if (journal != null)
-                    {
-                        journal.ensureProgress = Array.Empty<ProgressDirector.ProgressType>();
-                    }
-                    gameObjectPath.SetActive(beforeState);
-                    idClass.Value.GameObject = buildObject;
-                }
-                foreach (var id in SaveManager.CurrentLevel.BuildObjects.Keys)
-                {
-                    EntryPoint.ConsoleInstance.Log(id);
-                    foreach (var data in SaveManager.CurrentLevel.BuildObjects[id])
-                    {
-                        ObjectManager.RequestObject(id, idClass =>
-                        {
-                            if (idClass != null)
-                            {
-                                GameObject obj = Object.Instantiate(idClass.GameObject, BuildObjectData.Vector3Save.RevertToVector3(data.Pos), Quaternion.Euler(BuildObjectData.Vector3Save.RevertToVector3(data.Rot)), ObjectManager.World.transform);
-                                var buildObject = obj.AddComponent<BuildObject>();
-                                buildObject.ID = idClass;
-                                buildObject.SetData(data.Properties);
-                                obj.transform.localScale = BuildObjectData.Vector3Save.RevertToVector3(data.Scale);
-                                obj.SetActive(true);
-                                ObjectManager.AddObject(id, obj);
-
-                            }
-                        });
-                        
-                        ToolbarUI.Instance.UpdateStatus();
-                    }
-                }
-                ToolbarUI.Instance.UpdateStatus();
-
-
-            };
-            SRCallbacks.OnMainMenuLoaded += menu =>
-            {
-                SRLENewLevelUI.AllSprites = ZoneDirector.zonePediaIdLookup
-                    .Values
-                    .Distinct()
-                    .Select(z => z.GetIcon())
-                    .ToList();
-                var addMainMenuButton = MainMenuUtils.AddMainMenuButtonWithTranslation(menu, "SRLE", "b.srle", () =>
-                {
-                    var instantiateAndWaitForDestroy = (menu.expoSelectGameUI).InstantiateInactive(true);
-                    instantiateAndWaitForDestroy.name = "SRLE_UI";
-                    Object.Destroy(instantiateAndWaitForDestroy.GetComponent<ExpoGameSelectUI>());
-                    var expoGameSelectUI = instantiateAndWaitForDestroy.AddComponent<BaseUI>();
-                    expoGameSelectUI.onDestroy = null;
-                    expoGameSelectUI.onDestroy = () =>
-                    { 
-                        menu?.gameObject.SetActive(true);
-                    };
-                    menu.gameObject.SetActive(false);
-                    instantiateAndWaitForDestroy.gameObject.SetActive(true);
-                    
-                    var panel = instantiateAndWaitForDestroy.transform.Find("Panel");
-                    panel.transform.Find("Window Title").GetComponentInChildren<XlateText>().SetKey("l.srle.window_title");
-                    panel = panel.transform.Find("Panel");
-                    var createLevel = panel.GetChild(0);
-                    createLevel.GetComponentInChildren<XlateText>().SetKey("l.srle.create_a_level");
-                    (createLevel.GetComponentInChildren<Button>().onClick = new Button.ButtonClickedEvent()).AddListener(() =>
-                    {
-                        var newGameUI = menu.newGameUI.InstantiateInactive();
-                        newGameUI.name = "SRLENewLevel";
-                        var gameUI = newGameUI.GetComponent<NewGameUI>();
-                        var srleNewLevelUI = newGameUI.AddComponent<SRLENewLevelUI>();
-                        srleNewLevelUI.onDestroy += () =>
-                        {
-                            if (expoGameSelectUI)
-                                expoGameSelectUI.Close();
-                        };
-                        srleNewLevelUI.gameIconPrefab = gameUI.gameIconPrefab;
-                        var panel = newGameUI.transform.Find("Panel").gameObject;
-                        panel.FindChild("Title").GetComponent<XlateText>().SetKey("l.srle.create_a_level");
-
-                        GameObject infoPanel = panel.FindChild("InfoPanel");
-                        (panel.FindChild("BackButton", true).GetComponent<Button>().onClick = new Button.ButtonClickedEvent()).AddListener(
-                            () => {
-                                    expoGameSelectUI.Close();
-		                            srleNewLevelUI.Close();
-	                            });
-                        infoPanel.GetChild(0).GetComponent<XlateText>().SetKey("l.srle.level_name");
-                        srleNewLevelUI.levelNameField = gameUI.gameNameField;
-                        infoPanel.GetChild(3).GetComponent<XlateText>().SetKey("l.srle.choose_level_icon");
-                        infoPanel.GetChild(6).GetComponent<XlateText>().SetKey("l.srle.select_world_type");
-
-                        var ModeOuterPanel = infoPanel.GetChild(7).GetChild(0);
-                        srleNewLevelUI.worldModeDescription = gameUI.gameModeText;
-                        srleNewLevelUI.iconGroup = gameUI.iconGroup;
-                        srleNewLevelUI.iconTabByMenuKeys = gameUI.iconTabByMenuKeys;
-
-                        srleNewLevelUI.rightIconButton = gameUI.rightIconButton;
-                        (srleNewLevelUI.rightIconButton.onClick = new Button.ButtonClickedEvent()).AddListener(srleNewLevelUI.SelectNextIcon);
-                            
-                        srleNewLevelUI.leftIconButton = gameUI.leftIconButton;
-                        (srleNewLevelUI.leftIconButton.onClick = new Button.ButtonClickedEvent()).AddListener(srleNewLevelUI.SelectPreviousIcon);
-                            
-
-
-
-                        var SeaToggle = ModeOuterPanel.GetChild(0);
-                        SeaToggle.name = "SeaToggle";
-                        SeaToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type.sea");
-                        srleNewLevelUI.SeaToggle = SeaToggle.GetComponent<SRToggle>();
-
-                        var DesertToggle = ModeOuterPanel.GetChild(1);
-                        DesertToggle.name = "DesertToggle";
-                        DesertToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type.desert");
-                        srleNewLevelUI.DesertToggle = DesertToggle.GetComponent<SRToggle>();
-
-                            
-                        var VoidToggle = ModeOuterPanel.GetChild(2);
-                        VoidToggle.name = "VoidToggle";
-                        VoidToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type.void");
-                        srleNewLevelUI.VoidToggle = VoidToggle.GetComponent<SRToggle>();
-
-                            
-                            
-                        var StandardToggle = Object.Instantiate(ModeOuterPanel.GetChild(0).gameObject, ModeOuterPanel.transform);
-                        StandardToggle.name = "StandardToggle";
-                        StandardToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type.standard");
-                        srleNewLevelUI.StandardToggle = StandardToggle.GetComponent<SRToggle>();
-                        StandardToggle.transform.SetSiblingIndex(0);
-                        Object.DestroyImmediate(gameUI);
-                        newGameUI.SetActive(true);
-                        instantiateAndWaitForDestroy.SetActive(false);
-
-                    });
-                    var loadLevel = panel.GetChild(1);
-                    loadLevel.GetComponentInChildren<XlateText>().SetKey("l.srle.load_a_level");
-                    (loadLevel.GetComponentInChildren<Button>().onClick = new Button.ButtonClickedEvent()).AddListener(
-                        () =>
-                        {
-                            var loadLevelUI = GameObjectUtils.InstantiateInactive(menu.loadGameUI);
-                            loadLevelUI.name = "SRLELoadLevelUI";
-
-                            var srleNewLevelUI = loadLevelUI.AddComponent<SRLE.Components.SRLELoadLevelUI>();
-                            srleNewLevelUI.onDestroy = () =>
-                            { 
-                                if (expoGameSelectUI)
-                                    expoGameSelectUI.Close();
-
-                            };
-                            GameObject panel = loadLevelUI.GetChild(0).gameObject;
-                            panel.GetChild(0).GetComponent<XlateText>().SetKey("l.srle.load_a_level");
-                            (panel.transform.Find("CloseButton").GetComponent<Button>().onClick = new Button.ButtonClickedEvent()).AddListener(
-                                () =>
-                                {
-                                    expoGameSelectUI.Close();
-                                    srleNewLevelUI.Close();
-                                    
-                                });
-                            var loadGameUI = loadLevelUI.GetComponent<LoadGameUI>();
-                            srleNewLevelUI.loadingPanel = loadGameUI.loadingPanel;
-                            srleNewLevelUI.noSavesPanel = loadGameUI.noSavesPanel;
-                            srleNewLevelUI.deleteUIPrefab = loadGameUI.deleteUIPrefab.InstantiateInactive(true);
-                            srleNewLevelUI.deleteUIPrefab.SetActive(true);
-                            var gameSummaryPanelDeleteUIObj = srleNewLevelUI.deleteUIPrefab.transform.Find("MainPanel/GameSummaryPanel").gameObject;
-                            var levelSummaryPanelDeleteUI = gameSummaryPanelDeleteUIObj.AddComponent<LevelSummaryPanel>();
-                            var gameSummaryPanelDeleteUI = levelSummaryPanelDeleteUI.GetComponent<GameSummaryPanel>();
-                            levelSummaryPanelDeleteUI.objectsAmountText = gameSummaryPanelDeleteUI.dayText;
-                            levelSummaryPanelDeleteUI.levelIcon = gameSummaryPanelDeleteUI.gameIcon;
-                            levelSummaryPanelDeleteUI.modeText = gameSummaryPanelDeleteUI.modeText;
-                            levelSummaryPanelDeleteUI.levelNameText = gameSummaryPanelDeleteUI.gameNameText;
-                            levelSummaryPanelDeleteUI.modeDescText = gameSummaryPanelDeleteUI.modeDescText;
-                            levelSummaryPanelDeleteUI.fileSizeText = gameSummaryPanelDeleteUI.pediaText;
-                            Object.Destroy(gameSummaryPanelDeleteUI);
-                            
-                            
-                            srleNewLevelUI.noSavesPanel.GetComponentInChildren<XlateText>().SetKey("m.srle.no_saved_levels");
-                            srleNewLevelUI.summaryPanel = loadGameUI.summaryPanel.gameObject;
-                            srleNewLevelUI.loadGameButtonPrefab = loadGameUI.loadGameButtonPrefab;
-                            srleNewLevelUI.loadButtonPanel = loadGameUI.loadButtonPanel;
-                            srleNewLevelUI.scroller = loadGameUI.scroller;
-                            var gameSummaryPanel = srleNewLevelUI.summaryPanel.GetComponent<GameSummaryPanel>();
-                            var levelSummaryPanel = srleNewLevelUI.summaryPanel.AddComponent<LevelSummaryPanel>();
-                            levelSummaryPanel.objectsAmountText = gameSummaryPanel.dayText;
-                            levelSummaryPanel.levelIcon = gameSummaryPanel.gameIcon;
-                            levelSummaryPanel.modeText = gameSummaryPanel.modeText;
-                            levelSummaryPanel.levelNameText = gameSummaryPanel.gameNameText;
-                            levelSummaryPanel.modeDescText = gameSummaryPanel.modeDescText;
-                            levelSummaryPanel.fileSizeText = gameSummaryPanel.pediaText;
-                            gameSummaryPanel.currencyText.transform.parent.gameObject.SetActive(false);
-                            levelSummaryPanel.gameObject.FindChild(gameSummaryPanel.versionText.gameObject.name, true).SetActive(false);
-                            Object.DestroyImmediate(gameSummaryPanel);
-
-
-                            // levelSummaryPanel.transform.Find("MainPanel/ValidPanel/InfoPanel/Panel").gameObject.SetActive(false);
-                            
-                            Object.DestroyImmediate(loadGameUI);
-                            loadLevelUI.SetActive(true);
-                            instantiateAndWaitForDestroy.SetActive(false);
-                            
-                        });
-                    
-                                
-                });
-                addMainMenuButton.name = "SRLEButton";
-                addMainMenuButton.transform.Find("Text").GetComponent<XlateText>().SetKey("b.srle");
-                addMainMenuButton.transform.SetSiblingIndex(4);
-               
-            };
 
         }
 
         public override void Load()
         {
-            
+            foreach (var id in Gadget.DECO_CLASS.Concat(Gadget.LAMP_CLASS))
+            {
+                if (SRSingleton<GameContext>.Instance.LookupDirector.gadgetDefinitionDict.TryGetValue(id, out var gadgetDefinition))
+                {
+                    if (gadgetDefinition && gadgetDefinition.prefab)
+                    {
+                        var copyPrefab = PrefabUtils.CopyPrefab(gadgetDefinition.prefab);
+                        copyPrefab.RemoveComponent<Gadget>();
+                        ObjectManager.RegisterObject("srle", "Mods", copyPrefab.name, copyPrefab);
+                    }
+                }
+               
+            }
         }
-        
-        
-        
-    //     public class TestHashCodeCommand : ConsoleCommand
-    //     {
-    //         public override bool Execute(string[] args)
-    //         {
-    //             Ray ray = SRLECamera.Instance.camera.ScreenPointToRay(Input.mousePosition);
-    //             if (!Physics.Raycast(ray, out var hit))
-    //                 return false;
-    //             GetObjectByHashCode(hit.collider.gameObject);
-    //             return true;
-    //         }
-    //
-    //         public override string ID => "testhashcode";
-    //         public override string Usage => ID;
-    //         public override string Description => "Test hashcode";
-    //     }
-    // }
+
+        // ── Save-game loaded ──────────────────────────────────────────────────
+
+        private static void OnSaveGamePreLoaded(SceneContext context)
+        {
+            if (LevelManager.CurrentMode == LevelManager.Mode.NONE)
+                return;
+            
+            ObjectManager.World = new GameObject("SRLEWorld");
+            ObjectManager.World.hideFlags |= HideFlags.HideAndDontSave;
+            Object.DontDestroyOnLoad(ObjectManager.World);
+            UIInitializer.Initialize();
+            foreach (var id in SaveManager.CurrentLevel.BuildObjects.Keys)
+            {
+                foreach (var data in SaveManager.CurrentLevel.BuildObjects[id])
+                {
+                    ObjectManager.RequestObject(id, idClass =>
+                    {
+                        if (idClass != null)
+                        {
+                            GameObject obj = Object.Instantiate(idClass.gameObject, BuildObjectData.Vector3Save.RevertToVector3(data.Pos), Quaternion.Euler(BuildObjectData.Vector3Save.RevertToVector3(data.Rot)), ObjectManager.World.transform);
+                            var buildObject = obj.AddComponent<BuildObject>();
+                            buildObject.ID = idClass;
+                            buildObject.SetData(data.Properties);
+                            obj.transform.localScale = BuildObjectData.Vector3Save.RevertToVector3(data.Scale);
+                            obj.SetActive(true);
+                            ObjectManager.AddObject(id, obj);
+
+                        }
+                    });
+                    ToolbarUI.Instance.UpdateStatus();
+                }
+            }
+            ToolbarUI.Instance.UpdateStatus();
+
+            ApplyWorldType(SaveManager.CurrentLevel.WorldType);
+        }
+
+        private static void ApplyWorldType(WorldType worldType)
+        {
+            switch (worldType)
+            {
+                case WorldType.STANDARD:
+                    break;
+                case WorldType.SEA:
+                    foreach (var zoneDirector in Object.FindObjectsOfType<ZoneDirector>())
+                    {
+                        for (int i = 0; i < zoneDirector.transform.childCount; i++)
+                        {
+                            var transform = zoneDirector.transform.GetChild(i);
+                            if (transform.name.Equals("Sea"))
+                                continue;
+                            transform.gameObject.SetActive(false);
+                        }
+                    }
+                    break;
+                case WorldType.VOID:
+                    foreach (var zoneDirector in Object.FindObjectsOfType<ZoneDirector>())
+                    {
+                        for (int i = 0; i < zoneDirector.transform.childCount; i++)
+                        {
+                            zoneDirector.transform.GetChild(i).gameObject.SetActive(false);
+                        }
+                    }
+                    break;
+                case WorldType.DESERT:
+                    foreach (var zoneDirector in Object.FindObjectsOfType<ZoneDirector>())
+                    {
+                        for (int i = 0; i < zoneDirector.transform.childCount; i++)
+                        {
+                            var transform = zoneDirector.transform.GetChild(i);
+                            if (transform.name.Equals("SandSea"))
+                            {
+                                transform.gameObject.SetActive(true);
+                                transform.position = new Vector3(89.4098f, -3f,-145.1977f);
+                                continue;
+                            }
+                            transform.gameObject.SetActive(false);                        
+                        }
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(worldType), worldType, null);
+            }
+        }
+
+        // ── Main menu setup ───────────────────────────────────────────────────
+
+        private static void SetupMainMenu(MainMenuUI menu)
+        {
+            // Destroy world objects left over from a previous session
+            if (ObjectManager.World != null)
+            {
+                Object.Destroy(ObjectManager.World);
+                ObjectManager.World = null;
+            }
+            ObjectManager.BuildObjects.Clear();
+            SaveManager.CurrentLevel = null;
+            LevelManager.SetMode(LevelManager.Mode.NONE);
+            ChunkManager.Clear();
+            RuntimeGizmo.UndoRedo.UndoRedoManager.Clear();
+
+            SRLENewLevelUI.AllSprites = ZoneDirector.zonePediaIdLookup
+                .Values
+                .Distinct()
+                .Select(z => z.GetIcon())
+                .ToList();
+
+            var button = MainMenuUtils.AddMainMenuButtonWithTranslation(menu, "SRLE", "b.srle", () => OpenSRLELobby(menu));
+            button.name = "SRLEButton";
+            button.transform.Find("Text").GetComponent<XlateText>().SetKey("b.srle");
+            button.transform.SetSiblingIndex(4);
+        }
+
+        private static void OpenSRLELobby(MainMenuUI menu)
+        {
+            var lobbyObj = (menu.expoSelectGameUI).InstantiateInactive(true);
+            lobbyObj.name = "SRLE_UI";
+            Object.Destroy(lobbyObj.GetComponent<ExpoGameSelectUI>());
+            var lobbyUI = lobbyObj.AddComponent<BaseUI>();
+            lobbyUI.onDestroy = null;
+            lobbyUI.onDestroy = () => menu?.gameObject.SetActive(true);
+            menu.gameObject.SetActive(false);
+            lobbyObj.gameObject.SetActive(true);
+
+            var panel = lobbyObj.transform.Find("Panel");
+            panel.transform.Find("Window Title").GetComponentInChildren<XlateText>().SetKey("l.srle.window_title");
+            panel = panel.transform.Find("Panel");
+
+            var createLevel = panel.GetChild(0);
+            createLevel.GetComponentInChildren<XlateText>().SetKey("l.srle.create_a_level");
+            (createLevel.GetComponentInChildren<Button>().onClick = new Button.ButtonClickedEvent()).AddListener(
+                () => OpenNewLevelUI(menu, lobbyObj, lobbyUI));
+
+            var loadLevel = panel.GetChild(1);
+            loadLevel.GetComponentInChildren<XlateText>().SetKey("l.srle.load_a_level");
+            (loadLevel.GetComponentInChildren<Button>().onClick = new Button.ButtonClickedEvent()).AddListener(
+                () => OpenLoadLevelUI(menu, lobbyObj, lobbyUI));
+        }
+
+        private static void OpenNewLevelUI(MainMenuUI menu, GameObject lobbyObj, BaseUI lobbyUI)
+        {
+            var newGameUI = menu.newGameUI.InstantiateInactive();
+            newGameUI.name = "SRLENewLevel";
+            var gameUI = newGameUI.GetComponent<NewGameUI>();
+            var srleNewLevelUI = newGameUI.AddComponent<SRLENewLevelUI>();
+            srleNewLevelUI.onDestroy += () =>
+            {
+                if (lobbyUI)
+                    lobbyUI.Close();
+            };
+            srleNewLevelUI.gameIconPrefab = gameUI.gameIconPrefab;
+            var panel = newGameUI.transform.Find("Panel").gameObject;
+            panel.FindChild("Title").GetComponent<XlateText>().SetKey("l.srle.create_a_level");
+
+            GameObject infoPanel = panel.FindChild("InfoPanel");
+            (panel.FindChild("BackButton", true).GetComponent<Button>().onClick = new Button.ButtonClickedEvent()).AddListener(
+                () =>
+                {
+                    lobbyUI.Close();
+                    srleNewLevelUI.Close();
+                });
+            infoPanel.GetChild(0).GetComponent<XlateText>().SetKey("l.srle.level_name");
+            srleNewLevelUI.levelNameField = gameUI.gameNameField;
+            infoPanel.GetChild(3).GetComponent<XlateText>().SetKey("l.srle.choose_level_icon");
+            infoPanel.GetChild(6).GetComponent<XlateText>().SetKey("l.srle.select_world_type");
+
+            var modeOuterPanel = infoPanel.GetChild(7).GetChild(0);
+            srleNewLevelUI.worldModeDescription = gameUI.gameModeText;
+            srleNewLevelUI.iconGroup = gameUI.iconGroup;
+            srleNewLevelUI.iconTabByMenuKeys = gameUI.iconTabByMenuKeys;
+
+            srleNewLevelUI.rightIconButton = gameUI.rightIconButton;
+            (srleNewLevelUI.rightIconButton.onClick = new Button.ButtonClickedEvent()).AddListener(srleNewLevelUI.SelectNextIcon);
+
+            srleNewLevelUI.leftIconButton = gameUI.leftIconButton;
+            (srleNewLevelUI.leftIconButton.onClick = new Button.ButtonClickedEvent()).AddListener(srleNewLevelUI.SelectPreviousIcon);
+
+            var seaToggle = modeOuterPanel.GetChild(0);
+            seaToggle.name = "SeaToggle";
+            seaToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type.sea");
+            srleNewLevelUI.SeaToggle = seaToggle.GetComponent<SRToggle>();
+
+            var desertToggle = modeOuterPanel.GetChild(1);
+            desertToggle.name = "DesertToggle";
+            desertToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type.desert");
+            srleNewLevelUI.DesertToggle = desertToggle.GetComponent<SRToggle>();
+
+            var voidToggle = modeOuterPanel.GetChild(2);
+            voidToggle.name = "VoidToggle";
+            voidToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type.void");
+            srleNewLevelUI.VoidToggle = voidToggle.GetComponent<SRToggle>();
+
+            var standardToggle = Object.Instantiate(modeOuterPanel.GetChild(0).gameObject, modeOuterPanel.transform);
+            standardToggle.name = "StandardToggle";
+            standardToggle.GetComponentInChildren<XlateText>().SetKey("l.srle.world_type.standard");
+            srleNewLevelUI.StandardToggle = standardToggle.GetComponent<SRToggle>();
+            standardToggle.transform.SetSiblingIndex(0);
+
+            // var startButton = panel.FindChild("StartButton", true)?.GetComponent<Button>()
+            //                ?? gameUI.GetComponentInChildren<Button>(true);
+            // if (startButton != null)
+            //     (startButton.onClick = new Button.ButtonClickedEvent()).AddListener(srleNewLevelUI.CreateNewLevel);
+
+            Object.DestroyImmediate(gameUI);
+            newGameUI.SetActive(true);
+            lobbyObj.SetActive(false);
+        }
+
+        private static void OpenLoadLevelUI(MainMenuUI menu, GameObject lobbyObj, BaseUI lobbyUI)
+        {
+            var loadLevelUI = GameObjectUtils.InstantiateInactive(menu.loadGameUI);
+            loadLevelUI.name = "SRLELoadLevelUI";
+
+            var srleLoadLevelUI = loadLevelUI.AddComponent<SRLELoadLevelUI>();
+            srleLoadLevelUI.onDestroy = () =>
+            {
+                if (lobbyUI)
+                    lobbyUI.Close();
+            };
+
+            GameObject panel = loadLevelUI.GetChild(0).gameObject;
+            panel.GetChild(0).GetComponent<XlateText>().SetKey("l.srle.load_a_level");
+            (panel.transform.Find("CloseButton").GetComponent<Button>().onClick = new Button.ButtonClickedEvent()).AddListener(
+                () =>
+                {
+                    lobbyUI.Close();
+                    srleLoadLevelUI.Close();
+                });
+
+            var loadGameUI = loadLevelUI.GetComponent<LoadGameUI>();
+            srleLoadLevelUI.loadingPanel = loadGameUI.loadingPanel;
+            srleLoadLevelUI.noSavesPanel = loadGameUI.noSavesPanel;
+            srleLoadLevelUI.deleteUIPrefab = loadGameUI.deleteUIPrefab.InstantiateInactive(true);
+            srleLoadLevelUI.deleteUIPrefab.SetActive(true);
+
+            var gameSummaryPanelDeleteUIObj = srleLoadLevelUI.deleteUIPrefab.transform.Find("MainPanel/GameSummaryPanel").gameObject;
+            var levelSummaryPanelDeleteUI = gameSummaryPanelDeleteUIObj.AddComponent<LevelSummaryPanel>();
+            var gameSummaryPanelDeleteUI = levelSummaryPanelDeleteUI.GetComponent<GameSummaryPanel>();
+            levelSummaryPanelDeleteUI.objectsAmountText = gameSummaryPanelDeleteUI.dayText;
+            levelSummaryPanelDeleteUI.levelIcon = gameSummaryPanelDeleteUI.gameIcon;
+            levelSummaryPanelDeleteUI.modeText = gameSummaryPanelDeleteUI.modeText;
+            levelSummaryPanelDeleteUI.levelNameText = gameSummaryPanelDeleteUI.gameNameText;
+            levelSummaryPanelDeleteUI.modeDescText = gameSummaryPanelDeleteUI.modeDescText;
+            levelSummaryPanelDeleteUI.fileSizeText = gameSummaryPanelDeleteUI.pediaText;
+            Object.Destroy(gameSummaryPanelDeleteUI);
+
+            srleLoadLevelUI.noSavesPanel.GetComponentInChildren<XlateText>().SetKey("m.srle.no_saved_levels");
+            srleLoadLevelUI.summaryPanel = loadGameUI.summaryPanel.gameObject;
+            srleLoadLevelUI.loadGameButtonPrefab = loadGameUI.loadGameButtonPrefab;
+            srleLoadLevelUI.loadButtonPanel = loadGameUI.loadButtonPanel;
+            srleLoadLevelUI.scroller = loadGameUI.scroller;
+
+            var gameSummaryPanel = srleLoadLevelUI.summaryPanel.GetComponent<GameSummaryPanel>();
+            var levelSummaryPanel = srleLoadLevelUI.summaryPanel.AddComponent<LevelSummaryPanel>();
+            levelSummaryPanel.objectsAmountText = gameSummaryPanel.dayText;
+            levelSummaryPanel.levelIcon = gameSummaryPanel.gameIcon;
+            levelSummaryPanel.modeText = gameSummaryPanel.modeText;
+            levelSummaryPanel.levelNameText = gameSummaryPanel.gameNameText;
+            levelSummaryPanel.modeDescText = gameSummaryPanel.modeDescText;
+            levelSummaryPanel.fileSizeText = gameSummaryPanel.pediaText;
+            gameSummaryPanel.currencyText.transform.parent.gameObject.SetActive(false);
+            levelSummaryPanel.gameObject.FindChild(gameSummaryPanel.versionText.gameObject.name, true).SetActive(false);
+            Object.DestroyImmediate(gameSummaryPanel);
+
+            Object.DestroyImmediate(loadGameUI);
+            loadLevelUI.SetActive(true);
+            lobbyObj.SetActive(false);
+        }
     }
 }

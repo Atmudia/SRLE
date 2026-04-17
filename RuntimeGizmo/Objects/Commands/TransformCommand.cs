@@ -26,18 +26,22 @@ namespace SRLE.RuntimeGizmo.Objects.Commands
 		
 		public void Execute()
 		{
+			var prevPosition = transform.position;
 			transform.position = newValues.position;
 			transform.rotation = newValues.rotation;
 			transform.localScale = newValues.scale;
+			ChunkManager.Reregister(transform, prevPosition);
 
 			transformGizmo.SetPivotPoint();
 		}
 
 		public void UnExecute()
 		{
+			var prevPosition = transform.position;
 			transform.position = oldValues.position;
 			transform.rotation = oldValues.rotation;
 			transform.localScale = oldValues.scale;
+			ChunkManager.Reregister(transform, prevPosition);
 
 			transformGizmo.SetPivotPoint();
 		}

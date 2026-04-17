@@ -27,10 +27,6 @@ namespace SRLE.Models
         public Vector3Save Pos { get; set; }
         public Vector3Save Rot { get; set; }
         public Vector3Save Scale { get; set; }
-        public uint BuildID{ get; set; }
-        public uint HandlerID { get; set; }
-        public string SceneGroup{ get; set; }
-
         public Dictionary<string, string> Properties { get; set; }
         public class Vector3Save
         {

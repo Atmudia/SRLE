@@ -10,7 +10,7 @@ namespace SRLE.Patches
         [HarmonyPrefix]
         public static bool CreateNew()
         {
-            return SaveManager.CurrentLevel == null;
+            return !LevelManager.IsActive;
         }
     }
 }

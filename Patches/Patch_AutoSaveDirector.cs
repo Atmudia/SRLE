@@ -10,8 +10,9 @@ namespace SRLE.Patches
         [HarmonyFinalizer]
         public static Exception FinalizerSaveGame(Exception __exception)
         {
-            if (SaveManager.CurrentLevel == null) 
+            if (!LevelManager.IsActive)
                 return __exception;
+            // SaveLevel handles its own exceptions internally and logs them
             SaveManager.SaveLevel();
             return null;
         }
@@ -30,11 +31,12 @@ namespace SRLE.Patches
                 {
                     SceneContext.Instance.PlayerState.AddKey();
                 }
-
+                
                 foreach(var upgrade in (PlayerState.Upgrade[])Enum.GetValues(typeof(PlayerState.Upgrade)))
                 {
                     SceneContext.Instance.PlayerState.AddUpgrade(upgrade);
                 }
+                
             }
         }
     }

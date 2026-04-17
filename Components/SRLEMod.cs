@@ -1,6 +1,6 @@
 using System.IO;
+using SRLE.Models;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace SRLE.Components
@@ -16,11 +16,17 @@ namespace SRLE.Components
             else Object.Destroy(this);
         }
 
+        private WorldType m_SelectedWorldType = WorldType.STANDARD;
+        private static readonly string[] s_WorldTypeNames = { "Standard", "Sea", "Desert", "Void" };
+        private static readonly WorldType[] s_WorldTypes = { WorldType.STANDARD, WorldType.SEA, WorldType.DESERT, WorldType.VOID };
+
         protected void OnGUI()
         {
             if (!Levels.isMainMenu())
                 return;
+
             GUI.Label(new Rect(15f, 125f, 150f, 25f), "SRLE v" + EntryPoint.Version);
+
             var files = Directory.GetFiles(SaveManager.LevelsPath, "*.srle");
             for (int i = 0; i < files.Length; i++)
             {
@@ -32,24 +38,29 @@ namespace SRLE.Components
                     SaveManager.LoadLevel(file);
                 }
             }
-            currentLevel = GUI.TextField(new Rect(125f, 170f + 35f * files.Length, 200f, 25f), currentLevel);
 
-            GUI.Box(new Rect(15f, 150f + 35f * files.Length, 350f, 100f), "");
-            GUI.Label(new Rect(25f, 170f + 35f * files.Length, 150f, 25f), "Level Name:");
-            if (GUI.Button(new Rect(25f, 210f + 35f * files.Length, 150f, 25f), "Create new Level"))
+            float y = 150f + 35f * files.Length;
+            GUI.Box(new Rect(15f, y, 350f, 130f), "");
+            GUI.Label(new Rect(25f, y + 10f, 100f, 25f), "Level Name:");
+            currentLevel = GUI.TextField(new Rect(125f, y + 10f, 225f, 25f), currentLevel);
+
+            GUI.Label(new Rect(25f, y + 45f, 100f, 25f), "World Type:");
+            for (int i = 0; i < s_WorldTypes.Length; i++)
             {
-                var fileName = currentLevel + ".srle";
-                var isValid = !string.IsNullOrEmpty(fileName) &&
-                              fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0 &&
-                              !File.Exists(Path.Combine(currentLevel, fileName));
+                bool selected = m_SelectedWorldType == s_WorldTypes[i];
+                if (GUI.Toggle(new Rect(125f + 80f * i, y + 45f, 75f, 25f), selected, s_WorldTypeNames[i]) && !selected)
+                    m_SelectedWorldType = s_WorldTypes[i];
+            }
+
+            if (GUI.Button(new Rect(25f, y + 85f, 150f, 25f), "Create new Level"))
+            {
+                var isValid = !string.IsNullOrEmpty(currentLevel) &&
+                              currentLevel.IndexOfAny(Path.GetInvalidFileNameChars()) < 0 &&
+                              !File.Exists(Path.Combine(SaveManager.LevelsPath, currentLevel + ".srle"));
                 if (isValid)
                 {
                     LevelManager.IsLoading = true;
-                    SaveManager.CreateLevel(currentLevel);
-                }
-                else
-                {
-                    //error = "Invalid Levelname or already exists";
+                    SaveManager.CreateLevel(currentLevel, m_SelectedWorldType);
                 }
             }
         }
@@ -58,6 +69,18 @@ namespace SRLE.Components
         {
             // if (UIInitializer.IsInitialized)
             //     ObjectManager.UpdateRequests();
+
+            if (!LevelManager.IsActive) return;
+
+            Vector3 pos;
+            if (SRLECamera.Instance != null && SRLECamera.Instance.gameObject.activeSelf)
+                pos = SRLECamera.Instance.transform.position;
+            else if (SRLECamera.Instance?.playerController != null)
+                pos = SRLECamera.Instance.playerController.transform.position;
+            else
+                return;
+
+            ChunkManager.UpdateActiveChunks(pos);
         }
     }
 }

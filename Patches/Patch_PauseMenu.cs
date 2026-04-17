@@ -7,12 +7,10 @@ namespace SRLE.Patches
     internal static class Patch_PauseMenu
     {
         [HarmonyPatch(nameof(PauseMenu.PauseGame)), HarmonyPrefix]
-    
         public static bool TogglePause()
         {
             if (LevelManager.CurrentMode != LevelManager.Mode.BUILD) return true;
             SRLECamera.Instance.SetActive(!SRLECamera.Instance.isActiveAndEnabled);
-            EntryPoint.ConsoleInstance.Log(!SRLECamera.Instance.isActiveAndEnabled);
             return false;
         }
         [HarmonyPatch(nameof(PauseMenu.Quit)), HarmonyPrefix]

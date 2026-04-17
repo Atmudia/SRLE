@@ -31,8 +31,6 @@ namespace SRLE.Components
 			base.Awake();
 			UpdateAvailLevels();
 		}
-		
-		
 
 		public void UpdateAvailLevels()
 		{

@@ -2,7 +2,9 @@ namespace SRLE.RuntimeGizmo.UndoRedo
 {
 	public class UndoRedo
 	{
-		public int maxUndoStored {get {return undoCommands.maxLength;} set => SetMaxLength(value);
+		public int MaxUndoStored {
+			get => undoCommands.MaxLength;
+			set => SetMaxLength(value);
 		}
 
 		DropoutStack<ICommand> undoCommands = new DropoutStack<ICommand>();
@@ -11,7 +13,7 @@ namespace SRLE.RuntimeGizmo.UndoRedo
 		public UndoRedo() {}
 		public UndoRedo(int maxUndoStored)
 		{
-			this.maxUndoStored = maxUndoStored;
+			this.MaxUndoStored = maxUndoStored;
 		}
 
 		public void Clear()
@@ -42,7 +44,7 @@ namespace SRLE.RuntimeGizmo.UndoRedo
 
 		public void Insert(ICommand command)
 		{
-			if(maxUndoStored <= 0) return;
+			if(MaxUndoStored <= 0) return;
 
 			undoCommands.Push(command);
 			redoCommands.Clear();
@@ -56,8 +58,8 @@ namespace SRLE.RuntimeGizmo.UndoRedo
 
 		void SetMaxLength(int max)
 		{
-			undoCommands.maxLength = max;
-			redoCommands.maxLength = max;
+			undoCommands.MaxLength = max;
+			redoCommands.MaxLength = max;
 		}
 	}
 }

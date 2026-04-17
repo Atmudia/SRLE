@@ -1,8 +1,6 @@
-using System;
 using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace SRLE.Components
@@ -15,7 +13,7 @@ namespace SRLE.Components
 
         public static SettingsUI Instance;
 
-        [Serializable]
+        [System.Serializable]
         public class Settings
         {
             public bool EnableFog = false;
@@ -33,49 +31,35 @@ namespace SRLE.Components
             Toggle fogToggle = transform.Find("Settings/Panel/FogToggle").GetComponent<Toggle>();
             m_RenderText = transform.Find("Settings/Panel/RenderText").GetComponent<Text>();
             Slider renderSlider = transform.Find("Settings/Panel/RenderSlider").GetComponent<Slider>();
-            Dropdown hightlightDropdown = transform.Find("Settings/Panel/HighlightDropdown").GetComponent<Dropdown>();
+            Dropdown highlightDropdown = transform.Find("Settings/Panel/HighlightDropdown").GetComponent<Dropdown>();
             m_HighlightText = transform.Find("Settings/Panel/HighlightText").GetComponent<Text>();
-            Slider hightlightSlider = transform.Find("Settings/Panel/HighlightSlider").GetComponent<Slider>();
+            Slider highlightSlider = transform.Find("Settings/Panel/HighlightSlider").GetComponent<Slider>();
+
+            // Set initial values before adding listeners so no callbacks fire during init
+            renderSlider.value = SaveManager.Settings.RenderDistance;
+            fogToggle.isOn = SaveManager.Settings.EnableFog;
+            highlightSlider.value = SaveManager.Settings.HighlightStrength;
+            highlightDropdown.value = (int)SaveManager.Settings.HighlightMethod;
 
             closeButton.onClick.AddListener(OnClose);
             fogToggle.onValueChanged.AddListener(OnFogChanged);
             renderSlider.onValueChanged.AddListener(OnRenderDistanceChanged);
-            hightlightDropdown.onValueChanged.AddListener(OnHighlightMethodChanged);
-            hightlightSlider.onValueChanged.AddListener(OnHightlightStrengthChanged);
-
-            if(!File.Exists(Path.Combine(SaveManager.DataPath, "settings.txt")))
-            {
-                SaveManager.Settings = new Settings()
-                {
-                    EnableFog = true,
-                    HighlightMethod = ObjectHighlight.HighlightType.Wireframe,
-                    HighlightStrength = 10,
-                    RenderDistance = 1000
-                };
-            }
-            else SaveManager.Settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Path.Combine(SaveManager.DataPath, "settings.txt")));
-
-            renderSlider.value = SaveManager.Settings.RenderDistance;
-            OnRenderDistanceChanged(SaveManager.Settings.RenderDistance);
-            fogToggle.isOn = SaveManager.Settings.EnableFog;
-            OnFogChanged(SaveManager.Settings.EnableFog);
-            hightlightSlider.value = SaveManager.Settings.HighlightStrength;
-            OnHightlightStrengthChanged(SaveManager.Settings.HighlightStrength);
+            highlightDropdown.onValueChanged.AddListener(OnHighlightMethodChanged);
+            highlightSlider.onValueChanged.AddListener(OnHighlightStrengthChanged);
 
             OnClose();
         }
 
-        private void OnHightlightStrengthChanged(float arg0)
+        private void OnHighlightStrengthChanged(float value)
         {
-            m_HighlightText.text = $"Highlight Strength: {arg0}";
-            SaveManager.Settings.HighlightStrength = (byte)arg0;
-        
+            m_HighlightText.text = $"Highlight Strength: {value}";
+            SaveManager.Settings.HighlightStrength = (byte)value;
             SaveSettings();
         }
 
-        private void OnHighlightMethodChanged(int arg0)
+        private void OnHighlightMethodChanged(int value)
         {
-            SaveManager.Settings.HighlightMethod = (ObjectHighlight.HighlightType)arg0;
+            SaveManager.Settings.HighlightMethod = (ObjectHighlight.HighlightType)value;
             SaveSettings();
 
             foreach (var highlight in FindObjectsOfType<ObjectHighlight>())
@@ -84,18 +68,18 @@ namespace SRLE.Components
             }
         }
 
-        private void OnRenderDistanceChanged(float arg0)
+        private void OnRenderDistanceChanged(float value)
         {
-            m_RenderText.text = $"Render Distance: {arg0} Meters";
-            SaveManager.Settings.RenderDistance = (int)arg0;
-
+            m_RenderText.text = $"Render Distance: {value} Meters";
+            EntryPoint.ConsoleInstance.Log("Render Distance: " + value);
+            SaveManager.Settings.RenderDistance = (int)value;
             SaveSettings();
         }
 
-        private void OnFogChanged(bool arg0)
+        private void OnFogChanged(bool value)
         {
-            RenderSettings.fog = arg0;
-            SaveManager.Settings.EnableFog = arg0;
+            RenderSettings.fog = value;
+            SaveManager.Settings.EnableFog = value;
             SaveSettings();
         }
 

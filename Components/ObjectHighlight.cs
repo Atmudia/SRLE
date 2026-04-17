@@ -25,7 +25,7 @@ namespace SRLE.Components
             MeshFilter mf = GetComponent<MeshFilter>();
 
             type = SaveManager.Settings.HighlightMethod;
-            if (mf == null || mf.sharedMesh == null)
+            if (!mf || !mf.sharedMesh)
                 type = HighlightType.Bounds;
 
             switch (type)

@@ -4,7 +4,7 @@ namespace SRLE.RuntimeGizmo.Objects
 {
 	public struct IntersectPoints
 	{
-		public Vector3 first;
-		public Vector3 second;
+		public Vector3 First;
+		public Vector3 Second;
 	}
 }

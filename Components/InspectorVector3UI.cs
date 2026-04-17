@@ -1,5 +1,6 @@
-using System;
 using System.Globalization;
+using SRLE.RuntimeGizmo.Objects.Commands;
+using SRLE.RuntimeGizmo.UndoRedo;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -15,7 +16,6 @@ namespace SRLE.Components
 
         private Vector3 m_LastVector;
 
-        public Action OnBeforeChange;
         public string Name { set => Label.text = value; }
 
         public void Awake()
@@ -24,7 +24,7 @@ namespace SRLE.Components
             XInput = transform.Find("XInput").GetComponent<InputField>();
             YInput = transform.Find("YInput").GetComponent<InputField>();
             ZInput = transform.Find("ZInput").GetComponent<InputField>();
-            
+
             XInput.onEndEdit.AddListener(new UnityAction<string>(OnValueChanged));
             YInput.onEndEdit.AddListener(new UnityAction<string>(OnValueChanged));
             ZInput.onEndEdit.AddListener(new UnityAction<string>(OnValueChanged));
@@ -38,18 +38,22 @@ namespace SRLE.Components
                 m_LastVector = vector;
                 XInput.text = vector.x.ToString(CultureInfo.InvariantCulture);
                 YInput.text = vector.y.ToString(CultureInfo.InvariantCulture);
-                ZInput.text = vector.z.ToString(CultureInfo.InvariantCulture);;
+                ZInput.text = vector.z.ToString(CultureInfo.InvariantCulture);
             }
         }
 
         private void OnValueChanged(string arg)
         {
-            if (float.TryParse(XInput.text, out float x) && float.TryParse(YInput.text, out float y) && float.TryParse(ZInput.text, out float z))
-            {
-                OnBeforeChange?.Invoke();
-                setter(new Vector3(x, y, z));
-            }
+            if (!float.TryParse(XInput.text, NumberStyles.Float, CultureInfo.InvariantCulture, out float x) ||
+                !float.TryParse(YInput.text, NumberStyles.Float, CultureInfo.InvariantCulture, out float y) ||
+                !float.TryParse(ZInput.text, NumberStyles.Float, CultureInfo.InvariantCulture, out float z))
+                return;
+
+            var oldValue = (Vector3)getter();
+            var newValue = new Vector3(x, y, z);
+            if (oldValue == newValue) return;
+
+            UndoRedoManager.Execute(new InspectorChangeCommand(setter, oldValue, newValue));
         }
-        
     }
 }

@@ -1,13 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
 using MonomiPark.SlimeRancher.Regions;
-using Newtonsoft.Json;
 using SRLE.Components;
-using SRML.SR;
-using UnityEngine;
 
 namespace SRLE.Patches
 {
@@ -17,15 +12,16 @@ namespace SRLE.Patches
         [HarmonyPatch(nameof(SpawnResource.Update)), HarmonyPrefix]
         public static bool Update(SpawnResource __instance)
         {
-            if (ObjectManager.GetBuildObject(__instance.gameObject, out BuildObject buildObject))
-            {
-                __instance.UpdateToTime(__instance.timeDir.WorldTime(), __instance.timeDir.DeltaWorldTime());
-                if (__instance.spawnQueue.Count > 0)
+            if (LevelManager.IsActive)
+                if (ObjectManager.GetBuildObject(__instance.gameObject, out _))
                 {
-                    __instance.Spawn(__instance.spawnQueue.Dequeue());
+                    __instance.UpdateToTime(__instance.timeDir.WorldTime(), __instance.timeDir.DeltaWorldTime());
+                    if (__instance.spawnQueue.Count > 0)
+                    {
+                        __instance.Spawn(__instance.spawnQueue.Dequeue());
+                    }
+                    return false;   
                 }
-                return false;   
-            }
             return true;
         }
 
@@ -57,10 +53,11 @@ namespace SRLE.Patches
 
         public static RegionRegistry.RegionSetId GetCustomRegionSetId(SpawnResource self)
         {
-            if (ObjectManager.GetBuildObject(self.gameObject, out BuildObject buildObject))
-            {
-                return buildObject.Region;
-            }
+            if (LevelManager.IsActive)
+                if (ObjectManager.GetBuildObject(self.gameObject, out BuildObject buildObject))
+                {
+                    return buildObject.Region;
+                }
             return self.region.setId; 
         }
         

@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using SRLE.Models;
 using TMPro;
 using UnityEngine;
@@ -30,11 +31,7 @@ namespace SRLE.Components.MainMenuUIs
             this.modeDescText.text = bundle.Xlate("m.srle.desc.worldType." + lowerInvariant);
 
 
-            int num = 0;
-            foreach (var VARIABLE in srleName.BuildObjects)
-            {
-                VARIABLE.Value.ForEach(_ => num++);
-            }
+            int num = srleName.BuildObjects.Values.Sum(list => list.Count);
             
             this.objectsAmountText.text = bundle.Xlate(MessageUtil.Tcompose("l.srle.object_count", (object) num));
 

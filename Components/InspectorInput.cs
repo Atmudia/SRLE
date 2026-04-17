@@ -1,8 +1,8 @@
 using System;
 using System.Globalization;
-using UnityEngine.Events;
+using SRLE.RuntimeGizmo.Objects.Commands;
+using SRLE.RuntimeGizmo.UndoRedo;
 using UnityEngine.UI;
-
 
 namespace SRLE.Components
 {
@@ -11,6 +11,7 @@ namespace SRLE.Components
         private Text m_Label;
         public InputField Input;
 
+        /// <summary>Called after both execute and undo, for side effects beyond setting the value.</summary>
         public Action OnChange;
 
         public string Name { set => m_Label.text = value; }
@@ -22,33 +23,27 @@ namespace SRLE.Components
         {
             m_Label = transform.Find("Label").GetComponent<Text>();
             Input = transform.Find("Input").GetComponent<InputField>();
-
             Input.onEndEdit.AddListener(OnEndEdit);
         }
 
         private void Start()
         {
-            Input.text = Convert.ToString(getter(), CultureInfo.InvariantCulture); ;
+            Input.text = Convert.ToString(getter(), CultureInfo.InvariantCulture);
         }
 
         private void OnEndEdit(string arg0)
         {
-            if (Cast != null && Cast == typeof(float))
-            {
-                if (float.TryParse(arg0, out var result))
-                {
-                    setter(result);
-                }
-                else
-                {
-                    setter(0);
-                }
-            }
+            object oldValue = getter();
+            object newValue;
+
+            if (Cast == typeof(float))
+                newValue = float.TryParse(arg0, NumberStyles.Float, CultureInfo.InvariantCulture, out var f) ? f : (object)0f;
             else
-            {
-                setter(arg0);
-            }
-            OnChange?.Invoke();
+                newValue = arg0;
+
+            if (Equals(oldValue, newValue)) return;
+
+            UndoRedoManager.Execute(new InspectorChangeCommand(setter, oldValue, newValue, OnChange));
         }
     }
 }

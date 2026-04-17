@@ -1,7 +1,5 @@
 using System;
 using HarmonyLib;
-using JetBrains.Annotations;
-using SRLE.Components;
 
 namespace SRLE.Patches
 {
