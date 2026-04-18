@@ -42,7 +42,9 @@ namespace SRLE.Components
 
         public void OnEnable()
         {
+            GameContext.Instance.InputDirector.input.SetInputMode(SRInput.InputMode.PAUSE, gameObject.GetInstanceID());
             SRSingleton<HudUI>.Instance.gameObject.SetActive(false);
+            
             playerCamera.enabled = false;
             transform.position = playerController.transform.position;
             transform.rotation = playerController.transform.rotation;
@@ -80,7 +82,10 @@ namespace SRLE.Components
         public void OnDisable()
         {
             if (!SRSingleton<HudUI>.Instance) return;
+
+            GameContext.Instance.InputDirector.input.SetInputMode(SRInput.InputMode.PAUSE, gameObject.GetInstanceID());
             SRSingleton<HudUI>.Instance.gameObject.SetActive(true);
+            
             playerCamera.enabled = true;
             playerController.SetPosition(transform.position);
             playerController.transform.rotation = transform.rotation;
