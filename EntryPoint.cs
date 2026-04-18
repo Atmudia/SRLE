@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
 using SRLE.Commands;
@@ -20,7 +22,33 @@ namespace SRLE
     public class EntryPoint : ModEntryPoint
     {
         public new static Console.ConsoleInstance ConsoleInstance = new Console.ConsoleInstance("SRLE");
+        private static readonly Assembly ModAssembly = typeof(EntryPoint).Assembly;
+        private static readonly List<Assembly> LibAssemblies = new List<Assembly>();
         public const string Version = "1.0.0";
+
+        public EntryPoint()
+        {
+            foreach (var file in ModAssembly.GetManifestResourceNames())
+                if (file.ToLower().EndsWith(".dll"))
+                {
+                    try
+                    {
+                        var stream = ModAssembly.GetManifestResourceStream(file);
+                        var bytes = new byte[stream.Length];
+                        _ = stream.Read(bytes, 0, bytes.Length);
+                        LibAssemblies.Add(Assembly.Load(bytes));
+                    }
+                    catch (Exception e)
+                    {
+                        // ConsoleInstance.Log("An error occured loading a resource assembly: " + e);
+                    }
+                }
+            AppDomain.CurrentDomain.AssemblyResolve += (x, y) =>
+            {
+                var name = new AssemblyName(y.Name).Name;
+                return LibAssemblies.FirstOrDefault(lA => lA.GetName().Name == name);
+            };
+        }
         
         public override void PreLoad()
         {

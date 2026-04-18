@@ -13,8 +13,9 @@
     <Reference Include="0Harmony">
       <HintPath>$(GameDir)/SRML/Libs/0Harmony.dll</HintPath>
     </Reference>
+
     <Reference Include="AssetsTools.NET">
-      <HintPath>$(GameDir)/SRML/Libs/AssetsTools.NET.dll</HintPath>
+      <HintPath>AssetsTools.NET.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(GameDir)/SRML/Libs/Newtonsoft.Json.dll</HintPath>
@@ -64,6 +65,7 @@
     <EmbeddedResource Include="lz4.tpk" />
     <EmbeddedResource Include="templatebundle" />
     <EmbeddedResource Include="srle" />
+    <EmbeddedResource Include="AssetsTools.NET.dll" />
   </ItemGroup>
 
   <ItemGroup>
